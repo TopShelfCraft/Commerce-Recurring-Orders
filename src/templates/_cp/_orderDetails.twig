@@ -1,0 +1,160 @@
+<style>
+
+    #recurringOrder {
+        margin-top: 1em;
+    }
+
+</style>
+
+{% set statusColors = {
+    'active': 'green',
+    'cancelled': 'black',
+    'error': 'red',
+    'paused': 'yellow',
+    'unscheduled': 'orange',
+} %}
+
+{% set statusButtons = {
+    'active': [
+        { label: 'Cancel', action: 'recurring-orders/orders/cancel-recurring-order', },
+        { label: 'Pause', action: 'recurring-orders/orders/pause-recurring-order', },
+    ],
+    'unscheduled': [
+        { label: 'Cancel', action: 'recurring-orders/orders/cancel-recurring-order', },
+        { label: 'Pause', action: 'recurring-orders/orders/pause-recurring-order', },
+    ],
+    'cancelled': [
+        { label: 'Re-Activate', action: 'recurring-orders/orders/make-order-recurring', },
+    ],
+    'error': [
+        { label: 'Cancel', action: 'recurring-orders/orders/cancel-recurring-order', },
+        { label: 'Pause', action: 'recurring-orders/orders/pause-recurring-order', },
+    ],
+    'paused': [
+        { label: 'Cancel', action: 'recurring-orders/orders/cancel-recurring-order', },
+        { label: 'Resume', action: 'recurring-orders/orders/make-order-recurring', },
+    ],
+} %}
+
+
+<div id="recurringOrder" class="meta">
+
+    <h3 class="order-title">Recurring Order</h3>
+
+    {% if order.isRecurring %}
+
+        <div id="recurringOrder-status" class="field">
+            <div class="heading">
+                <label id="recurringOrder-status-label" for="recurringOrder-status">
+                    Status
+                </label>
+            </div>
+            <div class="input ltr">
+                <span class="status {{ statusColors[order.recurringOrderStatus] }}"></span>
+                {{ order.recurringOrderStatus | capitalize }}
+                {% for button in statusButtons[order.recurringOrderStatus] %}
+                    <a class="small btn right edit" style="margin:2px" href="{{ actionUrl(button.action, {id: order.id}) }}">
+                        {{ button.label }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="recurringOrder-recurrenceInterval" class="field">
+            <div class="heading">
+                <label for="recurringOrder-recurrenceInterval" class="">
+                    Recurrence Inverval
+                </label>
+            </div>
+            <div class="input">
+                {% if order.recurrenceInterval %}
+                    {{ order.getHumanReadableRecurrenceInterval() }}
+                {% else %}
+                    &mdash;
+                {% endif %}
+            </div>
+        </div>
+
+        {% if order.recurringOrderStatus == 'error' %}
+
+            <div id="recurringOrder-errorReason" class="field">
+                <div class="heading">
+                    <label for="recurringOrder-errorReason" class="">
+                        Error Reason
+                    </label>
+                </div>
+                <div class="input">
+                    {{ order.recurringOrderErrorReason }}
+                </div>
+            </div>
+
+            <div id="recurringOrder-errorReason" class="field">
+                <div class="heading">
+                    <label for="recurringOrder-errorReason" class="">
+                        Error Count
+                    </label>
+                </div>
+                <div class="input">
+                    {{ order.recurringOrderErrorCount }}
+                </div>
+            </div>
+
+        {% endif %}
+
+        <div id="recurringOrder-lastRecurrence" class="field">
+            <div class="heading">
+                <label for="recurringOrder-lastRecurrence" class="">
+                    Last Recurrence
+                </label>
+            </div>
+            <div class="input">
+                {% if order.lastRecurrence %}
+                    {{ order.lastRecurrence | date }}
+                {% else %}
+                    &mdash;
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="recurringOrder-nextRecurrence" class="field">
+            <div class="heading">
+                <label for="recurringOrder-nextRecurrence" class="">
+                    Next Recurrence
+                </label>
+            </div>
+            <div class="input">
+                {% if order.nextRecurrence %}
+                    {{ order.nextRecurrence | date }}
+                {% else %}
+                    &mdash;
+                {% endif %}
+            </div>
+        </div>
+
+        {# TODO: Show payment source? #}
+
+    {% else %}
+
+        <div id="recurringOrder-status" class="field">
+            <div class="heading">
+                <label id="recurringOrder-status-label" for="recurringOrder-status">
+                    Status
+                </label>
+            </div>
+            <div class="input ltr">
+                <span class="commerceStatusLabel">
+                    <span class="status red"></span>
+                    Not Recurring
+                </span>
+                <a class="small btn right edit" style="margin:2px" href="#">
+                    Make Recurring
+                </a>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{# TODO: Add link to Parent Order if this is a Generated Order. #}
+{# TODO: (Probably shouldn't show Recurrence controls on Generated Orders unless they are already recurring...?) #}

@@ -1,0 +1,42 @@
+{
+	"name": "steadfast/recurring-orders",
+	"description": "Recurring Orders functionality for Craft Commerce 3.x",
+	"type": "craft-plugin",
+	"version": "0.0.3",
+	"license": "proprietary",
+	"support": {
+		"issues": "https://github.com/steadfastdesign/recurring-orders/issues",
+		"source": "https://github.com/steadfastdesign/recurring-orders"
+	},
+	"authors": [
+		{
+			"name": "Michael Rog",
+			"homepage": "https://topshelfcraft.com"
+		},
+		{
+			"name": "Steadfast Design",
+			"homepage": "https://steadfast.design"
+		}
+	],
+	"require": {
+		"php": ">=7.0",
+		"craftcms/cms": "^3.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"topshelfcraft\\recurringorders\\": "src/"
+		}
+	},
+	"extra": {
+		"name": "Recurring Orders",
+		"handle": "recurring-orders",
+		"developer": "Steadfast Design",
+		"developerUrl": "https://steadfast.design",
+		"developerEmail": "support@steadfast.design",
+		"documentationUrl": "https://steadfast.design",
+		"schemaVersion": "0.0.3.0",
+		"hasCpSettings": false,
+		"hasCpSection": false,
+		"class": "topshelfcraft\\recurringorders\\RecurringOrders"
+	}
+}
