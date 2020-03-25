@@ -1,3 +1,6 @@
+{% set settings = craft.recurringOrders.settings %}
+
+
 <style>
 
     #recurringOrder {
@@ -52,6 +55,9 @@
             <div class="input ltr">
                 <span class="status {{ statusColors[order.recurringOrderStatus] }}"></span>
                 {{ order.recurringOrderStatus | capitalize }}
+                {% if order.recurringOrderStatus === 'active' %}
+                    &mdash; every {{ order.getHumanReadableRecurrenceInterval() }}
+                {% endif %}
                 {% for button in statusButtons[order.recurringOrderStatus] %}
                     <a class="small btn right edit" style="margin:2px" href="{{ actionUrl(button.action, {id: order.id}) }}">
                         {{ button.label }}
@@ -67,10 +73,19 @@
                 </label>
             </div>
             <div class="input">
-                {% if order.recurrenceInterval %}
-                    {{ order.getHumanReadableRecurrenceInterval() }}
+                {% if settings.recurrenceIntervalOptions is not empty %}
+                    {% include '_includes/forms/select' with {
+                        id: 'makeRecurring-recurrenceInterval',
+                        name: 'makeRecurring[recurrenceInterval]',
+                        value: order.recurrenceInterval,
+                        options: settings.recurrenceIntervalOptions,
+                    } %}
                 {% else %}
-                    &mdash;
+                    {% include '_includes/forms/text' with {
+                        id: 'makeRecurring-recurrenceInterval',
+                        name: 'makeRecurring[recurrenceInterval]',
+                        value: order.recurrenceInterval,
+                    } %}
                 {% endif %}
             </div>
         </div>
@@ -123,11 +138,11 @@
                 </label>
             </div>
             <div class="input">
-                {% if order.nextRecurrence %}
-                    {{ order.nextRecurrence | date }}
-                {% else %}
-                    &mdash;
-                {% endif %}
+                {% include '_includes/forms/date' with {
+                    id: 'makeRecurring-nextRecurrence',
+                    name: 'makeRecurring[nextRecurrence]',
+                    value: order.nextRecurrence,
+                } %}
             </div>
         </div>
 
@@ -146,7 +161,7 @@
                     <span class="status red"></span>
                     Not Recurring
                 </span>
-                <a class="small btn right edit" style="margin:2px" href="#">
+                <a class="small btn right edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/make-order-recurring', {id: order.id}) }}">
                     Make Recurring
                 </a>
             </div>

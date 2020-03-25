@@ -3,6 +3,7 @@ namespace topshelfcraft\recurringorders\controllers\web;
 
 use Craft;
 use craft\commerce\Plugin as Commerce;
+use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\web\Response;
@@ -41,11 +42,12 @@ class OrdersController extends BaseWebController
 
 		if ($nextRecurrence = $request->getParam('nextRecurrence'))
 		{
-			$attributes['nextRecurrence'] = $nextRecurrence;
+			$attributes['nextRecurrence'] = DateTimeHelper::toDateTime($nextRecurrence);
 		}
 
-		// TODO: Normalize $resetNextRecurrence with boolean filter.
-		$resetNextRecurrence = $request->getParam('resetNextRecurrence', false);
+		$resetNextRecurrence = self::normalizeBoolean(
+			$request->getParam('resetNextRecurrence', false)
+		);
 
 		try
 		{

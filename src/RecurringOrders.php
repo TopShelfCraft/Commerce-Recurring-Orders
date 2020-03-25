@@ -28,6 +28,8 @@ use yii\base\Event;
  * @property Orders $orders
  *
  * @method Settings getSettings()
+ *
+ * @todo: Translate all the things!
  */
 class RecurringOrders extends Plugin
 {

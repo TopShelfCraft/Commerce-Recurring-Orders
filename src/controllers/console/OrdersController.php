@@ -21,7 +21,7 @@ class OrdersController extends BaseConsoleController
 	public function actionMakeOrderRecurring($orderId, $recurrenceInterval, $resetNextRecurrence = false)
 	{
 
-		// TODO: Normalize $resetNextRecurrence with boolean filter.
+		$resetNextRecurrence = self::normalizeBoolean($resetNextRecurrence);
 
 		try
 		{

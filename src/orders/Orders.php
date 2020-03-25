@@ -5,11 +5,16 @@ use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
+use craft\helpers\DateTimeHelper;
+use topshelfcraft\recurringorders\controllers\ControllerHelpersTrait;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\Exception;
 
 class Orders extends Component
 {
+
+	// TODO: (╯°□°)╯︵ ┻━┻
+	use ControllerHelpersTrait;
 
 	/**
 	 * @param Order $order The Commerce Order
@@ -83,10 +88,14 @@ class Orders extends Component
 
 		if ($nextRecurrence = $request->getParam('makeRecurring.nextRecurrence'))
 		{
-			$attributes['nextRecurrence'] = $nextRecurrence;
+			$attributes['nextRecurrence'] = DateTimeHelper::toDateTime($nextRecurrence);
 		}
 
-		$this->makeOrderRecurring($order, $attributes);
+		$resetNextRecurrence = self::normalizeBoolean(
+			$request->getParam('makeRecurring.resetNextRecurrence', false)
+		);
+
+		$this->makeOrderRecurring($order, $attributes, $resetNextRecurrence);
 
 	}
 
