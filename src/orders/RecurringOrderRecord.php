@@ -56,6 +56,7 @@ class RecurringOrderRecord extends BaseRecord
 			// TODO: Move this into validation and make it Yii-ish
 			if (!OrdersHelper::isValidInterval($value))
 			{
+				// TODO: Translate.
 				throw new Exception("{$value} is not a valid interval.");
 			}
 		}

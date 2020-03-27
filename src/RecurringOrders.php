@@ -120,6 +120,18 @@ class RecurringOrders extends Plugin
 		static::log($msg, $level, $file);
 	}
 
+	/**
+	 * @param $message
+	 * @param array $params
+	 * @param null $language
+	 *
+	 * @return string
+	 */
+	public static function t($message, $params = [], $language = null)
+	{
+		return Craft::t(self::getInstance()->getHandle(), $message, $params, $language);
+	}
+
 	/*
      * Protected methods
      * ===========================================================================

@@ -154,6 +154,7 @@ class Orders extends Component
 
 		if (!$parentOrder->getIsRecurring())
 		{
+			// TODO: Translate?
 			throw new Exception("Cannot process recurrence on a non-recurring Order.");
 		}
 
@@ -170,6 +171,7 @@ class Orders extends Component
 		if (!$paymentSource)
 		{
 			$success = false;
+			// TODO: Translate?
 			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
 			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
 			// TODO: Trigger error and return early

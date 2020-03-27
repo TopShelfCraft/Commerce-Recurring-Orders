@@ -14,6 +14,7 @@ class OrdersController extends BaseWebController
 	public function actionProcessOutstandingOrders()
 	{
 		// TODO: Implement
+		// TODO: Translate.
 		return $this->returnErrorResponse("Not yet implemented.");
 	}
 
@@ -63,6 +64,7 @@ class OrdersController extends BaseWebController
 			return $this->returnErrorResponse($e->getMessage());
 		}
 
+		// TODO: Translate.
 		return $this->returnErrorResponse("Could not make Order recurring.");
 
 	}
@@ -108,6 +110,7 @@ class OrdersController extends BaseWebController
 
 			if (!$recurringOrder)
 			{
+				// TODO: Translate.
 				return $this->returnErrorResponse("Order is not Recurring.");
 			}
 
@@ -125,6 +128,7 @@ class OrdersController extends BaseWebController
 			return $this->returnSuccessResponse();
 		}
 
+		// TODO: Translate.
 		return $this->returnErrorResponse("Could not update the Order.");
 
 	}

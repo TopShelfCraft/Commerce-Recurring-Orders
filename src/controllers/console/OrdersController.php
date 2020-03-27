@@ -43,6 +43,7 @@ class OrdersController extends BaseConsoleController
 			$this->_writeError($e->getMessage());
 		}
 
+		// TODO: Translate?
 		$this->_writeError("Could not make the Order recurring.");
 		return ExitCode::UNSPECIFIED_ERROR;
 

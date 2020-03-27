@@ -1,5 +1,5 @@
-{% set settings = craft.recurringOrders.settings %}
-
+{% set recurringOrders = craft.recurringOrders %}
+{% set settings = recurringOrders.settings %}
 
 <style>
 
@@ -42,25 +42,27 @@
 
 <div id="recurringOrder" class="meta">
 
-    <h3 class="order-title">Recurring Order</h3>
+    <h3 class="order-title">
+        {{ recurringOrders.t("Recurring Order") }}
+    </h3>
 
     {% if order.isRecurring %}
 
         <div id="recurringOrder-status" class="field">
             <div class="heading">
                 <label id="recurringOrder-status-label" for="recurringOrder-status">
-                    Status
+                    {{ recurringOrders.t("Status") }}
                 </label>
             </div>
             <div class="input ltr">
                 <span class="status {{ statusColors[order.recurringOrderStatus] }}"></span>
-                {{ order.recurringOrderStatus | capitalize }}
+                {{ recurringOrders.t("_status:"~order.recurringOrderStatus) }}
                 {% if order.recurringOrderStatus === 'active' %}
-                    &mdash; every {{ order.getHumanReadableRecurrenceInterval() }}
+                    &mdash; {{ recurringOrders.t("every {interval}", {interval: order.getHumanReadableRecurrenceInterval()}) }}
                 {% endif %}
                 {% for button in statusButtons[order.recurringOrderStatus] %}
                     <a class="small btn right edit" style="margin:2px" href="{{ actionUrl(button.action, {id: order.id}) }}">
-                        {{ button.label }}
+                        {{ recurringOrders.t(button.label) }}
                     </a>
                 {% endfor %}
             </div>
@@ -69,7 +71,7 @@
         <div id="recurringOrder-recurrenceInterval" class="field">
             <div class="heading">
                 <label for="recurringOrder-recurrenceInterval" class="">
-                    Recurrence Inverval
+                    {{ recurringOrders.t("Recurrence Interval") }}
                 </label>
             </div>
             <div class="input">
@@ -95,18 +97,19 @@
             <div id="recurringOrder-errorReason" class="field">
                 <div class="heading">
                     <label for="recurringOrder-errorReason" class="">
-                        Error Reason
+                        {{ recurringOrders.t("Error Reason") }}
                     </label>
                 </div>
                 <div class="input">
                     {{ order.recurringOrderErrorReason }}
+                    {# TODO: Translate. #}
                 </div>
             </div>
 
             <div id="recurringOrder-errorReason" class="field">
                 <div class="heading">
                     <label for="recurringOrder-errorReason" class="">
-                        Error Count
+                        {{ recurringOrders.t("Error Count") }}
                     </label>
                 </div>
                 <div class="input">
@@ -119,7 +122,7 @@
         <div id="recurringOrder-lastRecurrence" class="field">
             <div class="heading">
                 <label for="recurringOrder-lastRecurrence" class="">
-                    Last Recurrence
+                    {{ recurringOrders.t("Last Recurrence") }}
                 </label>
             </div>
             <div class="input">
@@ -134,7 +137,7 @@
         <div id="recurringOrder-nextRecurrence" class="field">
             <div class="heading">
                 <label for="recurringOrder-nextRecurrence" class="">
-                    Next Recurrence
+                    {{ recurringOrders.t("Next Recurrence") }}
                 </label>
             </div>
             <div class="input">
@@ -146,6 +149,7 @@
             </div>
         </div>
 
+        {# TODO: Schedule now? #}
         {# TODO: Show payment source? #}
 
     {% else %}
@@ -153,16 +157,16 @@
         <div id="recurringOrder-status" class="field">
             <div class="heading">
                 <label id="recurringOrder-status-label" for="recurringOrder-status">
-                    Status
+                    {{ recurringOrders.t("Status") }}
                 </label>
             </div>
             <div class="input ltr">
                 <span class="commerceStatusLabel">
                     <span class="status red"></span>
-                    Not Recurring
+                    {{ recurringOrders.t("Not Recurring") }}
                 </span>
                 <a class="small btn right edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/make-order-recurring', {id: order.id}) }}">
-                    Make Recurring
+                    {{ recurringOrders.t("Make Recurring") }}
                 </a>
             </div>
         </div>

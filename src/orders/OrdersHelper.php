@@ -28,6 +28,7 @@ class OrdersHelper
 
 		if (empty($interval))
 		{
+			// TODO: Translate.
 			throw new Exception("Unable to convert empty value to date interval.");
 		}
 
@@ -51,6 +52,7 @@ class OrdersHelper
 			return \DateInterval::createFromDateString($interval);
 		}
 
+		// TODO: Translate.
 		throw new Exception("Unable to convert {$interval} to date interval.");
 
 	}
