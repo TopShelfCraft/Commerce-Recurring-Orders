@@ -7,14 +7,17 @@ use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\console\Application as ConsoleApplication;
 use craft\events\ElementEvent;
+use craft\events\RegisterCpNavItemsEvent;
 use craft\helpers\FileHelper;
 use craft\services\Elements;
 use craft\web\Application as WebApplication;
+use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
 use topshelfcraft\recurringorders\config\Settings;
 use topshelfcraft\recurringorders\orders\Orders;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
+use topshelfcraft\recurringorders\view\CpHelper;
 use yii\base\Event;
 
 /**
@@ -75,6 +78,7 @@ class RecurringOrders extends Plugin
 		self::$plugin = $this;
 
 		$this->_attachComponentBehaviors();
+		$this->_registerEventHandlers();
 		$this->_attachVariableGlobal();
 		$this->_registerTemplateHooks();
 
@@ -170,7 +174,7 @@ class RecurringOrders extends Plugin
 	}
 
 	/**
-	 * Makes the plugin instance available to Twig via the `craft.recurringOrders` variable.
+	 * Attaches custom behaviors to Order and OrderQuery components
 	 */
 	private function _attachComponentBehaviors() {
 
@@ -194,18 +198,6 @@ class RecurringOrders extends Plugin
 			}
 		);
 
-		Event::on(
-			Elements::class,
-			Elements::EVENT_AFTER_SAVE_ELEMENT,
-			function (ElementEvent $event) {
-				$element = $event->element;
-				if ($element instanceof Order)
-				{
-					$this->orders->afterSaveOrder($element);
-				}
-			}
-		);
-
 	}
 
 	/**
@@ -217,6 +209,40 @@ class RecurringOrders extends Plugin
 		Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
 			return Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderDetails', $context);
 		});
+
+	}
+
+	/**
+	 * Registers handlers for various Event hooks
+	 */
+	private function _registerEventHandlers()
+	{
+
+		/*
+		 * Extra processing when Craft assembles its list of CP nav links.
+		 */
+		Event::on(
+			Cp::class,
+			Cp::EVENT_REGISTER_CP_NAV_ITEMS,
+			function (RegisterCpNavItemsEvent $event) {
+				$event->navItems = CpHelper::modifyCpNavItems($event->navItems);
+			}
+		);
+
+		/*
+		 * Extra processing after an Order element is saved
+		 */
+		Event::on(
+			Elements::class,
+			Elements::EVENT_AFTER_SAVE_ELEMENT,
+			function (ElementEvent $event) {
+				$element = $event->element;
+				if ($element instanceof Order)
+				{
+					$this->orders->afterSaveOrder($element);
+				}
+			}
+		);
 
 	}
 

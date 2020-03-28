@@ -7,6 +7,16 @@ class Settings extends Model
 {
 
 	/**
+	 * @var bool
+	 */
+	public $addCommerceRecurringOrdersNavItem;
+
+	/**
+	 * @var bool
+	 */
+	public $hideCommerceSubscriptionsNavItem;
+
+	/**
 	 * @var array
 	 */
 	public $recurrenceIntervalOptions;
