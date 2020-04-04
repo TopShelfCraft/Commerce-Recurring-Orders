@@ -259,6 +259,51 @@ class RecurringOrders extends Plugin
 			}
 		);
 
+		/*
+		 * Register custom Sort Options for Order elements
+		 */
+		Event::on(
+			Order::class,
+			Order::EVENT_REGISTER_SORT_OPTIONS,
+			[Orders::class, 'registerSortOptions']
+		);
+
+		/*
+		 * Register custom Table Attributes for Order elements
+		 */
+		Event::on(
+			Order::class,
+			Order::EVENT_REGISTER_TABLE_ATTRIBUTES,
+			[Orders::class, 'registerTableAttributes']
+		);
+
+		/*
+		 * Tweak the Default Table Attributes for Order elements
+		 */
+		Event::on(
+			Order::class,
+			Order::EVENT_REGISTER_DEFAULT_TABLE_ATTRIBUTES,
+			[Orders::class, 'registerDefaultTableAttributes']
+		);
+
+		/*
+		 * Define custom HTML to represent attributes in Order index tables
+		 */
+		Event::on(
+			Order::class,
+			Order::EVENT_SET_TABLE_ATTRIBUTE_HTML,
+			[Orders::class, 'setTableAttributeHtml']
+		);
+
+		/*
+		 * Register custom Sources for Order elements
+		 */
+		Event::on(
+			Order::class,
+			Order::EVENT_REGISTER_SOURCES,
+			[Orders::class, 'registerSources']
+		);
+
 	}
 
 }

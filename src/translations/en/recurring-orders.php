@@ -16,6 +16,8 @@ return [
 	"Not Recurring" => "Not Recurring",
 	"Pause" => "Pause",
 	"Re-Activate" => "Re-Activate",
+	"Recurrence Error Count" => "Recurrence Error Count",
+	"Recurrence Status" => "Recurrence Status",
 	"Recurring Order" => "Recurring Order",
 	"Recurring Orders" => "Recurring Orders",
 	"Recurrence Interval" => "Recurrence Interval",

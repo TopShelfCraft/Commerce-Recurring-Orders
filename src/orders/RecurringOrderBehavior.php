@@ -35,22 +35,6 @@ class RecurringOrderBehavior extends Behavior
 	private $_resetNextRecurrenceOnSave;
 
 	/**
-	 * @inheritdoc
-	 */
-	public function init()
-	{
-		parent::init();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function events()
-	{
-		return [];
-	}
-
-	/**
 	 * @param RecurringOrderRecord|null $record
 	 */
 	public function loadRecurringOrderRecord(RecurringOrderRecord $record = null)
@@ -346,6 +330,8 @@ class RecurringOrderBehavior extends Behavior
 	 * @param array|null $attributes
 	 *
 	 * @return bool
+	 *
+	 * @throws \yii\db\Exception if the RecurringOrderRecord cannot be saved.
 	 */
 	public function saveRecurringOrdersRecord($attributes = null)
 	{

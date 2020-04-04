@@ -1,0 +1,13 @@
+{% set recurringOrders = craft.recurringOrders %}
+{% set status = status ?? null %}
+
+{% set statusColors = {
+    'active': 'green',
+    'cancelled': 'black',
+    'error': 'red',
+    'paused': 'yellow',
+    'unscheduled': 'orange',
+} %}
+
+<span class="status {{ status ? statusColors[status] }}"></span>
+{{ status ? recurringOrders.t("_status:"~status) : recurringOrders.t("Not Recurring") }}
