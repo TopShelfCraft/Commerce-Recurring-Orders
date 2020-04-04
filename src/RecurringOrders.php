@@ -32,7 +32,9 @@ use yii\base\Event;
  *
  * @method Settings getSettings()
  *
- * @todo: Translate all the things!
+ * @todo: Eager load Recurring Order records
+ * @todo: Recurrence Count, Recurrence Limit
+ * @todo: Expiration dates?
  */
 class RecurringOrders extends Plugin
 {
@@ -219,17 +221,6 @@ class RecurringOrders extends Plugin
 	{
 
 		/*
-		 * Extra processing when Craft assembles its list of CP nav links.
-		 */
-		Event::on(
-			Cp::class,
-			Cp::EVENT_REGISTER_CP_NAV_ITEMS,
-			function (RegisterCpNavItemsEvent $event) {
-				$event->navItems = CpHelper::modifyCpNavItems($event->navItems);
-			}
-		);
-
-		/*
 		 * Extra processing before an Order element is saved
 		 */
 		Event::on(
@@ -260,12 +251,23 @@ class RecurringOrders extends Plugin
 		);
 
 		/*
+		 * Extra processing when Craft assembles its list of CP nav links.
+		 */
+		Event::on(
+			Cp::class,
+			Cp::EVENT_REGISTER_CP_NAV_ITEMS,
+			function (RegisterCpNavItemsEvent $event) {
+				$event->navItems = CpHelper::modifyCpNavItems($event->navItems);
+			}
+		);
+
+		/*
 		 * Register custom Sort Options for Order elements
 		 */
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_SORT_OPTIONS,
-			[Orders::class, 'registerSortOptions']
+			[CpHelper::class, 'registerSortOptions']
 		);
 
 		/*
@@ -274,7 +276,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_TABLE_ATTRIBUTES,
-			[Orders::class, 'registerTableAttributes']
+			[CpHelper::class, 'registerTableAttributes']
 		);
 
 		/*
@@ -283,7 +285,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_DEFAULT_TABLE_ATTRIBUTES,
-			[Orders::class, 'registerDefaultTableAttributes']
+			[CpHelper::class, 'registerDefaultTableAttributes']
 		);
 
 		/*
@@ -292,7 +294,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_SET_TABLE_ATTRIBUTE_HTML,
-			[Orders::class, 'setTableAttributeHtml']
+			[CpHelper::class, 'setTableAttributeHtml']
 		);
 
 		/*
@@ -301,7 +303,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_SOURCES,
-			[Orders::class, 'registerSources']
+			[CpHelper::class, 'registerSources']
 		);
 
 	}

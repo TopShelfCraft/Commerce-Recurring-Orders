@@ -14,6 +14,8 @@ return [
 	"Make Recurring" => "Make Recurring",
 	"Next Recurrence" => "Next Recurrence",
 	"Not Recurring" => "Not Recurring",
+	"Originating Order" => "Originating Order",
+	"Parent Order" => "Parent Order",
 	"Pause" => "Pause",
 	"Re-Activate" => "Re-Activate",
 	"Recurrence Error Count" => "Recurrence Error Count",
