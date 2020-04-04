@@ -2,7 +2,7 @@
 namespace topshelfcraft\recurringorders\controllers\console;
 
 use craft\helpers\DateTimeHelper;
-use topshelfcraft\recurringorders\orders\OrdersHelper;
+use topshelfcraft\recurringorders\misc\IntervalHelper;
 use yii\console\ExitCode;
 
 /**
@@ -20,7 +20,7 @@ class DevController extends BaseConsoleController
 	{
 		$this->_writeLine(
 			DateTimeHelper::humanDurationFromInterval(
-				OrdersHelper::normalizeInterval($interval)
+				IntervalHelper::normalizeInterval($interval)
 			)
 		);
 		return ExitCode::OK;

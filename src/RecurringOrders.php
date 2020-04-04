@@ -230,6 +230,21 @@ class RecurringOrders extends Plugin
 		);
 
 		/*
+		 * Extra processing before an Order element is saved
+		 */
+		Event::on(
+			Elements::class,
+			Elements::EVENT_BEFORE_SAVE_ELEMENT,
+			function (ElementEvent $event) {
+				$element = $event->element;
+				if ($element instanceof Order)
+				{
+					$this->orders->beforeSaveOrder($element);
+				}
+			}
+		);
+
+		/*
 		 * Extra processing after an Order element is saved
 		 */
 		Event::on(

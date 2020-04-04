@@ -21,4 +21,14 @@ class Settings extends Model
 	 */
 	public $recurrenceIntervalOptions;
 
+	/**
+	 * @param bool $addBlankOption
+	 *
+	 * @return array
+	 */
+	public function getRecurrenceIntervalOptions($addBlankOption = true)
+	{
+		return array_merge(['' => ''], $this->recurrenceIntervalOptions);
+	}
+
 }

@@ -1,7 +1,7 @@
 <?php
-namespace topshelfcraft\recurringorders\controllers;
+namespace topshelfcraft\recurringorders\misc;
 
-trait ControllerHelpersTrait
+trait NormalizeTrait
 {
 
 	protected static function normalizeBoolean($value)

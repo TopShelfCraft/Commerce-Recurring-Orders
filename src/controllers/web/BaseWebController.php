@@ -3,14 +3,14 @@ namespace topshelfcraft\recurringorders\controllers\web;
 
 use Craft;
 use craft\web\Controller;
-use topshelfcraft\recurringorders\controllers\ControllerHelpersTrait;
+use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 abstract class BaseWebController extends Controller
 {
 
-	use ControllerHelpersTrait;
+	use NormalizeTrait;
 
 	/**
 	 * @param string $errorMessage

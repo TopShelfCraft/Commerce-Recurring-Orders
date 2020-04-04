@@ -1,14 +1,14 @@
 <?php
 namespace topshelfcraft\recurringorders\controllers\console;
 
-use topshelfcraft\recurringorders\controllers\ControllerHelpersTrait;
+use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use yii\console\Controller;
 use yii\helpers\Console;
 
 abstract class BaseConsoleController extends Controller
 {
 
-	use ControllerHelpersTrait;
+	use NormalizeTrait;
 
 	/**
 	 * Writes an error to console

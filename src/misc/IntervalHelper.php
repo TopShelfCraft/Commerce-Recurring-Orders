@@ -1,11 +1,11 @@
 <?php
-namespace topshelfcraft\recurringorders\orders;
+namespace topshelfcraft\recurringorders\misc;
 
 use craft\helpers\ConfigHelper;
 use craft\helpers\StringHelper;
 use yii\base\Exception;
 
-class OrdersHelper
+class IntervalHelper
 {
 
 	/**

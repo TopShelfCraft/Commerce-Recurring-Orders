@@ -51,6 +51,9 @@ class Install extends Migration
 				'lastRecurrence' => $this->dateTime(),
 				'nextRecurrence' => $this->dateTime(),
 				'paymentSourceId' => $this->integer(),
+				'spec' => $this->string(1023),
+				'originatingOrderId' => $this->integer(),
+				'parentOrderId' => $this->integer(),
 
 				'dateCreated' => $this->dateTime()->notNull(),
 				'dateUpdated' => $this->dateTime()->notNull(),
@@ -107,7 +110,7 @@ class Install extends Migration
 
 			]);
 
-			// Delete the Order History record if the Recurring Order is deleted.
+			// Delete the Order History record if the referenced Recurring Order is deleted.
 
 			$this->addForeignKey(
 				null,
@@ -118,7 +121,7 @@ class Install extends Migration
 				'CASCADE'
 			);
 
-			// Wipe the Updated-By User reference if the User is deleted.
+			// Wipe the Updated-By User reference if the referenced User is deleted.
 
 			$this->addForeignKey(
 				null,
@@ -131,49 +134,6 @@ class Install extends Migration
 
 		}
 
-		/*
-		 * Add Generated Orders table
-		 */
-
-		if (!$this->db->tableExists(GeneratedOrderRecord::tableName())) {
-
-			$this->createTable(GeneratedOrderRecord::tableName(), [
-
-				'id' => $this->integer()->notNull(),
-				'parentOrderId' => $this->integer()->notNull(),
-
-				'dateCreated' => $this->dateTime()->notNull(),
-				'dateUpdated' => $this->dateTime()->notNull(),
-				'uid' => $this->uid(),
-
-				'PRIMARY KEY(id)',
-
-			]);
-
-			// Delete the Generated Order record if the Order is deleted.
-
-			$this->addForeignKey(
-				null,
-				GeneratedOrderRecord::tableName(),
-				['id'],
-				Order::tableName(),
-				['id'],
-				'CASCADE'
-			);
-
-			// Delete the Generated Order record if the *parent* Order is deleted.
-
-			$this->addForeignKey(
-				null,
-				GeneratedOrderRecord::tableName(),
-				['parentOrderId'],
-				Order::tableName(),
-				['id'],
-				'CASCADE'
-			);
-
-		}
-
 	}
 
 	private function _removeTables()
@@ -181,7 +141,6 @@ class Install extends Migration
 
 		// Drop tables in reverse of the order we created them, to avoid foreign key constraint failures.
 
-		$this->dropTableIfExists(GeneratedOrderRecord::tableName());
 		$this->dropTableIfExists(RecurringOrderHistoryRecord::tableName());
 		$this->dropTableIfExists(RecurringOrderRecord::tableName());
 

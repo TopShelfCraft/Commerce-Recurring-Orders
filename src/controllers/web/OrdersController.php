@@ -2,8 +2,10 @@
 namespace topshelfcraft\recurringorders\controllers\web;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\DateTimeHelper;
+use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\web\Response;
@@ -31,6 +33,9 @@ class OrdersController extends BaseWebController
 
 		$id = $request->getRequiredParam('id');
 
+		/** @var RecurringOrderBehavior $order */
+		$order = Commerce::getInstance()->orders->getOrderById($id);
+
 		if ($status = $request->getParam('status'))
 		{
 			$attributes['status'] = $status;
@@ -52,7 +57,7 @@ class OrdersController extends BaseWebController
 
 		try
 		{
-			$order = Commerce::getInstance()->orders->getOrderById($id);
+			/** @var Order $order */
 			$success = RecurringOrders::$plugin->orders->makeOrderRecurring($order, $attributes, $resetNextRecurrence);
 			if ($success)
 			{

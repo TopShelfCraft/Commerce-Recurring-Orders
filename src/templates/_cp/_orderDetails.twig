@@ -50,17 +50,17 @@
 
         <div id="recurringOrder-status" class="field">
             <div class="heading">
-                <label id="recurringOrder-status-label" for="recurringOrder-status">
+                <label for="recurringOrder-status">
                     {{ recurringOrders.t("Status") }}
                 </label>
             </div>
             <div class="input ltr">
-                <span class="status {{ statusColors[order.recurringOrderStatus] }}"></span>
-                {{ recurringOrders.t("_status:"~order.recurringOrderStatus) }}
-                {% if order.recurringOrderStatus === 'active' %}
+                <span class="status {{ statusColors[order.recurrenceStatus] }}"></span>
+                {{ recurringOrders.t("_status:"~order.recurrenceStatus) }}
+                {% if order.recurrenceStatus === 'active' %}
                     &mdash; {{ recurringOrders.t("every {interval}", {interval: order.getHumanReadableRecurrenceInterval()}) }}
                 {% endif %}
-                {% for button in statusButtons[order.recurringOrderStatus] %}
+                {% for button in statusButtons[order.recurrenceStatus] %}
                     <a class="small btn right edit" style="margin:2px" href="{{ actionUrl(button.action, {id: order.id}) }}">
                         {{ recurringOrders.t(button.label) }}
                     </a>
@@ -80,7 +80,7 @@
                         id: 'makeRecurring-recurrenceInterval',
                         name: 'makeRecurring[recurrenceInterval]',
                         value: order.recurrenceInterval,
-                        options: settings.recurrenceIntervalOptions,
+                        options: settings.getRecurrenceIntervalOptions(),
                     } %}
                 {% else %}
                     {% include '_includes/forms/text' with {
@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        {% if order.recurringOrderStatus == 'error' %}
+        {% if order.recurrenceStatus == 'error' %}
 
             <div id="recurringOrder-errorReason" class="field">
                 <div class="heading">
@@ -101,7 +101,7 @@
                     </label>
                 </div>
                 <div class="input">
-                    {{ order.recurringOrderErrorReason }}
+                    {{ order.recurrenceErrorReason }}
                     {# TODO: Translate. #}
                 </div>
             </div>
@@ -113,7 +113,7 @@
                     </label>
                 </div>
                 <div class="input">
-                    {{ order.recurringOrderErrorCount }}
+                    {{ order.recurrenceErrorCount }}
                 </div>
             </div>
 
@@ -156,7 +156,7 @@
 
         <div id="recurringOrder-status" class="field">
             <div class="heading">
-                <label id="recurringOrder-status-label" for="recurringOrder-status">
+                <label for="recurringOrder-status">
                     {{ recurringOrders.t("Status") }}
                 </label>
             </div>

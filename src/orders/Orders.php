@@ -5,16 +5,15 @@ use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
-use craft\helpers\DateTimeHelper;
-use topshelfcraft\recurringorders\controllers\ControllerHelpersTrait;
+use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use topshelfcraft\recurringorders\RecurringOrders;
+use yii\base\ErrorException;
 use yii\base\Exception;
 
 class Orders extends Component
 {
 
-	// TODO: (╯°□°)╯︵ ┻━┻
-	use ControllerHelpersTrait;
+	use NormalizeTrait;
 
 	/**
 	 * @param Order $order The Commerce Order
@@ -24,13 +23,13 @@ class Orders extends Component
 	 * @return bool
 	 *
 	 * @throws \Exception
+	 *
+	 * @deprecated
 	 */
-	public function makeOrderRecurring(Order $order, $attributes, $resetNextRecurrence = false)
+	public function makeOrderRecurring(Order $order, $attributes = [], $resetNextRecurrence = false)
 	{
 
-		$record = $order->getRecurringOrder() ?: new RecurringOrderRecord([
-			'id' => $order->id,
-		]);
+		/** @var RecurringOrderBehavior $order */
 
 		// Default status, if none provided
 		if (!isset($attributes['status']))
@@ -38,33 +37,32 @@ class Orders extends Component
 			$attributes['status'] = RecurringOrderRecord::STATUS_ACTIVE;
 		}
 
-		$record->setAttributes($attributes, false);
+		$order->setRecurringOrdersAttributes($attributes);
 
-		if ($resetNextRecurrence && $record->recurrenceInterval)
+		if ($resetNextRecurrence)
 		{
-			$record->nextRecurrence = (new \DateTime())->add(OrdersHelper::normalizeInterval($record->recurrenceInterval));
+			$order->resetNextRecurrence();
 		}
 
-		if ($success = $record->save())
-		{
-			$order->loadRecurringOrderRecord($record);
-		}
+		return $order->saveRecurringOrdersRecord();
 
-		return $success;
+		// TODO: Deprecate this.
 
 	}
 
+
+
 	/**
-	 * Intercepts Order Save events and, if it appears we're in the middle of an Action request,
+	 * Intercepts Order Save events *before* saving begins, and, if it appears we're in the middle of an Action request,
 	 * processes any given `makeRecurring` attributes.
 	 *
 	 * @param Order $order
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception if `recurrenceInterval` is not valid.
+	 * @throws \Exception
 	 */
-	public function afterSaveOrder(Order $order)
+	public function beforeSaveOrder(Order $order)
 	{
 
 		$request = Craft::$app->request;
@@ -74,28 +72,57 @@ class Orders extends Component
 			return;
 		}
 
-		$attributes = [];
+		/** @var RecurringOrderBehavior $order */
 
 		if ($status = $request->getParam('makeRecurring.status'))
 		{
-			$attributes['status'] = $status;
+			$order->setRecurrenceStatus($status);
 		}
 
 		if ($recurrenceInterval = $request->getParam('makeRecurring.recurrenceInterval'))
 		{
-			$attributes['recurrenceInterval'] = $recurrenceInterval;
+			$order->setRecurrenceInterval($recurrenceInterval);
 		}
 
 		if ($nextRecurrence = $request->getParam('makeRecurring.nextRecurrence'))
 		{
-			$attributes['nextRecurrence'] = DateTimeHelper::toDateTime($nextRecurrence);
+			$order->setNextRecurrence($nextRecurrence);
 		}
 
-		$resetNextRecurrence = self::normalizeBoolean(
-			$request->getParam('makeRecurring.resetNextRecurrence', false)
-		);
+		if (($resetNextRecurrence = $request->getParam('makeRecurring.resetNextRecurrence')) !== null)
+		{
+			$order->setResetNextRecurrenceOnSave(self::normalizeBoolean($resetNextRecurrence));
+		}
 
-		$this->makeOrderRecurring($order, $attributes, $resetNextRecurrence);
+		// TODO: Process `spec` fields
+
+	}
+
+	/**
+	 * Intercepts Order Save events *after* the Order is saved, and saves the associated RecurringOrderRecord.
+	 *
+	 * @param Order $order
+	 *
+	 * @return void
+	 *
+	 * @throws \Exception to interrupt the Order Save event if the RecurringOrderRecord cannot be saved.
+	 */
+	public function afterSaveOrder(Order $order)
+	{
+
+		/** @var RecurringOrderBehavior $order */
+
+		if ($order->getResetNextRecurrenceOnSave())
+		{
+			$order->resetNextRecurrence();
+		}
+
+		$success = $order->saveRecurringOrdersRecord();
+
+		if (!$success)
+		{
+			throw new ErrorException("Could not save the Recurring Order record.");
+		}
 
 	}
 

@@ -2,8 +2,8 @@
 namespace topshelfcraft\recurringorders\orders;
 
 use Craft;
-use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\base\BaseRecord;
+use topshelfcraft\recurringorders\misc\IntervalHelper;
 use yii\base\Exception;
 
 /**
@@ -17,6 +17,9 @@ use yii\base\Exception;
  * @property \DateTime $lastRecurrence
  * @property \DateTime $nextRecurrence
  * @property int $paymentSourceId
+ * @property mixed $spec
+ * @property mixed $originatingOrderId
+ * @property mixed $parentOrderId
  */
 class RecurringOrderRecord extends BaseRecord
 {
@@ -54,7 +57,7 @@ class RecurringOrderRecord extends BaseRecord
 		if ($name === 'recurrenceInterval')
 		{
 			// TODO: Move this into validation and make it Yii-ish
-			if (!OrdersHelper::isValidInterval($value))
+			if (!IntervalHelper::isValidInterval($value))
 			{
 				// TODO: Translate.
 				throw new Exception("{$value} is not a valid interval.");
@@ -70,67 +73,9 @@ class RecurringOrderRecord extends BaseRecord
 	{
 		if ($this->recurrenceInterval instanceof \DateInterval)
 		{
-			$this->recurrenceInterval = OrdersHelper::durationInSeconds($this->recurrenceInterval);
+			$this->recurrenceInterval = IntervalHelper::durationInSeconds($this->recurrenceInterval);
 		}
 		parent::prepareForDb();
-	}
-
-	/**
-	 * @return RecurringOrderQuery
-	 */
-	public static function find()
-	{
-		return new RecurringOrderQuery(static::class);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getStatus()
-	{
-		/*
-		 * A record may have an "Active" status, but its recurrence schedule isn't set yet,
-		 * in which case it gets the special implicit status of "Unscheduled"
-		 */
-		if ($this->status === self::STATUS_ACTIVE)
-		{
-			if (empty($this->recurrenceInterval) || empty($this->nextRecurrence))
-			{
-				return self::STATUS_UNSCHEDULED;
-			}
-		}
-		return $this->status;
-	}
-
-	/**
-	 * Whether the Recurring Order is Active, AND has both a Recurrence Interval and Next Recurrence
-	 *
-	 * @return bool
-	 */
-	public function getIsScheduled()
-	{
-		return $this->getStatus() === self::STATUS_ACTIVE;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getHumanReadableRecurrenceInterval()
-	{
-		if ($this->recurrenceInterval)
-		{
-			try
-			{
-				return DateTimeHelper::humanDurationFromInterval(
-					OrdersHelper::normalizeInterval($this->recurrenceInterval)
-				);
-			}
-			catch (\Exception $e)
-			{
-				Craft::error($e->getMessage());
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -141,13 +86,24 @@ class RecurringOrderRecord extends BaseRecord
 	 * @param null $attributeNames
 	 *
 	 * @return bool
+	 *
+	 * @throws \yii\db\Exception if there's a problem with the db Transaction.
 	 */
 	public function save($runValidation = true, $attributeNames = null)
 	{
+
+		$transaction = Craft::$app->db->getTransaction() ?? Craft::$app->db->beginTransaction();
+
 		/*
 		 * We're doing this inside of save() rather than afterSave() because save() resets dirty attributes status.
 		 */
-		$isDirty = !empty($this->getDirtyAttributes());
+		$isDirty = !empty($this->getDirtyAttributes([
+			'orderId',
+			'status',
+			'errorReason',
+			'errorCount',
+			'recurrenceInterval',
+		]));
 		if ($saved = parent::save($runValidation, $attributeNames))
 		{
 			if ($isDirty)
@@ -160,11 +116,19 @@ class RecurringOrderRecord extends BaseRecord
 					'recurrenceInterval' => $this->recurrenceInterval,
 					'updatedByUserId' => Craft::$app->getUser()->id,
 				]);
-				// TODO: Wrap in Transaction
-				$historyRecord->save();
+				$saved = $saved && $historyRecord->save();
 			}
 		}
-		return $saved;
+
+		if ($saved)
+		{
+			$transaction->commit();
+			return true;
+		}
+
+		$transaction->rollBack();
+		return false;
+
 	}
 
 }
