@@ -75,6 +75,7 @@
                 </label>
             </div>
             <div class="input">
+                <span>
                 {% if settings.recurrenceIntervalOptions is not empty %}
                     {% include '_includes/forms/select' with {
                         id: 'makeRecurring-recurrenceInterval',
@@ -89,6 +90,7 @@
                         value: order.recurrenceInterval,
                     } %}
                 {% endif %}
+                </span>
             </div>
         </div>
 
@@ -141,11 +143,16 @@
                 </label>
             </div>
             <div class="input">
-                {% include '_includes/forms/date' with {
-                    id: 'makeRecurring-nextRecurrence',
-                    name: 'makeRecurring[nextRecurrence]',
-                    value: order.nextRecurrence,
-                } %}
+                <span>
+                    {% include '_includes/forms/date' with {
+                        id: 'makeRecurring-nextRecurrence',
+                        name: 'makeRecurring[nextRecurrence]',
+                        value: order.nextRecurrence,
+                    } %}
+                </span>
+                <a class="small btn right edit" style="margin:2px" href="#">
+                    {{ recurringOrders.t("Process Now") }}
+                </a>
             </div>
         </div>
 
