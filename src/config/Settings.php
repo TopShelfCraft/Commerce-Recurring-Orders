@@ -27,6 +27,11 @@ class Settings extends Model
 	public $showUserOrdersTab = true;
 
 	/**
+	 * @var bool
+	 */
+	public $showOrderHistoryTab = true;
+
+	/**
 	 * @param bool $addBlankOption
 	 *
 	 * @return array

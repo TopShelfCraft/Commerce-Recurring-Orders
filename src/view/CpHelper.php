@@ -224,6 +224,30 @@ class CpHelper
 
 	/**
 	 * @param array $context
+	 */
+	public static function cpCommerceOrderEditHook(array &$context)
+	{
+
+		if (!RecurringOrders::getInstance()->getSettings()->showOrderHistoryTab)
+		{
+			return;
+		}
+
+//		Craft::dd($context);
+
+		if ($context['order']->isCompleted)
+		{
+			$context['tabs'][] = [
+				'label' => RecurringOrders::t('Recurring Orders'),
+				'url' => '#recurringOrdersTab',
+				'class' => null,
+			];
+		}
+
+	}
+
+	/**
+	 * @param array $context
 	 *
 	 * @return string
 	 *
@@ -234,11 +258,18 @@ class CpHelper
 	 */
 	public static function cpCommerceOrderEditMainPageHook(array &$context)
 	{
-		return Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderDetails', $context);
+
+		$return = Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderDetails', $context);
+		$return .= "</div>"; // Usurp the container from Commerce's existing Order Details tab.
+		$return .= Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderHistoryTab', $context);
+		$return .= "<div>"; // Mend our earlier usurpation by restoring order and symmetry to the HTML.
+
+		return $return;
+
 	}
 
 	/**
-	 * Optionally adds a Recurring Orders tab in the Users edit screen.
+	 * Optionally adds a Recurring Orders tab on the Users edit screen.
 	 *
 	 * @param array $context
 	 */
@@ -263,6 +294,8 @@ class CpHelper
 	}
 
 	/**
+	 * Fills in the content for the Recurring Orders tab on the Users edit screen.
+	 *
 	 * @param array $context
 	 *
 	 * @return string
