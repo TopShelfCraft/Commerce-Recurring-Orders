@@ -9,12 +9,22 @@ class Settings extends Model
 	/**
 	 * @var bool
 	 */
-	public $hideCommerceSubscriptionsNavItem;
+	public $addOrderElementSources = true;
+
+	/**
+	 * @var bool
+	 */
+	public $hideCommerceSubscriptionsNavItem = false;
 
 	/**
 	 * @var array
 	 */
 	public $recurrenceIntervalOptions;
+
+	/**
+	 * @var bool
+	 */
+	public $showUserOrdersTab = true;
 
 	/**
 	 * @param bool $addBlankOption

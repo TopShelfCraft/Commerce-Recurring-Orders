@@ -55,8 +55,7 @@
                 </label>
             </div>
             <div class="input ltr">
-                <span class="status {{ statusColors[order.recurrenceStatus] }}"></span>
-                {{ recurringOrders.t("_status:"~order.recurrenceStatus) }}
+                {% include 'recurring-orders/_cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}
                 {% if order.recurrenceStatus === 'active' %}
                     &mdash; {{ recurringOrders.t("every {interval}", {interval: order.getHumanReadableRecurrenceInterval()}) }}
                 {% endif %}
@@ -150,13 +149,13 @@
                         value: order.nextRecurrence,
                     } %}
                 </span>
+                {# TODO: Schedule now! #}
                 <a class="small btn right edit" style="margin:2px" href="#">
                     {{ recurringOrders.t("Process Now") }}
                 </a>
             </div>
         </div>
 
-        {# TODO: Schedule now? #}
         {# TODO: Show payment source? #}
 
     {% else %}
@@ -169,8 +168,7 @@
             </div>
             <div class="input ltr">
                 <span class="commerceStatusLabel">
-                    <span class="status red"></span>
-                    {{ recurringOrders.t("Not Recurring") }}
+                    {% include 'recurring-orders/_cp/_includes/_statusLabel' %}
                 </span>
                 <a class="small btn right edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/make-order-recurring', {id: order.id}) }}">
                     {{ recurringOrders.t("Make Recurring") }}

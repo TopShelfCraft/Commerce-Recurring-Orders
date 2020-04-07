@@ -208,9 +208,12 @@ class RecurringOrders extends Plugin
 	private function _registerTemplateHooks()
 	{
 
-		Craft::$app->view->hook('cp.commerce.order.edit.main-pane', function(array &$context) {
-			return Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderDetails', $context);
-		});
+		Craft::$app->view->hook('cp.commerce.order.edit.main-pane', [CpHelper::class, 'cpCommerceOrderEditMainPageHook']);
+
+		if ($this->getSettings()->showUserOrdersTab) {
+			Craft::$app->getView()->hook('cp.users.edit', [CpHelper::class, 'cpUsersEditHook']);
+			Craft::$app->getView()->hook('cp.users.edit.content', [CpHelper::class, 'cpUsersEditContentHook']);
+		}
 
 	}
 

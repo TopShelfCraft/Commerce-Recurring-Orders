@@ -2,6 +2,8 @@
 namespace topshelfcraft\recurringorders\view;
 
 use Craft;
+use craft\commerce\Plugin as Commerce;
+use craft\commerce\web\assets\commercecp\CommerceCpAsset;
 use craft\events\RegisterElementDefaultTableAttributesEvent;
 use craft\events\RegisterElementSortOptionsEvent;
 use craft\events\RegisterElementSourcesEvent;
@@ -77,6 +79,11 @@ class CpHelper
 	 */
 	public static function registerSources(RegisterElementSourcesEvent $event)
 	{
+
+		if (!RecurringOrders::getInstance()->getSettings()->addOrderElementSources)
+		{
+			return;
+		}
 
 		$sources = $event->sources;
 
@@ -183,7 +190,7 @@ class CpHelper
 
 		if ($attribute === 'recurrenceStatus') {
 			$event->html = $order->getRecurrenceStatus()
-				? Craft::$app->view->renderTemplate('recurring-orders/_cp/_statusLabel', ['status' => $order->getRecurrenceStatus()], View::TEMPLATE_MODE_CP)
+				? Craft::$app->view->renderTemplate('recurring-orders/_cp/_includes/_statusLabel', ['status' => $order->getRecurrenceStatus()], View::TEMPLATE_MODE_CP)
 				: '';
 		}
 
@@ -212,6 +219,76 @@ class CpHelper
 			// TODO: Eager-load Parent orders when this table attribute is active
 			$event->html = $order->getParentOrderId() ? $order->getParentOrder()->getLink() : '';
 		}
+
+	}
+
+	/**
+	 * @param array $context
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
+	 * @throws \Twig\Error\LoaderError
+	 * @throws \Twig\Error\RuntimeError
+	 * @throws \Twig\Error\SyntaxError
+	 */
+	public static function cpCommerceOrderEditMainPageHook(array &$context)
+	{
+		return Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderDetails', $context);
+	}
+
+	/**
+	 * Optionally adds a Recurring Orders tab in the Users edit screen.
+	 *
+	 * @param array $context
+	 */
+	public static function cpUsersEditHook(array &$context)
+	{
+
+		if (!RecurringOrders::getInstance()->getSettings()->showUserOrdersTab)
+		{
+			return;
+		}
+
+		$currentUser = Craft::$app->getUser()->getIdentity();
+
+		if (!$context['isNewUser'] && $currentUser->can('commerce-manageOrders'))
+		{
+			$context['tabs']['recurringOrders'] = [
+				'label' => RecurringOrders::t('Recurring Orders'),
+				'url' => '#recurringOrders'
+			];
+		}
+
+	}
+
+	/**
+	 * @param array $context
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
+	 * @throws \Twig\Error\LoaderError
+	 * @throws \Twig\Error\RuntimeError
+	 * @throws \Twig\Error\SyntaxError
+	 */
+	public static function cpUsersEditContentHook(array &$context)
+	{
+
+		if (!$context['user'] || $context['isNewUser'])
+		{
+			return;
+		}
+
+		$customer = Commerce::getInstance()->getCustomers()->getCustomerByUserId($context['user']->id);
+
+		if (!$customer) {
+			return;
+		}
+
+		return Craft::$app->getView()->renderTemplate('recurring-orders/_cp/_customerOrdersTabContent', [
+			'customer' => $customer,
+		]);
 
 	}
 
