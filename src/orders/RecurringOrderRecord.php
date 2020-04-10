@@ -56,6 +56,10 @@ class RecurringOrderRecord extends BaseRecord
 	{
 		if ($name === 'recurrenceInterval')
 		{
+			if ($value instanceof \DateInterval)
+			{
+				$value = IntervalHelper::durationInSeconds($this->recurrenceInterval);
+			}
 			// TODO: Move this into validation and make it Yii-ish
 			if (!IntervalHelper::isValidInterval($value))
 			{
@@ -63,18 +67,23 @@ class RecurringOrderRecord extends BaseRecord
 				throw new Exception("{$value} is not a valid interval.");
 			}
 		}
+		if ($name === 'spec' && $value instanceof Spec)
+		{
+			$value = $value->getJsonForDb();
+		}
 		parent::__set($name, $value);
 	}
 
 	/**
-	 * @throws \Exception if `recurrenceInterval` is invalid.
+	 *
 	 */
 	public function prepareForDb()
 	{
-		if ($this->recurrenceInterval instanceof \DateInterval)
-		{
-			$this->recurrenceInterval = IntervalHelper::durationInSeconds($this->recurrenceInterval);
-		}
+		/*
+		 * Depending on the record schema, this method may be "too late" to handle typecasting for db.
+		 * Craft's ActiveRecord calls its own `_prepareValue` method as part of `__set`
+		 * so, for example, if we sent an Object argument into this Record's setter, it may have already been stringified.
+		 */
 		parent::prepareForDb();
 	}
 

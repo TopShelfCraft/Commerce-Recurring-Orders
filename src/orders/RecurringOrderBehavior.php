@@ -1,7 +1,9 @@
 <?php
 namespace topshelfcraft\recurringorders\orders;
 
+use Craft;
 use craft\commerce\elements\Order;
+use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\misc\IntervalHelper;
@@ -15,6 +17,8 @@ use yii\base\Behavior;
  * @property int|null $recurrenceErrorCount
  * @property \DateTime|null $lastRecurrence
  * @property \DateTime|null $nextRecurrence
+ * @property int|null $paymentSourceId
+ * @property mixed $spec
  * @property string|null $originatingOrderId
  * @property string|null $parentOrderId
  * @property bool $resetNextRecurrenceOnSave
@@ -28,6 +32,11 @@ class RecurringOrderBehavior extends Behavior
 	 * @var RecurringOrderRecord
 	 */
 	private $_record;
+
+	/**
+	 * @var Spec
+	 */
+	private $_spec;
 
 	/**
 	 * @var bool
@@ -69,13 +78,12 @@ class RecurringOrderBehavior extends Behavior
 		return $this->_record;
 	}
 
-
 	/**
 	 * Whether the Order is managed by the Recurring Orders plugin.
 	 *
 	 * @return bool
 	 */
-	public function getIsRecurring()
+	public function hasRecurrenceStatus()
 	{
 		return $this->_getRecord() ? !empty($this->_getRecord()->status) : false;
 	}
@@ -139,7 +147,8 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function setRecurrenceInterval($value)
 	{
-		$this->_getOrMakeRecord()->recurrenceInterval = $value;
+		// TODO: Validate?
+		$this->_getOrMakeRecord()->recurrenceInterval = ($value ?: null);
 	}
 
 	/**
@@ -176,7 +185,7 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function setRecurrenceErrorReason($value)
 	{
-		$this->_getOrMakeRecord()->errorReason = $value;
+		$this->_getOrMakeRecord()->errorReason = ($value ?: null);
 	}
 
 	/**
@@ -197,8 +206,6 @@ class RecurringOrderBehavior extends Behavior
 
 	/**
 	 * @return \DateTime|null
-	 *
-	 * @throws \Exception if DateTimeHelper cannot convert the value to a DateTime object.
 	 */
 	public function getLastRecurrence()
 	{
@@ -208,11 +215,14 @@ class RecurringOrderBehavior extends Behavior
 	/**
 	 * @param $value
 	 *
+	 * @throws \Exception if DateTimeHelper cannot convert the value to a DateTime
+	 *
 	 * @internal
 	 */
 	public function setLastRecurrence($value)
 	{
-		$this->_getOrMakeRecord()->lastRecurrence = $value;
+		// TODO: Typecasting and validation should probably go in the Record.
+		$this->_getOrMakeRecord()->lastRecurrence = (DateTimeHelper::toDateTime($value) ?: null);
 	}
 
 	/**
@@ -230,7 +240,47 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function setNextRecurrence($value)
 	{
-		$this->_getOrMakeRecord()->nextRecurrence = DateTimeHelper::toDateTime($value);
+		// TODO: Typecasting and validation should probably go in the Record.
+		$this->_getOrMakeRecord()->nextRecurrence = (DateTimeHelper::toDateTime($value) ?: null);
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function getPaymentSourceId()
+	{
+		return $this->_getRecord() ? $this->_getRecord()->paymentSourceId : null;
+	}
+
+	/**
+	 * @param $value
+	 */
+	public function setPaymentSourceId($value)
+	{
+		$this->_getOrMakeRecord()->paymentSourceId = ((int)$value ?: null);
+	}
+
+	/**
+	 * @return PaymentSource|null
+	 */
+	public function getPaymentSource()
+	{
+		return $this->getPaymentSourceId()
+			? Commerce::getInstance()->paymentSources->getPaymentSourceById($this->getPaymentSourceId())
+			: null;
+	}
+
+	/**
+	 * @return Spec
+	 */
+	public function getSpec()
+	{
+		if (!isset($this->_spec))
+		{
+			$config = $this->_getRecord() ? $this->_getRecord()->spec : null;
+			$this->_spec = new Spec($config);
+		}
+		return $this->_spec;
 	}
 
 	/**
@@ -246,7 +296,7 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function setOriginatingOrderId($value)
 	{
-		$this->_getOrMakeRecord()->originatingOrderId = $value;
+		$this->_getOrMakeRecord()->originatingOrderId = ((int)$value ?: null);
 	}
 
 	/**
@@ -254,7 +304,9 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function getOriginatingOrder()
 	{
-		return Commerce::getInstance()->orders->getOrderById($this->getOriginatingOrderId());
+		return $this->getOriginatingOrderId()
+			? Commerce::getInstance()->orders->getOrderById($this->getOriginatingOrderId())
+			: null;
 	}
 
 	/**
@@ -270,7 +322,7 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function setParentOrderId($value)
 	{
-		$this->_getOrMakeRecord()->parentOrderId = $value;
+		$this->_getOrMakeRecord()->parentOrderId = ((int)$value ?: null);
 	}
 
 	/**
@@ -278,7 +330,9 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function getParentOrder()
 	{
-		return Commerce::getInstance()->orders->getOrderById($this->getParentOrderId());
+		return $this->getParentOrderId()
+			? Commerce::getInstance()->orders->getOrderById($this->getParentOrderId())
+			: null;
 	}
 
 	/**
@@ -338,12 +392,24 @@ class RecurringOrderBehavior extends Behavior
 	 * @return bool
 	 *
 	 * @throws \yii\db\Exception if the RecurringOrderRecord cannot be saved.
+	 *
+	 * @todo If the record is completely empty, perhaps we should delete it from the db to keep things tidy?
 	 */
 	public function saveRecurringOrdersRecord($attributes = null)
 	{
+
+		if (!$this->_record && !$this->_spec && empty($attributes))
+		{
+			return true;
+		}
+
 		$record = $this->_getOrMakeRecord();
+		$record->spec = $this->getSpec(); // Changes to our local Spec object need to be pushed back to the Record.
 		$record->setAttributes($attributes, false);
+		$record->id = $this->owner->id; // In case we started earlier with a new (un-saved) Order element.
+
 		return $record->save();
+
 	}
 
 }

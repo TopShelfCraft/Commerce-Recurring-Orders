@@ -8,12 +8,47 @@ use craft\commerce\Plugin as Commerce;
 use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\ErrorException;
+use yii\base\Event;
 use yii\base\Exception;
 
 class Orders extends Component
 {
 
 	use NormalizeTrait;
+
+	/**
+	 * @event \yii\base\Event This event is raised when new Recurring Orders are potentially being derived from a newly completed Order.
+	 *
+	 * ```php
+	 * use craft\commerce\elements\Order;
+	 * use topshelfcraft\recurringorders\orders\DerivedOrdersEvent;
+	 *
+	 * Event::on(Orders::class, Order::EVENT_AFTER_PREPARE_DERIVED_ORDERS, function(DerivedOrdersEvent $event) {
+	 *     // @var Order $order
+	 *     $originatingOrder = $event->originatingOrder;
+	 *     // @var Order[] $derivedOrders
+	 *     $derivedOrders = $event->derivedOrders;
+	 * });
+	 * ```
+	 */
+	const EVENT_AFTER_PREPARE_DERIVED_ORDERS = 'afterPrepareDerivedOrders';
+
+	/**
+	 * @event \yii\base\Event This event is raised after newly derived Recurring Orders have been saved and completed.
+	 *
+	 * ```php
+	 * use craft\commerce\elements\Order;
+	 * use topshelfcraft\recurringorders\orders\DerivedOrdersEvent;
+	 *
+	 * Event::on(Orders::class, Order::EVENT_AFTER_COMPLETE_DERIVED_ORDERS, function(DerivedOrdersEvent $event) {
+	 *     // @var Order $order
+	 *     $originatingOrder = $event->originatingOrder;
+	 *     // @var Order[] $derivedOrders
+	 *     $derivedOrders = $event->derivedOrders;
+	 * });
+	 * ```
+	 */
+	const EVENT_AFTER_COMPLETE_DERIVED_ORDERS = 'afterCompleteDerivedOrders';
 
 	/**
 	 * @param Order $order The Commerce Order
@@ -123,6 +158,99 @@ class Orders extends Component
 		{
 			throw new ErrorException("Could not save the Recurring Order record.");
 		}
+
+	}
+
+	/**
+	 * @param Event $event
+	 */
+	public function afterCompleteOrder(Event $event)
+	{
+
+		$order = $event->sender;
+		/** @var Order $order */
+
+		/*
+		 * To prevent an infinite spiral of derived orders, bail early if this newly completed order already has an
+		 * Originating Order marked on it (i.e. it is already "derived").
+		 */
+		if ($order->getOriginatingOrderId())
+		{
+			return;
+		}
+
+		$derivedOrders = $this->_prepareDerivedOrders($order);
+
+		foreach ($derivedOrders as $derivedOrder)
+		{
+			Craft::$app->getElements()->saveElement($derivedOrder);
+			$derivedOrder->markAsComplete();
+		}
+
+		// Raising the 'afterCompleteDerivedOrders' event
+		$event = new DerivedOrdersEvent([
+			'originatingOrder' => $order,
+			'derivedOrders' => $derivedOrders,
+		]);
+		if ($this->hasEventHandlers(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS)) {
+			$this->trigger(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS, $event);
+		}
+
+	}
+
+	/**
+	 * @param Order $originatingOrder
+	 *
+	 * @return Order[]
+	 */
+	private function _prepareDerivedOrders(Order $originatingOrder)
+	{
+
+		$derivedOrders = [];
+
+		/** @var RecurringOrderBehavior $originatingOrder **/
+		$spec = $originatingOrder->getSpec();
+
+		if (!$spec->isEmpty())
+		{
+
+			$newOrder = $this->getLightClone($originatingOrder);
+
+			/** @var RecurringOrderBehavior $newOrder */
+
+			$newOrder->setOriginatingOrderId($originatingOrder->id);
+
+			$newOrder->setRecurrenceStatus($spec->getStatus() ?: RecurringOrderRecord::STATUS_ACTIVE);
+			$newOrder->setRecurrenceInterval($spec->getRecurrenceInterval());
+			$newOrder->setPaymentSourceId($spec->getPaymentSourceId());
+
+			try
+			{
+				$newOrder->setNextRecurrence($spec->getNextRecurrence());
+				if (!$newOrder->getNextRecurrence())
+				{
+					$newOrder->resetNextRecurrence();
+				}
+			}
+			catch (\Exception $e)
+			{
+				RecurringOrders::error($e->getMessage());
+			}
+
+			$derivedOrders = [$newOrder];
+
+		}
+
+		// Raising the 'afterPrepareDerivedOrders' event
+		$event = new DerivedOrdersEvent([
+			'originatingOrder' => $originatingOrder,
+			'derivedOrders' => $derivedOrders,
+		]);
+		if ($this->hasEventHandlers(self::EVENT_AFTER_PREPARE_DERIVED_ORDERS)) {
+			$this->trigger(self::EVENT_AFTER_PREPARE_DERIVED_ORDERS, $event);
+		}
+
+		return $event->derivedOrders;
 
 	}
 

@@ -15,7 +15,7 @@ class RecurringOrderQueryBehavior extends Behavior
 	/**
 	 * @var bool
 	 */
-	public $isRecurring;
+	public $hasRecurrenceStatus;
 
 	/**
 	 * @var bool
@@ -87,9 +87,9 @@ class RecurringOrderQueryBehavior extends Behavior
 	 *
 	 * @return OrderQuery
 	 */
-	public function isRecurring($value = true)
+	public function hasRecurrenceStatus($value = true)
 	{
-		$this->isRecurring = $value;
+		$this->hasRecurrenceStatus = $value;
 		return $this->owner;
 	}
 
@@ -227,8 +227,8 @@ class RecurringOrderQueryBehavior extends Behavior
 		$orderQuery->query->leftJoin($joinTable, "[[recurringOrders.id]] = [[subquery.elementsId]]");
 		$orderQuery->subQuery->leftJoin($joinTable, "[[recurringOrders.id]] = [[elements.id]]");
 
-		if ($this->isRecurring !== null) {
-			$orderQuery->subQuery->andWhere([($this->isRecurring ? 'is not' : 'is'), '[[recurringOrders.status]]', null]);
+		if ($this->hasRecurrenceStatus !== null) {
+			$orderQuery->subQuery->andWhere([($this->hasRecurrenceStatus ? 'is not' : 'is'), '[[recurringOrders.status]]', null]);
 		}
 
 		if ($this->hasRecurrenceSchedule === true) {
@@ -236,14 +236,6 @@ class RecurringOrderQueryBehavior extends Behavior
 				'and',
 				['is not', '[[recurringOrders.recurrenceInterval]]', null],
 				['is not', '[[recurringOrders.nextRecurrence]]', null],
-			]);
-		}
-
-		if ($this->hasRecurrenceSchedule === false) {
-			$orderQuery->subQuery->andWhere([
-				'or',
-				['is', '[[recurringOrders.recurrenceInterval]]', null],
-				['is', '[[recurringOrders.nextRecurrence]]', null],
 			]);
 		}
 

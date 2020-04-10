@@ -255,6 +255,16 @@ class RecurringOrders extends Plugin
 		);
 
 		/*
+		 * Extra processing after an Order is Completed
+		 */
+		Event::on(
+			Order::class,
+			Order::EVENT_AFTER_COMPLETE_ORDER,
+			[$this->orders, 'afterCompleteOrder']
+		);
+
+
+		/*
 		 * Extra processing when Craft assembles its list of CP nav links.
 		 */
 		Event::on(

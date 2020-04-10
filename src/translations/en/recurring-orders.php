@@ -1,11 +1,12 @@
 <?php
 
 return [
-	"_status:active" => "Active",
+	"_status:active" => "Recurring (Active)",
 	"_status:cancelled" => "Cancelled",
 	"_status:error" => "Error",
 	"_status:paused" => "Paused",
 	"_status:unscheduled" => "Unscheduled",
+	"Actively Recurring" => "Actively Recurring",
 	"Cancel" => "Cancel",
 	"Error Count" => "Error Count",
 	"Error Reason" => "Error Reason",

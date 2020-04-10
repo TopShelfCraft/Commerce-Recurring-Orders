@@ -1,7 +1,5 @@
 {% set recurringOrders = craft.recurringOrders %}
 
-{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
-
 <div id="recurringOrders" class="hidden">
 
     {% if customer %}
@@ -10,7 +8,7 @@
 
             <h2>{{ recurringOrders.t('Recurring Orders') }}</h2>
 
-            {% include 'recurring-orders/_cp/_includes/_ordersTable' with { customer: customer } %}
+            {% include 'recurring-orders/_cp/_includes/_customerOrdersTable' with { customer: customer } %}
 
         {% endif %}
 

@@ -46,7 +46,39 @@
         {{ recurringOrders.t("Recurring Order") }}
     </h3>
 
-    {% if order.isRecurring %}
+    {% if order.parentOrderId %}
+
+        <div id="recurringOrder-parentOrder" class="field">
+            <div class="heading">
+                <label for="recurringOrder-parentOrder">
+                    {# TODO: Translate. #}
+                    Parent Order
+                </label>
+            </div>
+            <div class="input ltr">
+                {{ order.parentOrder.getLink | raw }}
+            </div>
+        </div>
+
+    {% endif %}
+
+    {% if order.originatingOrderId %}
+
+        <div id="recurringOrder-originatingOrder" class="field">
+            <div class="heading">
+                <label for="recurringOrder-originatingOrder">
+                    {# TODO: Translate. #}
+                    Originating Order
+                </label>
+            </div>
+            <div class="input ltr">
+                {{ order.originatingOrder.getLink | raw }}
+            </div>
+        </div>
+
+    {% endif %}
+
+    {% if order.hasRecurrenceStatus %}
 
         <div id="recurringOrder-status" class="field">
             <div class="heading">
@@ -56,9 +88,9 @@
             </div>
             <div class="input ltr">
                 {% include 'recurring-orders/_cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}
-                {% if order.recurrenceStatus === 'active' %}
-                    &mdash; {{ recurringOrders.t("every {interval}", {interval: order.getHumanReadableRecurrenceInterval()}) }}
-                {% endif %}
+{#                {% if order.recurrenceStatus === 'active' %}#}
+{#                    &mdash; {{ recurringOrders.t("every {interval}", {interval: order.getHumanReadableRecurrenceInterval()}) }}#}
+{#                {% endif %}#}
                 {% for button in statusButtons[order.recurrenceStatus] %}
                     <a class="small btn right edit" style="margin:2px" href="{{ actionUrl(button.action, {id: order.id}) }}">
                         {{ recurringOrders.t(button.label) }}
@@ -177,6 +209,18 @@
         </div>
 
     {% endif %}
+
+    {% if order.hasRecurrenceStatus %}
+
+        <h3 class="order-title" style="margin-top: 3em;">
+            {# TODO: Translate. #}
+            Generated Recurrences
+        </h3>
+
+        {% include 'recurring-orders/_cp/_includes/_generatedOrdersTable' %}
+
+    {% endif %}
+
 
 </div>
 

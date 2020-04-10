@@ -1,7 +1,10 @@
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+
 {% do view.registerTranslations('commerce', [
   'No orders exist.',
   'Order Date',
   'Order',
+  'Status',
   'Search orders',
   'Total',
 ]) %}
@@ -12,30 +15,28 @@
     'Last Recurrence',
 ]) %}
 
-<div id="recurring-orders-vue-admin-table"></div>
+<div id="recurring-orders-generated-orders-vue-admin-table"></div>
 
 {% js %}
 
 var orderColumns = [
     { name: '__slot:title', title: Craft.t('commerce', 'Order'), sortField: 'reference' },
     { name: 'date', title: Craft.t('commerce', 'Order Date'), sortField: 'dateOrdered' },
-    { name: 'recurrenceStatus', title: Craft.t('recurring-orders', 'Recurrence Status'),
+    { name: 'orderStatus', title: Craft.t('commerce', 'Status'),
         callback: function(value) {
             return value;
         }
     },
-    { name: 'lastRecurrence', title: Craft.t('recurring-orders', 'Last Recurrence'), sortField: 'recurringOrders.lastRecurrence' },
-    { name: 'nextRecurrence', title: Craft.t('recurring-orders', 'Next Recurrence'), sortField: 'recurringOrders.nextRecurrence' },
     { name: 'total', title: Craft.t('commerce', 'Total'), sortField: 'totalPaid' },
 ];
 
 new Craft.VueAdminTable({
     columns: orderColumns,
-    container: '#recurring-orders-vue-admin-table',
+    container: '#recurring-orders-generated-orders-vue-admin-table',
     emptyMessage: Craft.t('commerce', 'No orders exist.'),
     padded: true,
-    perPage: 10,
-    tableDataEndpoint: Craft.getActionUrl('recurring-orders/cp-data/user-orders-table?customerId={{ customer.id }}'),
+    perPage: 20,
+    tableDataEndpoint: Craft.getActionUrl('recurring-orders/cp-data/generated-orders-table?parentId={{ order.id }}'),
     search: true,
     searchPlaceholder: Craft.t('commerce', 'Search orders')
   });
