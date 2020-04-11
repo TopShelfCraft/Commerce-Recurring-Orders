@@ -18,7 +18,7 @@ use topshelfcraft\recurringorders\config\Settings;
 use topshelfcraft\recurringorders\orders\Orders;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
-use topshelfcraft\recurringorders\view\CpHelper;
+use topshelfcraft\recurringorders\web\CpCustomizations;
 use yii\base\Event;
 
 /**
@@ -29,6 +29,7 @@ use yii\base\Event;
  *
  * @see http://www.yiiframework.com/doc-2.0/guide-structure-modules.html
  *
+ * @property CpCustomizations $cpCustomizations
  * @property Orders $orders
  *
  * @method Settings getSettings()
@@ -54,6 +55,7 @@ class RecurringOrders extends Plugin
 		 */
 
 		$config['components'] = [
+			'cpCustomizations' => CpCustomizations::class,
 			'orders' => Orders::class,
 		];
 
@@ -199,13 +201,13 @@ class RecurringOrders extends Plugin
 	private function _registerTemplateHooks()
 	{
 
-		Craft::$app->view->hook('cp.layouts.base', [CpHelper::class, 'cpLayoutsBaseHook']);
-		Craft::$app->view->hook('cp.commerce.order.edit', [CpHelper::class, 'cpCommerceOrderEditHook']);
-		Craft::$app->view->hook('cp.commerce.order.edit.main-pane', [CpHelper::class, 'cpCommerceOrderEditMainPaneHook']);
+		Craft::$app->view->hook('cp.layouts.base', [CpCustomizations::class, 'cpLayoutsBaseHook']);
+		Craft::$app->view->hook('cp.commerce.order.edit', [CpCustomizations::class, 'cpCommerceOrderEditHook']);
+		Craft::$app->view->hook('cp.commerce.order.edit.main-pane', [CpCustomizations::class, 'cpCommerceOrderEditMainPaneHook']);
 
 		if ($this->getSettings()->showUserRecurringOrdersTab) {
-			Craft::$app->getView()->hook('cp.users.edit', [CpHelper::class, 'cpUsersEditHook']);
-			Craft::$app->getView()->hook('cp.users.edit.content', [CpHelper::class, 'cpUsersEditContentHook']);
+			Craft::$app->getView()->hook('cp.users.edit', [CpCustomizations::class, 'cpUsersEditHook']);
+			Craft::$app->getView()->hook('cp.users.edit.content', [CpCustomizations::class, 'cpUsersEditContentHook']);
 		}
 
 	}
@@ -262,9 +264,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Cp::class,
 			Cp::EVENT_REGISTER_CP_NAV_ITEMS,
-			function (RegisterCpNavItemsEvent $event) {
-				$event->navItems = CpHelper::modifyCpNavItems($event->navItems);
-			}
+			[$this->cpCustomizations, 'modifyCpNavItems']
 		);
 
 		/*
@@ -273,7 +273,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_SORT_OPTIONS,
-			[CpHelper::class, 'registerSortOptions']
+			[$this->cpCustomizations, 'registerSortOptions']
 		);
 
 		/*
@@ -282,7 +282,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_TABLE_ATTRIBUTES,
-			[CpHelper::class, 'registerTableAttributes']
+			[$this->cpCustomizations, 'registerTableAttributes']
 		);
 
 		/*
@@ -291,7 +291,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_DEFAULT_TABLE_ATTRIBUTES,
-			[CpHelper::class, 'registerDefaultTableAttributes']
+			[$this->cpCustomizations, 'registerDefaultTableAttributes']
 		);
 
 		/*
@@ -300,7 +300,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_SET_TABLE_ATTRIBUTE_HTML,
-			[CpHelper::class, 'setTableAttributeHtml']
+			[$this->cpCustomizations, 'setTableAttributeHtml']
 		);
 
 		/*
@@ -309,13 +309,13 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_SOURCES,
-			[CpHelper::class, 'registerSources']
+			[$this->cpCustomizations, 'registerSources']
 		);
 
 		Event::on(
 			Dashboard::class,
 			Dashboard::EVENT_REGISTER_WIDGET_TYPES,
-			[CpHelper::class, 'registerWidgetTypes']
+			[$this->cpCustomizations, 'registerWidgetTypes']
 		);
 
 	}

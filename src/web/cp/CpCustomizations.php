@@ -1,9 +1,11 @@
 <?php
-namespace topshelfcraft\recurringorders\view;
+namespace topshelfcraft\recurringorders\web;
 
 use Craft;
+use craft\base\Component;
 use craft\commerce\Plugin as Commerce;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterElementDefaultTableAttributesEvent;
 use craft\events\RegisterElementSortOptionsEvent;
 use craft\events\RegisterElementSourcesEvent;
@@ -17,20 +19,20 @@ use topshelfcraft\recurringorders\web\widgets\RecentRecurringOrdersWidget;
 use topshelfcraft\recurringorders\web\widgets\CountUpcomingRecurrencesWidget;
 use yii\base\Exception;
 
-class CpHelper
+class CpCustomizations extends Component
 {
 
 	/**
 	 * Optionally remove the Subscriptions subnav link from the Commerce plugin's nav item.
 	 *
-	 * @param $navItems
-	 *
-	 * @return array
+	 * @param RegisterCpNavItemsEvent $event
 	 */
-	public static function modifyCpNavItems($navItems)
+	public function modifyCpNavItems(RegisterCpNavItemsEvent $event)
 	{
 
 		$settings = RecurringOrders::getInstance()->getSettings();
+
+		$navItems = $event->navItems;
 
 		$commerceItemKey = array_search('commerce', array_column($navItems, 'url'));
 		$commerceItem = $navItems[$commerceItemKey];
@@ -73,14 +75,14 @@ class CpHelper
 
 		$navItems[$commerceItemKey] = $commerceItem;
 
-		return $navItems;
+		$event->navItems = $navItems;
 
 	}
 
 	/**
 	 * @param RegisterElementSourcesEvent $event
 	 */
-	public static function registerSources(RegisterElementSourcesEvent $event)
+	public function registerSources(RegisterElementSourcesEvent $event)
 	{
 
 		if (!RecurringOrders::getInstance()->getSettings()->addOrderElementSources)
@@ -149,7 +151,7 @@ class CpHelper
 	/**
 	 * @param RegisterElementSortOptionsEvent $event
 	 */
-	public static function registerSortOptions(RegisterElementSortOptionsEvent $event)
+	public function registerSortOptions(RegisterElementSortOptionsEvent $event)
 	{
 		$event->sortOptions = $event->sortOptions + [
 				'recurringOrders.status' => RecurringOrders::t('Recurrence Status'),
@@ -162,7 +164,7 @@ class CpHelper
 	/**
 	 * @param RegisterElementTableAttributesEvent $event
 	 */
-	public static function registerTableAttributes(RegisterElementTableAttributesEvent $event)
+	public function registerTableAttributes(RegisterElementTableAttributesEvent $event)
 	{
 		$event->tableAttributes = $event->tableAttributes + [
 				'recurrenceStatus' => RecurringOrders::t('Recurrence Status'),
@@ -177,7 +179,7 @@ class CpHelper
 	/**
 	 * @param RegisterElementDefaultTableAttributesEvent $event
 	 */
-	public static function registerDefaultTableAttributes(RegisterElementDefaultTableAttributesEvent $event)
+	public function registerDefaultTableAttributes(RegisterElementDefaultTableAttributesEvent $event)
 	{
 		$event->tableAttributes = $event->tableAttributes + ['recurrenceStatus'];
 	}
@@ -191,7 +193,7 @@ class CpHelper
 	 * @throws \Twig\Error\SyntaxError
 	 * @throws \yii\base\InvalidConfigException
 	 */
-	public static function setTableAttributeHtml(SetElementTableAttributeHtmlEvent $event)
+	public function setTableAttributeHtml(SetElementTableAttributeHtmlEvent $event)
 	{
 
 		/** @var RecurringOrderBehavior $order */
@@ -236,7 +238,7 @@ class CpHelper
 	/**
 	 * @param RegisterComponentTypesEvent $event
 	 */
-	public static function registerWidgetTypes(RegisterComponentTypesEvent $event)
+	public function registerWidgetTypes(RegisterComponentTypesEvent $event)
 	{
 		$event->types[] = RecentGeneratedOrdersWidget::class;
 		$event->types[] = RecentRecurringOrdersWidget::class;
