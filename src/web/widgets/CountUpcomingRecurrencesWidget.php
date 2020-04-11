@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders\view\widgets;
+namespace topshelfcraft\recurringorders\web\widgets;
 
 use Craft;
 use craft\base\Widget;
