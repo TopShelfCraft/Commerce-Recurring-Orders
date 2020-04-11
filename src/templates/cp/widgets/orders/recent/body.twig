@@ -4,13 +4,16 @@
     'Total Paid',
     'Date Ordered',
 ]) %}
+{% do view.registerTranslations('recurring-orders', [
+    'Recurrence Status',
+]) %}
 <div class="commerce-widget-table-wrapper">
     <div id="{{ id }}"></div>
 </div>
 
 {% set tableData = [] %}
 {% for order in orders %}
-    {% set status %}{% include 'recurring-orders/_cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}{% endset %}
+    {% set status %}{% include 'recurring-orders/cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}{% endset %}
     {% set tableData = tableData|merge([{
         title: order.reference,
         url: order.getCpEditUrl(),
@@ -23,7 +26,7 @@
 {% js %}
 var columns = [
     { name: '__slot:title', title: Craft.escapeHtml(Craft.t('commerce', 'Reference')) },
-    { name: 'recurrenceStatus', title: Craft.escapeHtml(Craft.t('commerce', 'Status')) },
+    { name: 'recurrenceStatus', title: Craft.escapeHtml(Craft.t('recurring-orders', 'Recurrence Status')) },
     { name: 'total', title: Craft.escapeHtml(Craft.t('commerce', 'Total')) },
     { name: 'date', title: Craft.escapeHtml(Craft.t('commerce', 'Date Ordered')) }
 ];

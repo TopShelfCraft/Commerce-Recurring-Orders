@@ -17,6 +17,11 @@ class Settings extends Model
 	public $hideCommerceSubscriptionsNavItem = false;
 
 	/**
+	 * @var bool
+	 */
+	public $hideCommerceSubscriptionsCustomerTables = false;
+
+	/**
 	 * @var array
 	 */
 	public $recurrenceIntervalOptions;
@@ -24,12 +29,7 @@ class Settings extends Model
 	/**
 	 * @var bool
 	 */
-	public $showUserOrdersTab = true;
-
-	/**
-	 * @var bool
-	 */
-	public $showOrderHistoryTab = true;
+	public $showUserRecurringOrdersTab = true;
 
 	/**
 	 * @param bool $addBlankOption

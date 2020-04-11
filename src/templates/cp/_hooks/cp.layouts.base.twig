@@ -1,0 +1,39 @@
+<style>
+
+    {% set customerPageCss %}
+
+    /* Hide the Commerce Subscriptions heading */
+    #content > #addresses-vue-admin-table ~ h2,
+    #content > #addresses-vue-admin-table ~ hr {
+        display: none;
+    }
+
+    /* Hide the Commerce Subscriptions content */
+    #content > #subscriptions-vue-admin-table {
+        display: none;
+    }
+
+    {% endset %}
+
+    {% set userPageCss %}
+
+    /* Hide the Commerce Subscriptions heading */
+    #customerInfo #addresses-vue-admin-table ~ h2,
+    #customerInfo #addresses-vue-admin-table ~ hr {
+        display: none;
+    }
+
+    /* Hide the Commerce Subscriptions content */
+    #customerInfo #subscriptions-vue-admin-table { display: none; }
+
+    {% endset %}
+
+</style>
+
+{% if craft.app.config.general.cpTrigger ~ '/commerce/customers/' in craft.app.request.fullPath %}
+    {% includeCss customerPageCss %}
+{% endif %}
+
+{% if craft.app.config.general.cpTrigger ~ '/users/' in craft.app.request.fullPath %}
+    {% includeCss userPageCss %}
+{% endif %}

@@ -134,7 +134,7 @@ class CpHelper
 
 		$sources[] = [
 			'key' => 'recurringOrders.generated',
-			'label' => RecurringOrders::t("Generated Orders"),
+			'label' => RecurringOrders::t("Generated Recurrences"),
 			'criteria' => [
 				'hasParentOrder' => true,
 			],
@@ -199,7 +199,7 @@ class CpHelper
 
 		if ($attribute === 'recurrenceStatus') {
 			$event->html = $order->getRecurrenceStatus()
-				? Craft::$app->view->renderTemplate('recurring-orders/_cp/_includes/_statusLabel', ['status' => $order->getRecurrenceStatus()], View::TEMPLATE_MODE_CP)
+				? Craft::$app->view->renderTemplate('recurring-orders/cp/_includes/_statusLabel', ['status' => $order->getRecurrenceStatus()], View::TEMPLATE_MODE_CP)
 				: '';
 		}
 
@@ -240,28 +240,8 @@ class CpHelper
 	}
 
 	/**
-	 * @param array $context
-	 */
-	public static function cpCommerceOrderEditHook(array &$context)
-	{
-
-		if (RecurringOrders::getInstance()->getSettings()->showOrderHistoryTab)
-		{
-			if ($context['order']->isCompleted)
-			{
-				$context['tabs'][] = [
-					'label' => RecurringOrders::t('Recurring Orders'),
-					'url' => '#recurringOrdersTab',
-					'class' => null,
-				];
-			}
-		}
-
-		return Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderEditHook', $context);
-
-	}
-
-	/**
+	 * Optionally hides Commerce's Subscriptions from the Customer Info tab on Customer and User pages.
+	 *
 	 * @param array $context
 	 *
 	 * @return string
@@ -271,11 +251,60 @@ class CpHelper
 	 * @throws \Twig\Error\RuntimeError
 	 * @throws \Twig\Error\SyntaxError
 	 */
-	public static function cpCommerceOrderEditMainPageHook(array &$context)
+	public static function cpLayoutsBaseHook(array &$context)
+	{
+
+		if (RecurringOrders::getInstance()->getSettings()->hideCommerceSubscriptionsCustomerTables)
+		{
+			return Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.layouts.base', $context);
+		}
+
+	}
+
+	/**
+	 * Adds a Recurring Orders tab on the Users edit screen.
+	 *
+	 * @param array $context
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
+	 * @throws \Twig\Error\LoaderError
+	 * @throws \Twig\Error\RuntimeError
+	 * @throws \Twig\Error\SyntaxError
+	 */
+	public static function cpCommerceOrderEditHook(array &$context)
+	{
+
+		if ($context['order']->isCompleted)
+		{
+			$context['tabs'][] = [
+				'label' => RecurringOrders::t('Recurring Orders'),
+				'url' => '#recurringOrdersTab',
+				'class' => null,
+			];
+		}
+
+		return Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit', $context);
+
+	}
+
+	/**
+	 * Renders the content for the Recurring Orders tab on the Order edit screen.
+	 * @param array $context
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
+	 * @throws \Twig\Error\LoaderError
+	 * @throws \Twig\Error\RuntimeError
+	 * @throws \Twig\Error\SyntaxError
+	 */
+	public static function cpCommerceOrderEditMainPaneHook(array &$context)
 	{
 
 		$return = "</div>"; // Usurp the container from Commerce's existing Order Details tab.
-		$return .= Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderHistoryTab', $context);
+		$return .= Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit.main-pane', $context);
 		$return .= "<div>"; // Mend our earlier usurpation by restoring order and symmetry to the HTML.
 
 		return $return;
@@ -286,23 +315,25 @@ class CpHelper
 	 * Optionally adds a Recurring Orders tab on the Users edit screen.
 	 *
 	 * @param array $context
+	 *
+	 * @return string
 	 */
 	public static function cpUsersEditHook(array &$context)
 	{
 
-		if (!RecurringOrders::getInstance()->getSettings()->showUserOrdersTab)
+		if (RecurringOrders::getInstance()->getSettings()->showUserRecurringOrdersTab)
 		{
-			return;
-		}
 
-		$currentUser = Craft::$app->getUser()->getIdentity();
+			$currentUser = Craft::$app->getUser()->getIdentity();
 
-		if (!$context['isNewUser'] && $currentUser->can('commerce-manageOrders'))
-		{
-			$context['tabs']['recurringOrders'] = [
-				'label' => RecurringOrders::t('Recurring Orders'),
-				'url' => '#recurringOrders'
-			];
+			if (!$context['isNewUser'] && $currentUser->can('commerce-manageOrders'))
+			{
+				$context['tabs']['recurringOrders'] = [
+					'label' => RecurringOrders::t('Recurring Orders'),
+					'url' => '#recurringOrders'
+				];
+			}
+
 		}
 
 	}
@@ -333,7 +364,7 @@ class CpHelper
 			return;
 		}
 
-		return Craft::$app->getView()->renderTemplate('recurring-orders/_cp/_customerOrdersTabContent', [
+		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/_hooks/cp.users.edit.content', [
 			'customer' => $customer,
 		]);
 

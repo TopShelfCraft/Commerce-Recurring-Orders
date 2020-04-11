@@ -82,7 +82,7 @@ class RecentOrdersWidget extends Widget
         $namespaceId = Craft::$app->getView()->namespaceInputId($id);
 
 
-        return Craft::$app->getView()->renderTemplate('recurring-orders/_cp/_widgets/_orders/recent/body', [
+        return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/orders/recent/body', [
             'orders' => $orders,
             'showStatuses' => $this->orderStatusId === null,
             'id' => $id,
@@ -104,7 +104,7 @@ class RecentOrdersWidget extends Widget
 
         Craft::$app->getView()->registerJs("new Craft.Commerce.OrdersWidgetSettings('" . $namespaceId . "');");
 
-        return Craft::$app->getView()->renderTemplate('recurring-orders/_cp/_widgets/_orders/recent/settings', [
+        return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/orders/recent/settings', [
             'id' => $id,
             'widget' => $this,
             'orderStatuses' => $orderStatuses,

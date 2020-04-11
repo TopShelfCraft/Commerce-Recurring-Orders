@@ -1,7 +1,7 @@
 <?php
 
 return [
-	"_status:active" => "Recurring (Active)",
+	"_status:active" => "Active",
 	"_status:cancelled" => "Cancelled",
 	"_status:error" => "Error",
 	"_status:paused" => "Paused",
@@ -11,7 +11,8 @@ return [
 	"Error Count" => "Error Count",
 	"Error Reason" => "Error Reason",
 	"every {interval}" => "every {interval}",
-	"Generated Orders" => "Generated Orders",
+	"Generated Recurrence" => "Generated Recurrence",
+	"Generated Recurrences" => "Generated Recurrences",
 	"Last Recurrence" => "Last Recurrence",
 	"Make Recurring" => "Make Recurring",
 	"Next Recurrence" => "Next Recurrence",
@@ -22,6 +23,7 @@ return [
 	"Re-Activate" => "Re-Activate",
 	"Recurrence Error Count" => "Recurrence Error Count",
 	"Recurrence Status" => "Recurrence Status",
+	"Recurring" => "Recurring",
 	"Recurring Order" => "Recurring Order",
 	"Recurring Orders" => "Recurring Orders",
 	"Recurrence Interval" => "Recurrence Interval",
