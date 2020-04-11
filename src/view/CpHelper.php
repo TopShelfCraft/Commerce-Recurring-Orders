@@ -236,8 +236,6 @@ class CpHelper
 	 */
 	public static function registerWidgetTypes(RegisterComponentTypesEvent $event)
 	{
-		$event->types[] = TotalOrdersWidget::class;
-		$event->types[] = TotalRevenueWidget::class;
 		$event->types[] = RecentOrdersWidget::class;
 	}
 
@@ -276,7 +274,6 @@ class CpHelper
 	public static function cpCommerceOrderEditMainPageHook(array &$context)
 	{
 
-//		$return = Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderDetails', $context);
 		$return = "</div>"; // Usurp the container from Commerce's existing Order Details tab.
 		$return .= Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderHistoryTab', $context);
 		$return .= "<div>"; // Mend our earlier usurpation by restoring order and symmetry to the HTML.
