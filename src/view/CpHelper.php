@@ -13,6 +13,7 @@ use craft\web\View;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use topshelfcraft\recurringorders\view\widgets\RecentOrdersWidget;
+use topshelfcraft\recurringorders\view\widgets\UpcomingRecurrencesWidget;
 use yii\base\Exception;
 
 class CpHelper
@@ -59,7 +60,7 @@ class CpHelper
 				return $new;
 			}
 
-			if (Craft::$app->getUser()->checkPermission('accessPlugin-' . RecurringOrders::$plugin->id)) {
+			if (Craft::$app->getUser()->checkPermission('accessPlugin-' . RecurringOrders::getInstance()->id)) {
 				$newItem = [
 					'label' => RecurringOrders::t('Recurring Orders'),
 					'url' => 'recurring-orders'
@@ -237,6 +238,7 @@ class CpHelper
 	public static function registerWidgetTypes(RegisterComponentTypesEvent $event)
 	{
 		$event->types[] = RecentOrdersWidget::class;
+		$event->types[] = UpcomingRecurrencesWidget::class;
 	}
 
 	/**

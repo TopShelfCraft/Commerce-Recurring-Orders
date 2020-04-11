@@ -21,6 +21,7 @@ return [
 	"Parent Order" => "Parent Order",
 	"Pause" => "Pause",
 	"Re-Activate" => "Re-Activate",
+	"Recently Created Recurring Orders" => "Recently Created Recurring Orders",
 	"Recurrence Error Count" => "Recurrence Error Count",
 	"Recurrence Status" => "Recurrence Status",
 	"Recurring" => "Recurring",

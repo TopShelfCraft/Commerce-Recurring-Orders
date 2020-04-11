@@ -41,16 +41,6 @@ class RecurringOrders extends Plugin
 {
 
 	/*
-     * Static properties
-     * ===========================================================================
-     */
-
-	/**
-	 * @var RecurringOrders $plugin
-	 */
-	public static $plugin;
-
-	/*
      * Public methods
      * ===========================================================================
      */
@@ -77,8 +67,8 @@ class RecurringOrders extends Plugin
 	public function init()
 	{
 
+		Craft::setAlias('@recurring-orders', __DIR__);
 		parent::init();
-		self::$plugin = $this;
 
 		$this->_attachComponentBehaviors();
 		$this->_registerEventHandlers();
@@ -170,7 +160,7 @@ class RecurringOrders extends Plugin
 			function (Event $event) {
 				/** @var CraftVariable $variable **/
 				$variable = $event->sender;
-				$variable->set('recurringOrders', RecurringOrders::$plugin);
+				$variable->set('recurringOrders', $this);
 			}
 		);
 

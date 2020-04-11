@@ -28,7 +28,7 @@ class OrdersController extends BaseConsoleController
 
 			$order = Commerce::getInstance()->orders->getOrderById($orderId);
 
-			$success = RecurringOrders::$plugin->orders->makeOrderRecurring($order, [
+			$success = RecurringOrders::getInstance()->orders->makeOrderRecurring($order, [
 				'recurrenceInterval' => $recurrenceInterval
 			], $resetNextRecurrence);
 

@@ -51,6 +51,22 @@ class Orders extends Component
 	const EVENT_AFTER_COMPLETE_DERIVED_ORDERS = 'afterCompleteDerivedOrders';
 
 	/**
+	 * Return a list of all possible Recurrence Status labels, keyed by the status value.
+	 *
+	 * @return array
+	 */
+	public function getAllRecurrenceStatuses()
+	{
+		return [
+			RecurringOrderRecord::STATUS_ACTIVE => RecurringOrders::t('_status:'.RecurringOrderRecord::STATUS_ACTIVE),
+			RecurringOrderRecord::STATUS_UNSCHEDULED => RecurringOrders::t('_status:'.RecurringOrderRecord::STATUS_UNSCHEDULED),
+			RecurringOrderRecord::STATUS_PAUSED => RecurringOrders::t('_status:'.RecurringOrderRecord::STATUS_PAUSED),
+			RecurringOrderRecord::STATUS_CANCELLED => RecurringOrders::t('_status:'.RecurringOrderRecord::STATUS_CANCELLED),
+			RecurringOrderRecord::STATUS_ERROR => RecurringOrders::t('_status:'.RecurringOrderRecord::STATUS_ERROR),
+		];
+	}
+
+	/**
 	 * @param Order $order The Commerce Order
 	 * @param array $attributes Additional attributes to set on the Recurring Order record
 	 * @param bool $resetNextRecurrence Whether the Next Occurrence should be reset from the present time (if possible).

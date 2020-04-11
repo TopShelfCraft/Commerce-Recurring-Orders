@@ -58,7 +58,7 @@ class OrdersController extends BaseWebController
 		try
 		{
 			/** @var Order $order */
-			$success = RecurringOrders::$plugin->orders->makeOrderRecurring($order, $attributes, $resetNextRecurrence);
+			$success = RecurringOrders::getInstance()->orders->makeOrderRecurring($order, $attributes, $resetNextRecurrence);
 			if ($success)
 			{
 				return $this->returnSuccessResponse();
