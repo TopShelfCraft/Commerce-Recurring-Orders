@@ -1,0 +1,17 @@
+{% spaceless %}
+    <div class="commerce-widget-numberstat">
+
+        <strong class="commerce-widget-numberstat-number">{{ (number ?? 0)|e }}</strong>
+        <br>
+
+        {% if descriptor ?? null %}
+            <span>{{ descriptor|e }}</span>
+            <br>
+        {% endif %}
+
+        {% if timeFrame ?? null %}
+            <span class="extralight">{{ timeFrame|e }}</span>
+        {% endif %}
+
+    </div>
+{% endspaceless %}

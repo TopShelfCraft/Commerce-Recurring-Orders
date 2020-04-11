@@ -9,8 +9,13 @@ use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use topshelfcraft\recurringorders\web\assets\OrdersWidgetAsset;
 
-class RecentOrdersWidget extends Widget
+class RecentRecurringOrdersWidget extends Widget
 {
+
+	/**
+	 * @var string
+	 */
+	protected $handle = 'recurring-orders--recent-recurring-orders';
 
     /**
      * @var string|null
@@ -65,11 +70,10 @@ class RecentOrdersWidget extends Widget
 
         $orders = $this->_getOrders();
 
-        $id = 'recent-orders-settings-' . StringHelper::randomString();
-
+        $id = $this->handle . StringHelper::randomString();
         $namespaceId = Craft::$app->getView()->namespaceInputId($id);
 
-        return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/orders/recent/body', [
+        return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/recentRecurringOrders/body', [
             'orders' => $orders,
             'showStatuses' => $this->recurrenceStatus === null,
             'id' => $id,
@@ -86,12 +90,12 @@ class RecentOrdersWidget extends Widget
 
         Craft::$app->getView()->registerAssetBundle(OrdersWidgetAsset::class);
 
-        $id = 'recent-orders-settings-' . StringHelper::randomString();
+        $id = $this->handle . StringHelper::randomString();
         $namespaceId = Craft::$app->getView()->namespaceInputId($id);
 
         Craft::$app->getView()->registerJs("new Craft.RecurringOrders.OrdersWidgetSettings('" . $namespaceId . "');");
 
-        return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/orders/recent/settings', [
+        return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/recentRecurringOrders/settings', [
             'id' => $id,
             'widget' => $this,
             'statuses' => RecurringOrders::getInstance()->orders->getAllRecurrenceStatuses(),

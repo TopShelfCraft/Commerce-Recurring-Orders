@@ -12,8 +12,9 @@ use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
-use topshelfcraft\recurringorders\view\widgets\RecentOrdersWidget;
-use topshelfcraft\recurringorders\view\widgets\UpcomingRecurrencesWidget;
+use topshelfcraft\recurringorders\view\widgets\RecentGeneratedOrdersWidget;
+use topshelfcraft\recurringorders\view\widgets\RecentRecurringOrdersWidget;
+use topshelfcraft\recurringorders\view\widgets\CountUpcomingRecurrencesWidget;
 use yii\base\Exception;
 
 class CpHelper
@@ -237,8 +238,9 @@ class CpHelper
 	 */
 	public static function registerWidgetTypes(RegisterComponentTypesEvent $event)
 	{
-		$event->types[] = RecentOrdersWidget::class;
-		$event->types[] = UpcomingRecurrencesWidget::class;
+		$event->types[] = RecentGeneratedOrdersWidget::class;
+		$event->types[] = RecentRecurringOrdersWidget::class;
+		$event->types[] = CountUpcomingRecurrencesWidget::class;
 	}
 
 	/**
