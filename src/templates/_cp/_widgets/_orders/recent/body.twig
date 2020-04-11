@@ -1,0 +1,36 @@
+{% do view.registerTranslations('commerce', [
+    'Reference',
+    'Status',
+    'Total Paid',
+    'Date Ordered',
+]) %}
+<div class="commerce-widget-table-wrapper">
+    <div id="{{ id }}"></div>
+</div>
+
+{% set tableData = [] %}
+{% for order in orders %}
+    {% set status %}{% include 'recurring-orders/_cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}{% endset %}
+    {% set tableData = tableData|merge([{
+        title: order.reference,
+        url: order.getCpEditUrl(),
+        recurrenceStatus: status,
+        total: order.totalPrice|currency(order.currency),
+        date: order.dateOrdered|datetime('short'),
+    }]) %}
+{% endfor %}
+
+{% js %}
+var columns = [
+    { name: '__slot:title', title: Craft.escapeHtml(Craft.t('commerce', 'Reference')) },
+    { name: 'recurrenceStatus', title: Craft.escapeHtml(Craft.t('commerce', 'Status')) },
+    { name: 'total', title: Craft.escapeHtml(Craft.t('commerce', 'Total')) },
+    { name: 'date', title: Craft.escapeHtml(Craft.t('commerce', 'Date Ordered')) }
+];
+
+new Craft.VueAdminTable({
+    columns: columns,
+    container: '#{{ id }}',
+    tableData: {{ tableData|json_encode|raw }}
+});
+{% endjs %}

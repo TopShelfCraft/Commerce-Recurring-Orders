@@ -3,6 +3,7 @@ namespace topshelfcraft\recurringorders\view;
 
 use Craft;
 use craft\commerce\Plugin as Commerce;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterElementDefaultTableAttributesEvent;
 use craft\events\RegisterElementSortOptionsEvent;
 use craft\events\RegisterElementSourcesEvent;
@@ -11,6 +12,7 @@ use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
+use topshelfcraft\recurringorders\view\widgets\RecentOrdersWidget;
 use yii\base\Exception;
 
 class CpHelper
@@ -130,6 +132,14 @@ class CpHelper
 			],
 		];
 
+		$sources[] = [
+			'key' => 'recurringOrders.generated',
+			'label' => RecurringOrders::t("Generated Orders"),
+			'criteria' => [
+				'hasParentOrder' => true,
+			],
+		];
+
 		$event->sources = $sources;
 
 	}
@@ -222,26 +232,34 @@ class CpHelper
 	}
 
 	/**
+	 * @param RegisterComponentTypesEvent $event
+	 */
+	public static function registerWidgetTypes(RegisterComponentTypesEvent $event)
+	{
+		$event->types[] = TotalOrdersWidget::class;
+		$event->types[] = TotalRevenueWidget::class;
+		$event->types[] = RecentOrdersWidget::class;
+	}
+
+	/**
 	 * @param array $context
 	 */
 	public static function cpCommerceOrderEditHook(array &$context)
 	{
 
-		if (!RecurringOrders::getInstance()->getSettings()->showOrderHistoryTab)
+		if (RecurringOrders::getInstance()->getSettings()->showOrderHistoryTab)
 		{
-			return;
+			if ($context['order']->isCompleted)
+			{
+				$context['tabs'][] = [
+					'label' => RecurringOrders::t('Recurring Orders'),
+					'url' => '#recurringOrdersTab',
+					'class' => null,
+				];
+			}
 		}
 
-//		Craft::dd($context);
-
-		if ($context['order']->isCompleted)
-		{
-			$context['tabs'][] = [
-				'label' => RecurringOrders::t('Recurring Orders'),
-				'url' => '#recurringOrdersTab',
-				'class' => null,
-			];
-		}
+		return Craft::$app->view->renderTemplate('recurring-orders/_cp/_orderEditHook', $context);
 
 	}
 

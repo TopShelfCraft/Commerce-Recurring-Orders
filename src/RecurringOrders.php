@@ -9,6 +9,7 @@ use craft\console\Application as ConsoleApplication;
 use craft\events\ElementEvent;
 use craft\events\RegisterCpNavItemsEvent;
 use craft\helpers\FileHelper;
+use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
@@ -318,6 +319,12 @@ class RecurringOrders extends Plugin
 			Order::class,
 			Order::EVENT_REGISTER_SOURCES,
 			[CpHelper::class, 'registerSources']
+		);
+
+		Event::on(
+			Dashboard::class,
+			Dashboard::EVENT_REGISTER_WIDGET_TYPES,
+			[CpHelper::class, 'registerWidgetTypes']
 		);
 
 	}

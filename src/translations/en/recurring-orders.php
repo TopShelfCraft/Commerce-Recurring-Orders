@@ -11,6 +11,7 @@ return [
 	"Error Count" => "Error Count",
 	"Error Reason" => "Error Reason",
 	"every {interval}" => "every {interval}",
+	"Generated Orders" => "Generated Orders",
 	"Last Recurrence" => "Last Recurrence",
 	"Make Recurring" => "Make Recurring",
 	"Next Recurrence" => "Next Recurrence",

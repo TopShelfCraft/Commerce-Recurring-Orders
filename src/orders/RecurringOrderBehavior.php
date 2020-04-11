@@ -2,6 +2,7 @@
 namespace topshelfcraft\recurringorders\orders;
 
 use Craft;
+use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
@@ -333,6 +334,16 @@ class RecurringOrderBehavior extends Behavior
 		return $this->getParentOrderId()
 			? Commerce::getInstance()->orders->getOrderById($this->getParentOrderId())
 			: null;
+	}
+
+	/**
+	 * @return OrderQuery
+	 */
+	public function findDerivedOrders()
+	{
+		$query = Order::find();
+		/** @var RecurringOrderQueryBehavior $query */
+		return $query->originatingOrderId($this->owner->id);
 	}
 
 	/**
