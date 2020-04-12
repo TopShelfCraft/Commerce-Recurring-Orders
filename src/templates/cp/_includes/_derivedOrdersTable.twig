@@ -1,0 +1,45 @@
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+
+{% do view.registerTranslations('commerce', [
+    'No orders exist.',
+    'Order Date',
+    'Order',
+    'Status',
+    'Search orders',
+    'Total',
+]) %}
+
+{% do view.registerTranslations('recurring-orders', [
+    'Recurrence Status',
+    'Next Recurrence',
+    'Last Recurrence',
+]) %}
+
+{% set tableData = [] %}
+{% for order in derivedOrders %}
+    {% set status %}{% include 'recurring-orders/cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}{% endset %}
+    {% set tableData = tableData|merge([{
+        title: order.reference,
+        url: order.getCpEditUrl(),
+        recurrenceStatus: status,
+        total: order.totalPrice|currency(order.currency),
+        date: order.dateOrdered|datetime('short'),
+    }]) %}
+{% endfor %}
+
+{% js %}
+var columns = [
+    { name: '__slot:title', title: Craft.escapeHtml(Craft.t('commerce', 'Reference')) },
+    { name: 'recurrenceStatus', title: Craft.escapeHtml(Craft.t('recurring-orders', 'Recurrence Status')) },
+    { name: 'total', title: Craft.escapeHtml(Craft.t('commerce', 'Total')) },
+    { name: 'date', title: Craft.escapeHtml(Craft.t('commerce', 'Date Ordered')) }
+];
+
+new Craft.VueAdminTable({
+    columns: columns,
+    container: '#recurring-orders-derived-orders-vue-admin-table',
+    tableData: {{ tableData|json_encode|raw }}
+});
+{% endjs %}
+
+<div id="recurring-orders-derived-orders-vue-admin-table"></div>
