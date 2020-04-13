@@ -282,15 +282,13 @@ class CpCustomizations extends Component
 	public static function cpCommerceOrderEditHook(array &$context)
 	{
 
-		if ($context['order']->isCompleted)
-		{
-			$context['tabs'][] = [
-				'label' => RecurringOrders::t('Recurring Orders'),
-				'url' => '#recurringOrdersTab',
-				'class' => null,
-			];
-		}
+		$context['tabs'][] = [
+			'label' => RecurringOrders::t('Recurring Orders'),
+			'url' => '#recurringOrdersTab',
+			'class' => null,
+		];
 
+		// Add supplemental info to Order screen titles
 		return Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit', $context);
 
 	}
@@ -308,13 +306,7 @@ class CpCustomizations extends Component
 	 */
 	public static function cpCommerceOrderEditMainPaneHook(array &$context)
 	{
-
-		$return = "</div>"; // Usurp the container from Commerce's existing Order Details tab.
-		$return .= Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit.main-pane', $context);
-		$return .= "<div>"; // Mend our earlier usurpation by restoring order and symmetry to the HTML.
-
-		return $return;
-
+		return Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit.main-pane', $context);
 	}
 
 	/**
@@ -327,20 +319,22 @@ class CpCustomizations extends Component
 	public static function cpUsersEditHook(array &$context)
 	{
 
-		if (RecurringOrders::getInstance()->getSettings()->showUserRecurringOrdersTab)
+		if (!RecurringOrders::getInstance()->getSettings()->showUserRecurringOrdersTab)
 		{
-
-			$currentUser = Craft::$app->getUser()->getIdentity();
-
-			if (!$context['isNewUser'] && $currentUser->can('commerce-manageOrders'))
-			{
-				$context['tabs']['recurringOrders'] = [
-					'label' => RecurringOrders::t('Recurring Orders'),
-					'url' => '#recurringOrders'
-				];
-			}
-
+			return;
 		}
+
+		$currentUser = Craft::$app->getUser()->getIdentity();
+
+		if ($context['isNewUser'] || !$currentUser->can('commerce-manageOrders'))
+		{
+			return;
+		}
+
+		$context['tabs']['recurringOrders'] = [
+			'label' => RecurringOrders::t('Recurring Orders'),
+			'url' => '#recurringOrders'
+		];
 
 	}
 
@@ -359,7 +353,14 @@ class CpCustomizations extends Component
 	public static function cpUsersEditContentHook(array &$context)
 	{
 
-		if (!$context['user'] || $context['isNewUser'])
+		if (!RecurringOrders::getInstance()->getSettings()->showUserRecurringOrdersTab)
+		{
+			return;
+		}
+
+		$currentUser = Craft::$app->getUser()->getIdentity();
+
+		if (!$context['user'] || $context['isNewUser'] || !$currentUser->can('commerce-manageOrders'))
 		{
 			return;
 		}

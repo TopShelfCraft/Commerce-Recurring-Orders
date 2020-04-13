@@ -1,3 +1,10 @@
+{#
+
+This template expects:
+ - `orders`
+
+#}
+
 {% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
 
 {% do view.registerTranslations('commerce', [
@@ -16,7 +23,7 @@
 ]) %}
 
 {% set tableData = [] %}
-{% for order in derivedOrders %}
+{% for order in orders %}
     {% set status %}{% include 'recurring-orders/cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}{% endset %}
     {% set tableData = tableData|merge([{
         title: order.reference,

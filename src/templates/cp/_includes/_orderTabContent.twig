@@ -1,0 +1,71 @@
+{% set recurringOrders = craft.recurringOrders %}
+{% set settings = recurringOrders.settings %}
+
+{% set derivedOrders = order.findDerivedOrders().all() %}
+
+{# TODO: Make this configurable. #}
+{% set showRecurringOrderControls = (not (derivedOrders | length)) or (not order.parentId) or order.hasRecurrenceStatus %}
+
+
+<style>
+
+    #recurringOrders_derivedOrders,
+    #recurringOrders_orderControls,
+    #recurringOrders_generatedRecurrences {
+        margin-top: 1em;
+        margin-bottom: 3em;
+    }
+
+    #recurring-orders-derived-orders-vue-admin-table {
+        margin-top: 1em;
+        padding: 24px;
+    }
+
+</style>
+
+
+
+{% if derivedOrders | length %}
+
+    <div id="recurringOrders_derivedOrders">
+
+        <h3 class="order-title">
+            {{ recurringOrders.t("Derived Orders") }}
+        </h3>
+
+        {% include 'recurring-orders/cp/_includes/_recurringOrdersTable' with {orders: derivedOrders} only %}
+
+    </div>
+
+{% endif %}
+
+
+
+{% if showRecurringOrderControls %}
+
+    <div id="recurringOrders_orderControls">
+
+        {% include 'recurring-orders/cp/_includes/_orderControls' %}
+
+    </div>
+
+{% endif %}
+
+
+
+{% if order.hasRecurrenceStatus %}
+
+{#    {% set generatedOrders = order.findGeneratedOrders().all() %}#}
+
+    <div id="recurringOrders_generatedRecurrences">
+
+        <h3 class="order-title" style="margin-top: 3em;">
+            {# TODO: Translate. #}
+            Generated Recurrences
+        </h3>
+
+        {% include 'recurring-orders/cp/_includes/_generatedOrdersTable' %}
+
+    </div>
+
+{% endif %}

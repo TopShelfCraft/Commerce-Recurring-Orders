@@ -1,5 +1,10 @@
-<div id="recurringOrdersTab" class="hidden">
-
-    {% include 'recurring-orders/cp/_includes/_orderDetails' %}
-
+{# Usurp the container from Commerce's existing Order Details tab. #}
 </div>
+
+{# Shove in the content for the Recurring Orders tab. #}
+<div id="recurringOrdersTab" class="hidden">
+    {% include 'recurring-orders/cp/_includes/_orderTabContent' %}
+</div>
+
+{# Mend our earlier usurpation by restoring order and symmetry to the HTML. #}
+<div>

@@ -347,6 +347,16 @@ class RecurringOrderBehavior extends Behavior
 	}
 
 	/**
+	 * @return OrderQuery
+	 */
+	public function findGeneratedOrders()
+	{
+		$query = Order::find();
+		/** @var RecurringOrderQueryBehavior $query */
+		return $query->parentOrderId($this->owner->id);
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function getResetNextRecurrenceOnSave()

@@ -1,21 +1,7 @@
-{% set recurringOrders = craft.recurringOrders %}
-
 <div id="recurringOrders" class="hidden">
 
-    {% if customer %}
+    <h2>{{ "Recurring Orders"|t('recurring-orders') }}</h2>
 
-        {% if currentUser.can('commerce-manageOrders') %}
-
-            <h2>{{ recurringOrders.t('Recurring Orders') }}</h2>
-
-            {% include 'recurring-orders/cp/_includes/_customerOrdersTable' with { customer: customer } %}
-
-        {% endif %}
-
-    {% else %}
-
-        {# TODO: Empty state. #}
-
-    {% endif %}
+    {% include 'recurring-orders/cp/_includes/_customerOrdersTable' with { customer: customer } %}
 
 </div>
