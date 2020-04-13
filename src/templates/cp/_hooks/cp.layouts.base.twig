@@ -31,9 +31,13 @@
 </style>
 
 {% if craft.app.config.general.cpTrigger ~ '/commerce/customers/' in craft.app.request.fullPath %}
-    {% includeCss customerPageCss %}
+    {% css customerPageCss %}
 {% endif %}
 
 {% if craft.app.config.general.cpTrigger ~ '/users/' in craft.app.request.fullPath %}
-    {% includeCss userPageCss %}
+    {% css userPageCss %}
+{% endif %}
+
+{% if craft.app.config.general.cpTrigger ~ '/myaccount' in craft.app.request.fullPath %}
+    {% css userPageCss %}
 {% endif %}
