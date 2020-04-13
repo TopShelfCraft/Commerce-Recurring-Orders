@@ -138,7 +138,7 @@ class CpCustomizations extends Component
 
 		$sources[] = [
 			'key' => 'recurringOrders.generated',
-			'label' => RecurringOrders::t("Generated Recurrences"),
+			'label' => RecurringOrders::t("Generated Orders"),
 			'criteria' => [
 				'hasParentOrder' => true,
 			],
