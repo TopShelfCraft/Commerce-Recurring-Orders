@@ -88,14 +88,14 @@
                     {% include '_includes/forms/select' with {
                         id: 'makeRecurring-recurrenceInterval',
                         name: 'makeRecurring[recurrenceInterval]',
-                        value: order.recurrenceInterval,
+                        value: order.getRecurrenceInterval(),
                         options: settings.getRecurrenceIntervalOptions(),
                     } %}
                 {% else %}
                     {% include '_includes/forms/text' with {
                         id: 'makeRecurring-recurrenceInterval',
                         name: 'makeRecurring[recurrenceInterval]',
-                        value: order.recurrenceInterval,
+                        value: order.getRecurrenceInterval(),
                     } %}
                 {% endif %}
                 </span>
