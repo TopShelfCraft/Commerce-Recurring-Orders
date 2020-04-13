@@ -3,8 +3,15 @@
 
 {% set derivedOrders = order.findDerivedOrders().all() %}
 
-{# TODO: Make this configurable. #}
-{% set showRecurringOrderControls = (not (derivedOrders | length)) or (not order.parentId) or order.hasRecurrenceStatus %}
+{% set hideControlsForGeneratedOrder = craft.recurringOrders.getSettings().hideRecurrenceControlsForGeneratedOrders %}
+{% set hideControlsForOriginatingOrder = craft.recurringOrders.getSettings().hideRecurrenceControlsForOriginatingOrders %}
+{% set showRecurringOrderControls =
+    order.hasRecurrenceStatus
+    or not (
+        ((derivedOrders | length) and hideControlsForOriginatingOrder)
+        or (order.parentId and hideControlsForGeneratedOrder)
+    )
+%}
 
 
 <style>

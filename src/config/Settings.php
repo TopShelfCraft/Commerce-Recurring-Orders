@@ -22,6 +22,16 @@ class Settings extends Model
 	public $hideCommerceSubscriptionsCustomerTables = false;
 
 	/**
+	 * @var bool
+	 */
+	public $hideRecurrenceControlsForGeneratedOrders = true;
+
+	/**
+	 * @var bool
+	 */
+	public $hideRecurrenceControlsForOriginatingOrders = true;
+
+	/**
 	 * @var array
 	 */
 	public $recurrenceIntervalOptions;
