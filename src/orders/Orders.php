@@ -300,12 +300,12 @@ class Orders extends Component
 		$clone = new Order();
 		$clone->number = Commerce::getInstance()->getCarts()->generateCartNumber();
 		$clone->setAttributes($attributes, false);
+		Craft::$app->elements->saveElement($clone);
 
-		$lineItems = $order->getLineItems();
-		foreach ($lineItems as $lineItem)
+		$lineItems = [];
+		foreach ($order->getLineItems() as $lineItem)
 		{
-			// Clear out the LineItem ID so that we save, we get a new LineItem record, rather than overwriting the original one.
-			$lineItem->id = null;
+			$lineItems[] = Commerce::getInstance()->lineItems->createLineItem($order->id, $lineItem->purchasableId, $lineItem->getOptions(), $lineItem->qty, $lineItem->note);
 		}
 		$clone->setLineItems($lineItems);
 
