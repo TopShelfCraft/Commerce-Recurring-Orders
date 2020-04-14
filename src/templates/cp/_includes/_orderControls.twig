@@ -76,32 +76,6 @@
             </div>
         </div>
 
-        <div id="recurringOrder-recurrenceInterval" class="field">
-            <div class="heading">
-                <label for="recurringOrder-recurrenceInterval" class="">
-                    {{ recurringOrders.t("Recurrence Interval") }}
-                </label>
-            </div>
-            <div class="input">
-                <span>
-                {% if settings.recurrenceIntervalOptions is not empty %}
-                    {% include '_includes/forms/select' with {
-                        id: 'makeRecurring-recurrenceInterval',
-                        name: 'makeRecurring[recurrenceInterval]',
-                        value: order.getRecurrenceInterval(),
-                        options: settings.getRecurrenceIntervalOptions(),
-                    } %}
-                {% else %}
-                    {% include '_includes/forms/text' with {
-                        id: 'makeRecurring-recurrenceInterval',
-                        name: 'makeRecurring[recurrenceInterval]',
-                        value: order.getRecurrenceInterval(),
-                    } %}
-                {% endif %}
-                </span>
-            </div>
-        </div>
-
         {% if order.recurrenceStatus == 'error' %}
 
             <div id="recurringOrder-errorReason" class="field">
@@ -128,6 +102,32 @@
             </div>
 
         {% endif %}
+
+        <div id="recurringOrder-recurrenceInterval" class="field">
+            <div class="heading">
+                <label for="recurringOrder-recurrenceInterval" class="">
+                    {{ recurringOrders.t("Recurrence Interval") }}
+                </label>
+            </div>
+            <div class="input">
+                <span>
+                {% if settings.recurrenceIntervalOptions is not empty %}
+                    {% include '_includes/forms/select' with {
+                        id: 'makeRecurring-recurrenceInterval',
+                        name: 'makeRecurring[recurrenceInterval]',
+                        value: order.getRecurrenceInterval(),
+                        options: settings.getRecurrenceIntervalOptions(),
+                    } %}
+                {% else %}
+                    {% include '_includes/forms/text' with {
+                        id: 'makeRecurring-recurrenceInterval',
+                        name: 'makeRecurring[recurrenceInterval]',
+                        value: order.getRecurrenceInterval(),
+                    } %}
+                {% endif %}
+                </span>
+            </div>
+        </div>
 
         <div id="recurringOrder-lastRecurrence" class="field">
             <div class="heading">
@@ -159,7 +159,7 @@
                     } %}
                 </span>
                 {# TODO: Schedule now! #}
-                <a class="small btn right edit" style="margin:2px" href="#">
+                <a class="small btn right edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/process-order-recurrence', {id: order.id}) }}">
                     {{ recurringOrders.t("Process Now") }}
                 </a>
             </div>

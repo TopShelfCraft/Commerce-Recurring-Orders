@@ -30,11 +30,11 @@ class RecurringOrderRecord extends BaseRecord
 	const STATUS_PAUSED = 'paused';
 	const STATUS_UNSCHEDULED = 'unscheduled';
 
-	const ERROR_DISCOUNT_UNAVAILABLE = 'productUnavailable';
+	const ERROR_DISCOUNT_UNAVAILABLE = 'discountUnavailable';
 	const ERROR_NO_PAYMENT_SOURCE = 'noPaymentSource';
 	const ERROR_PAYMENT_ISSUE = 'paymentIssue';
 	const ERROR_PAYMENT_SOURCE_EXPIRED = 'paymentSourceExpired';
-	const ERROR_PRODUCT_UNAVAILABLE = 'discountUnavailable';
+	const ERROR_PRODUCT_UNAVAILABLE = 'productUnavailable';
 
 	const TableName = 'recurringorders_recurringorders';
 

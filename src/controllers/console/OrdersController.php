@@ -50,6 +50,37 @@ class OrdersController extends BaseConsoleController
 	}
 
 	/**
+	 * @param $orderId
+	 *
+	 * @return int
+	 *
+	 * @throws \yii\base\Exception
+	 */
+	public function actionProcessOrderRecurrence($orderId)
+	{
+
+		$order = Commerce::getInstance()->orders->getOrderById($orderId);
+
+		if (!$order)
+		{
+			return ExitCode::UNSPECIFIED_ERROR;
+		}
+
+		try
+		{
+			$success = RecurringOrders::getInstance()->orders->processOrderRecurrence($order);
+			return $success ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
+		}
+		catch (\Exception $e)
+		{
+			$this->_writeError($e->getMessage());
+		}
+
+		return ExitCode::UNSPECIFIED_ERROR;
+
+	}
+
+	/**
 	 * @return int
 	 */
 	public function actionProcessOutstandingOrders()

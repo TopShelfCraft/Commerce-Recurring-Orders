@@ -79,7 +79,7 @@ class CpDataController extends BaseWebController
 				'title' => $order->reference,
 				'url' => $order->getCpEditUrl(),
 				'date' => $order->dateOrdered->format('D jS M Y'),
-				'total' => Craft::$app->getFormatter()->asCurrency($order->getTotalPaid(), $order->currency, [], [], false),
+				'totalPrice' => Craft::$app->getFormatter()->asCurrency($order->getTotalPrice(), $order->currency, [], [], false),
 				'orderStatus' => $order->getOrderStatusHtml(),
 				'recurrenceStatus' => $order->getTableAttributeHtml('recurrenceStatus'),
 				'nextRecurrence' => $order->getTableAttributeHtml('nextRecurrence'),
@@ -160,7 +160,7 @@ class CpDataController extends BaseWebController
 				'title' => $order->reference,
 				'url' => $order->getCpEditUrl(),
 				'date' => $order->dateOrdered->format('D jS M Y'),
-				'total' => Craft::$app->getFormatter()->asCurrency($order->getTotalPaid(), $order->currency, [], [], false),
+				'totalPrice' => Craft::$app->getFormatter()->asCurrency($order->getTotalPrice(), $order->currency, [], [], false),
 				'orderStatus' => $order->getOrderStatusHtml(),
 			];
 		}

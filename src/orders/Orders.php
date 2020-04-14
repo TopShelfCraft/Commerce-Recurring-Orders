@@ -187,10 +187,11 @@ class Orders extends Component
 		/** @var Order $order */
 
 		/*
-		 * To prevent an infinite spiral of derived orders, bail early if this newly completed order already has an
-		 * Originating Order marked on it (i.e. it is already "derived").
+		 * To prevent an infinite spiral of derived or generated orders, bail early if this newly completed order
+		 * already has an Originating Order marked on it (i.e. it is already "derived")
+		 * or if it has a Parent Order (i.e. it is already "generated").
 		 */
-		if ($order->getOriginatingOrderId())
+		if ($order->getOriginatingOrderId() || $order->getParentOrderId())
 		{
 			return;
 		}
@@ -323,13 +324,18 @@ class Orders extends Component
 	public function processOrderRecurrence(Order $parentOrder)
 	{
 
-		if (!$parentOrder->getIsRecurring())
+		/** @var RecurringOrderBehavior $parentOrder */
+
+		// TODO: Only pass if the Parent Order has a Recurrence Schedule?
+		if (!$parentOrder->hasRecurrenceStatus())
 		{
 			// TODO: Translate?
 			throw new Exception("Cannot process recurrence on a non-recurring Order.");
 		}
 
 		$newOrder = $this->getLightClone($parentOrder);
+		/** @var RecurringOrderBehavior $newOrder */
+		$newOrder->parentOrderId = $parentOrder->id;
 
 		$success = true;
 		$errorReason = null;
@@ -341,22 +347,18 @@ class Orders extends Component
 
 		if (!$paymentSource)
 		{
-			$success = false;
-			// TODO: Translate?
-			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
-			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
-			// TODO: Trigger error and return early
+//			$success = false;
+//			// TODO: Translate?
+//			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
+//			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
+//			// TODO: Trigger error and return early
 		}
-
-
 
 		// TODO: Check for line item availability errors (ERROR_PRODUCT_UNAVAILABLE)
 
 		// TODO: Check for discount errors (ERROR_DISCOUNT_UNAVAILABLE)
 
 		// TODO: Check for Payment Source expiration (ERROR_PAYMENT_SOURCE_EXPIRED)
-
-
 
 		// TODO: (Start transaction...)
 
@@ -395,34 +397,16 @@ class Orders extends Component
 
 		try
 		{
-			$paymentForm = $newOrder->getGateway()->getPaymentFormModel();
-			$paymentForm->populateFromPaymentSource($paymentSource);
-			// Only bother trying the payment if we've been successful so far.
-			$success && Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
+//			$paymentForm = $newOrder->getGateway()->getPaymentFormModel();
+//			$paymentForm->populateFromPaymentSource($paymentSource);
+//			// Only bother trying the payment if we've been successful so far.
+//			$success && Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
 		}
 		catch(\Throwable $e)
 		{
 			$success = false;
 			RecurringOrders::error($e->getMessage());
 			$errorReason = RecurringOrderRecord::ERROR_PAYMENT_ISSUE;
-		}
-
-		/*
-		 * Record a new Generated Order
-		 */
-
-		try
-		{
-			$generatedOrderRecord = new GeneratedOrderRecord([
-				'orderId' => $newOrder->id,
-				'parentOrderId' => $parentOrder->id,
-			]);
-			$success = $success && $generatedOrderRecord->save();
-		}
-		catch(\Throwable $e)
-		{
-			$success = false;
-			RecurringOrders::error($e->getMessage());
 		}
 
 		// TODO: (Commit/rollback transaction.)
@@ -453,7 +437,7 @@ class Orders extends Component
 		$this->makeOrderRecurring($parentOrder, [
 			'status' => RecurringOrderRecord::STATUS_ERROR,
 			'errorReason' => $errorReason,
-			'errorCount' => intval($parentOrder->getRecurringOrderErrorCount()) + 1,
+			'errorCount' => intval($parentOrder->getRecurrenceErrorCount()) + 1,
 		], false);
 
 		// TODO: Trigger error events.

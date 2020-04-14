@@ -21,6 +21,44 @@ class OrdersController extends BaseWebController
 	}
 
 	/**
+	 * @return Response|null
+	 *
+	 * @throws \yii\web\BadRequestHttpException
+	 */
+	public function actionProcessOrderRecurrence()
+	{
+
+		$request = Craft::$app->request;
+
+		$id = $request->getRequiredParam('id');
+		$order = Commerce::getInstance()->orders->getOrderById($id);
+
+		if (!$order)
+		{
+			// TODO: Translate.
+			return $this->returnErrorResponse("Could not process this order recurrence, because the Parent Order does not exist.");
+		}
+
+		try
+		{
+			$success = RecurringOrders::getInstance()->orders->processOrderRecurrence($order);
+		}
+		catch(\Exception $e)
+		{
+			$success = false;
+		}
+
+		if ($success)
+		{
+			return $this->returnSuccessResponse();
+		}
+
+		// TODO: Translate.
+		return $this->returnErrorResponse("Could not process this Order Recurrence.");
+
+	}
+
+	/**
 	 * @return Response
 	 *
 	 * @throws \yii\web\BadRequestHttpException if the Return URL is invalid.
