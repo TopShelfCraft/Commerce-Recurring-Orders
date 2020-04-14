@@ -89,7 +89,7 @@ class RecurringOrderQueryBehavior extends Behavior
 	 */
 	public function hasRecurrenceStatus($value = true)
 	{
-		$this->hasRecurrenceStatus = $value;
+		$this->hasRecurrenceStatus = is_null($value) ? $value : (bool) $value;
 		return $this->owner;
 	}
 
@@ -100,7 +100,7 @@ class RecurringOrderQueryBehavior extends Behavior
 	 */
 	public function hasRecurrenceSchedule($value = true)
 	{
-		$this->hasRecurrenceSchedule = $value;
+		$this->hasRecurrenceSchedule = is_null($value) ? $value : (bool) $value;
 		return $this->owner;
 	}
 
@@ -177,7 +177,7 @@ class RecurringOrderQueryBehavior extends Behavior
 	 */
 	public function hasOriginatingOrder($value = true)
 	{
-		$this->hasOriginatingOrder = $value;
+		$this->hasOriginatingOrder = is_null($value) ? $value : (bool) $value;
 		return $this->owner;
 	}
 
@@ -199,7 +199,7 @@ class RecurringOrderQueryBehavior extends Behavior
 	 */
 	public function hasParentOrder($value = true)
 	{
-		$this->hasParentOrder = $value;
+		$this->hasParentOrder = is_null($value) ? $value : (bool) $value;
 		return $this->owner;
 	}
 
@@ -236,6 +236,14 @@ class RecurringOrderQueryBehavior extends Behavior
 				'and',
 				['is not', '[[recurringOrders.recurrenceInterval]]', null],
 				['is not', '[[recurringOrders.nextRecurrence]]', null],
+			]);
+		}
+
+		if ($this->hasRecurrenceSchedule === false) {
+			$orderQuery->subQuery->andWhere([
+				'or',
+				['is', '[[recurringOrders.recurrenceInterval]]', null],
+				['is', '[[recurringOrders.nextRecurrence]]', null],
 			]);
 		}
 
