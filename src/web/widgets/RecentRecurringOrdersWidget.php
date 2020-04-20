@@ -32,7 +32,7 @@ class RecentRecurringOrdersWidget extends Widget
      */
     public static function isSelectable(): bool
     {
-        return Craft::$app->getUser()->checkPermission('commerce-manageOrders');
+		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
     }
 
     /**

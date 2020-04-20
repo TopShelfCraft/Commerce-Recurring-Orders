@@ -14,6 +14,8 @@ use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
+use topshelfcraft\recurringorders\web\widgets\CountAllRecurringOrdersWidget;
+use topshelfcraft\recurringorders\web\widgets\CountGeneratedOrdersWidget;
 use topshelfcraft\recurringorders\web\widgets\RecentGeneratedOrdersWidget;
 use topshelfcraft\recurringorders\web\widgets\RecentRecurringOrdersWidget;
 use topshelfcraft\recurringorders\web\widgets\CountUpcomingRecurrencesWidget;
@@ -242,6 +244,8 @@ class CpCustomizations extends Component
 	{
 		$event->types[] = RecentGeneratedOrdersWidget::class;
 		$event->types[] = RecentRecurringOrdersWidget::class;
+		$event->types[] = CountAllRecurringOrdersWidget::class;
+		$event->types[] = CountGeneratedOrdersWidget::class;
 		$event->types[] = CountUpcomingRecurrencesWidget::class;
 	}
 

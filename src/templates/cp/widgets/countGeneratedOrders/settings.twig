@@ -1,0 +1,14 @@
+{% import "_includes/forms" as forms %}
+
+<div id="{{ id }}">
+
+    {{ forms.textField({
+        label: "Date Interval"|t('recurring-orders'),
+        name: 'dateRangeInterval',
+        value: widget.dateRangeInterval,
+        instructions: "(Leave blank to show Generated Orders for Today.)"|t('recurring-orders'),
+        errors: widget.getErrors('dateRangeInterval')
+    }) }}
+    {# TODO: Translate. #}
+
+</div>

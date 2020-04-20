@@ -1,0 +1,44 @@
+{% import "_includes/forms" as forms %}
+
+<div id="{{ id }}">
+
+    <div class="field">
+
+        <div class="heading">
+            <label>{{ "Recurrence Status"|t('recurring-orders') }}</label>
+        </div>
+
+        <div class="input ltr">
+
+            <input type="hidden" class="recurrenceStatusInput" name="recurrenceStatus" value="{{ widget.recurrenceStatus }}"/>
+
+            <a class="btn menubtn">
+                <span class="status"></span> {{ "All"|t('commerce') }}
+            </a>
+
+            <div class="menu">
+                <ul class="padded">
+                    <li>
+                        <a>
+                            <span class="statusLabel">
+                                <span class="status"></span> {{ "All"|t('commerce') }}
+                            </span>
+                        </a>
+                    </li>
+                    {% for status, label in statuses %}
+                        <li>
+                            <a data-recurrence-status="{{ status }}">
+                                <span class="statusLabel">
+                                    {% include 'recurring-orders/cp/_includes/_statusLabel' with {status: status} %}
+                                </span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

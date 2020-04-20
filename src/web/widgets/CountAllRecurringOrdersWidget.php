@@ -5,24 +5,24 @@ use Craft;
 use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
-use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
-use topshelfcraft\recurringorders\misc\IntervalHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
+use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
+use topshelfcraft\recurringorders\web\assets\OrdersWidgetAsset;
 
-class CountUpcomingRecurrencesWidget extends Widget
+class CountAllRecurringOrdersWidget extends Widget
 {
 
 	/**
 	 * @var string
 	 */
-	protected $handle = 'recurring-orders--count-upcoming-recurrences';
+	protected $handle = 'recurring-orders--count-all-recurring-orders';
 
 	/**
 	 * @var string|null
 	 */
-	public $dateRangeInterval;
+	public $recurrenceStatus;
 
 	/**
 	 * @inheritDoc
@@ -37,8 +37,8 @@ class CountUpcomingRecurrencesWidget extends Widget
 	 */
 	public static function displayName(): string
 	{
-		// TODO: Translate
-		return RecurringOrders::t( 'Count Upcoming Order Recurrences');
+		// TODO: Translate.
+		return RecurringOrders::t('Count All Recurring Orders');
 	}
 
 	/**
@@ -71,25 +71,26 @@ class CountUpcomingRecurrencesWidget extends Widget
 	public function getBodyHtml()
 	{
 
-		$interval = $this->dateRangeInterval ? IntervalHelper::normalizeInterval($this->dateRangeInterval) : null;
-		$humanDuration = $interval ? DateTimeHelper::humanDurationFromInterval($interval) : null;
-
-		$nextRecurrenceThreshold = $interval
-			? (new \DateTime())->add($interval)->getTimestamp()
-			: strtotime('tomorrow');
-
 		$query = Order::find()->isCompleted();
 		/** @var RecurringOrderQueryBehavior $query */
-		$query->hasRecurrenceSchedule();
-		$query->nextRecurrence('<'.$nextRecurrenceThreshold);
+		$query->hasRecurrenceStatus(true);
+		if ($this->recurrenceStatus)
+		{
+			if ($this->recurrenceStatus === RecurringOrderRecord::STATUS_UNSCHEDULED)
+			{
+				$query->hasRecurrenceSchedule(false);
+			}
+			else
+			{
+				$query->recurrenceStatus($this->recurrenceStatus);
+			}
+		}
 
 		$number = $query->count();
 
-		$descriptor = "Upcoming Order " . ($number == 1 ? 'Recurrence' : 'Recurrences');
+		$descriptor =  RecurringOrders::t($number == 1 ? 'Recurring Order' : 'Recurring Orders');
 
-		$timeFrame = $this->dateRangeInterval
-			? RecurringOrders::t('Next {interval}', ['interval' => $humanDuration])
-			: Craft::t('app', 'Today');
+		$timeFrame = $this->recurrenceStatus ? RecurringOrders::t('_status:' . $this->recurrenceStatus) : null;
 
 		$id = $this->handle . StringHelper::randomString();
 		$namespaceId = Craft::$app->getView()->namespaceInputId($id);
@@ -123,36 +124,19 @@ class CountUpcomingRecurrencesWidget extends Widget
 	public function getSettingsHtml(): string
 	{
 
-		$id = 'total-orders' . StringHelper::randomString();
+		Craft::$app->getView()->registerAssetBundle(OrdersWidgetAsset::class);
+
+		$id = $this->handle . StringHelper::randomString();
 		$namespaceId = Craft::$app->getView()->namespaceInputId($id);
 
-		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/countUpcomingRecurrences/settings', [
+		Craft::$app->getView()->registerJs("new Craft.RecurringOrders.OrdersWidgetSettings('" . $namespaceId . "');");
+
+		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/countAllRecurringOrders/settings', [
 			'id' => $id,
 			'namespaceId' => $namespaceId,
 			'widget' => $this,
+			'statuses' => RecurringOrders::getInstance()->orders->getAllRecurrenceStatuses(),
 		]);
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	protected function defineRules(): array
-	{
-
-		$rules = parent::defineRules();
-
-		$rules[] = [
-			'dateRangeInterval',
-			function ($attribute, $params, $validator) {
-				if ($this->$attribute && !IntervalHelper::isValidInterval($this->$attribute))
-				{
-					$this->addError($attribute, 'The Date Range Interval is not valid.');
-				}
-			}
-		];
-
-		return $rules;
 
 	}
 

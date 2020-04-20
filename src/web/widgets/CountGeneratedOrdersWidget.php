@@ -11,13 +11,13 @@ use topshelfcraft\recurringorders\misc\IntervalHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 
-class CountUpcomingRecurrencesWidget extends Widget
+class CountGeneratedOrdersWidget extends Widget
 {
 
 	/**
 	 * @var string
 	 */
-	protected $handle = 'recurring-orders--count-upcoming-recurrences';
+	protected $handle = 'recurring-orders--count-generated-orders';
 
 	/**
 	 * @var string|null
@@ -38,7 +38,7 @@ class CountUpcomingRecurrencesWidget extends Widget
 	public static function displayName(): string
 	{
 		// TODO: Translate
-		return RecurringOrders::t( 'Count Upcoming Order Recurrences');
+		return RecurringOrders::t( 'Count Generated Orders');
 	}
 
 	/**
@@ -74,21 +74,22 @@ class CountUpcomingRecurrencesWidget extends Widget
 		$interval = $this->dateRangeInterval ? IntervalHelper::normalizeInterval($this->dateRangeInterval) : null;
 		$humanDuration = $interval ? DateTimeHelper::humanDurationFromInterval($interval) : null;
 
-		$nextRecurrenceThreshold = $interval
-			? (new \DateTime())->add($interval)->getTimestamp()
-			: strtotime('tomorrow');
+		$dateOrderedThreshold = $interval
+			? (new \DateTime())->sub($interval)->getTimestamp()
+			: strtotime('today');
 
 		$query = Order::find()->isCompleted();
 		/** @var RecurringOrderQueryBehavior $query */
-		$query->hasRecurrenceSchedule();
-		$query->nextRecurrence('<'.$nextRecurrenceThreshold);
+		$query->hasParentOrder();
+		$query->dateOrdered('>'.$dateOrderedThreshold);
 
 		$number = $query->count();
 
-		$descriptor = "Upcoming Order " . ($number == 1 ? 'Recurrence' : 'Recurrences');
+		// TODO: Translate
+		$descriptor = "Generated " . ($number == 1 ? 'Order' : 'Orders');
 
 		$timeFrame = $this->dateRangeInterval
-			? RecurringOrders::t('Next {interval}', ['interval' => $humanDuration])
+			? RecurringOrders::t('Past {interval}', ['interval' => $humanDuration])
 			: Craft::t('app', 'Today');
 
 		$id = $this->handle . StringHelper::randomString();
@@ -126,7 +127,7 @@ class CountUpcomingRecurrencesWidget extends Widget
 		$id = 'total-orders' . StringHelper::randomString();
 		$namespaceId = Craft::$app->getView()->namespaceInputId($id);
 
-		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/countUpcomingRecurrences/settings', [
+		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/countGeneratedOrders/settings', [
 			'id' => $id,
 			'namespaceId' => $namespaceId,
 			'widget' => $this,
