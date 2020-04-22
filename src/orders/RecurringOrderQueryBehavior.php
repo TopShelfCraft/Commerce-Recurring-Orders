@@ -73,6 +73,11 @@ class RecurringOrderQueryBehavior extends Behavior
 	public $parentOrderId;
 
 	/**
+	 * @var mixed
+	 */
+	public $isOutstanding;
+
+	/**
 	 * @inheritdoc
 	 */
 	public function events()
@@ -215,6 +220,17 @@ class RecurringOrderQueryBehavior extends Behavior
 	}
 
 	/**
+	 * @param mixed $value
+	 *
+	 * @return OrderQuery
+	 */
+	public function isOutstanding($value = true)
+	{
+		$this->isOutstanding = is_null($value) ? $value : (bool) $value;
+		return $this->owner;
+	}
+
+	/**
 	 * @param CancelableEvent $event
 	 */
 	public function afterPrepare(CancelableEvent $event)
@@ -293,6 +309,11 @@ class RecurringOrderQueryBehavior extends Behavior
 		if ($this->parentOrderId)
 		{
 			$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.parentOrderId', $this->parentOrderId));
+		}
+
+		if ($this->isOutstanding)
+		{
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.time()));
 		}
 
 	}

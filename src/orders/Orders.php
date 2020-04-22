@@ -6,6 +6,7 @@ use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use topshelfcraft\recurringorders\misc\NormalizeTrait;
+use topshelfcraft\recurringorders\misc\PaymentSourcesHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\ErrorException;
 use yii\base\Event;
@@ -125,6 +126,8 @@ class Orders extends Component
 
 		/** @var RecurringOrderBehavior $order */
 
+		// Order fields
+
 		if ($status = $request->getParam('makeRecurring.status'))
 		{
 			$order->setRecurrenceStatus($status);
@@ -145,7 +148,32 @@ class Orders extends Component
 			$order->setResetNextRecurrenceOnSave(self::normalizeBoolean($resetNextRecurrence));
 		}
 
-		// TODO: Process `spec` fields
+		if (($paymentSourceId = $request->getParam('makeRecurring.paymentSourceId')) !== null)
+		{
+			$order->setPaymentSourceId($paymentSourceId ?: null);
+		}
+
+		// Spec fields
+
+		if ($specStatus = $request->getParam('makeRecurring.spec.status'))
+		{
+			$order->setRecurrenceStatus($specStatus);
+		}
+
+		if ($specRecurrenceInterval = $request->getParam('makeRecurring.spec.recurrenceInterval'))
+		{
+			$order->getSpec()->setRecurrenceInterval($specRecurrenceInterval);
+		}
+
+		if ($specNextRecurrence = $request->getParam('makeRecurring.spec.nextRecurrence'))
+		{
+			$order->getSpec()->setNextRecurrence($specNextRecurrence);
+		}
+
+		if (($specPaymentSourceId = $request->getParam('makeRecurring.spec.paymentSourceId')) !== null)
+		{
+			$order->getSpec()->setPaymentSourceId($specPaymentSourceId ?: null);
+		}
 
 	}
 
@@ -444,6 +472,18 @@ class Orders extends Component
 
 		return false;
 
+	}
+
+	/**
+	 * @param Order $order
+	 *
+	 * @return array
+	 *
+	 * @throws \yii\base\InvalidConfigException
+	 */
+	public function getPaymentSourceFormOptionsByOrder(Order $order)
+	{
+		return PaymentSourcesHelper::getPaymentSourceFormOptionsByOrder($order);
 	}
 
 }

@@ -1,7 +1,9 @@
 <?php
 namespace topshelfcraft\recurringorders\controllers\console;
 
+use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
+use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\console\ExitCode;
 
@@ -85,8 +87,30 @@ class OrdersController extends BaseConsoleController
 	 */
 	public function actionProcessOutstandingOrders()
 	{
-		// TODO: Implement
-		return ExitCode::UNAVAILABLE;
+
+		$query = Order::find();
+		/** @var RecurringOrderQueryBehavior $query */
+
+		$outstandingOrders = $query->isOutstanding()->all();
+
+		$success = true;
+
+		foreach ($outstandingOrders as $order)
+		{
+
+			try
+			{
+				$success = RecurringOrders::getInstance()->orders->processOrderRecurrence($order) && $success;
+			}
+			catch (\Exception $e)
+			{
+				$this->_writeError("Error while processing recurrence for Order {$order->id}: " . $e->getMessage());
+			}
+
+		}
+
+		return $success ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
+
 	}
 
 }

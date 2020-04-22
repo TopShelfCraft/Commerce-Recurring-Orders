@@ -1,3 +1,5 @@
+{% import "_includes/forms" as forms %}
+
 {% set statusButtons = {
     'active': [
         { label: 'Cancel', action: 'recurring-orders/orders/cancel-recurring-order', },
@@ -151,17 +153,38 @@
                 </label>
             </div>
             <div class="input">
-                <span>
-                    {% include '_includes/forms/date' with {
+                <div id="floatingDateTimeFieldWrapper" style="display: inline-block; float: left;">
+                    {{ forms.dateTimeField({
                         id: 'makeRecurring-nextRecurrence',
                         name: 'makeRecurring[nextRecurrence]',
                         value: order.nextRecurrence,
-                    } %}
-                </span>
+                        errors: order.getErrors('nextRecurrence'),
+                        disabled: false,
+                    }) }}
+                </div>
                 {# TODO: Schedule now! #}
                 <a class="small btn right edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/process-order-recurrence', {id: order.id}) }}">
                     {{ recurringOrders.t("Process Now") }}
                 </a>
+            </div>
+        </div>
+
+        <div id="recurringOrder-paymentSourceId" class="field">
+            <div class="heading">
+                <label for="recurringOrder-paymentSourceId" class="">
+                    {# TODO: Translate. #}
+                    {{ recurringOrders.t("Payment Source") }}
+                </label>
+            </div>
+            <div class="input">
+                <span>
+                    {% include '_includes/forms/select' with {
+                        id: 'makeRecurring-paymentSourceId',
+                        name: 'makeRecurring[paymentSourceId]',
+                        value: order.getPaymentSourceId(),
+                        options: recurringOrders.orders.getPaymentSourceFormOptionsByOrder(order),
+                    } %}
+                </span>
             </div>
         </div>
 
