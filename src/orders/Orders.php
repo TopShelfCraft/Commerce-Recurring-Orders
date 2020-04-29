@@ -224,12 +224,29 @@ class Orders extends Component
 			return;
 		}
 
+		$this->replicateAsRecurring($order);
+
+	}
+
+	/**
+	 * @param Order $order
+	 *
+	 * @throws Exception from `saveElement()`
+	 * @throws \Throwable from `markAsComplete()`
+	 * @throws \craft\commerce\errors\OrderStatusException from `markAsComplete()`
+	 * @throws \craft\errors\ElementNotFoundException from `markAsComplete()`
+	 */
+	public function replicateAsRecurring(Order $order)
+	{
+
+		$success = true;
+
 		$derivedOrders = $this->_prepareDerivedOrders($order);
 
 		foreach ($derivedOrders as $derivedOrder)
 		{
-			Craft::$app->getElements()->saveElement($derivedOrder);
-			$derivedOrder->markAsComplete();
+			$success = $success && Craft::$app->getElements()->saveElement($derivedOrder);
+			$success = $success && $derivedOrder->markAsComplete();
 		}
 
 		// Raising the 'afterCompleteDerivedOrders' event
@@ -240,6 +257,8 @@ class Orders extends Component
 		if ($this->hasEventHandlers(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS)) {
 			$this->trigger(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS, $event);
 		}
+
+		return $success;
 
 	}
 

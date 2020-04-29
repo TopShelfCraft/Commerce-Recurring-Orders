@@ -112,6 +112,36 @@ class OrdersController extends BaseWebController
 
 	}
 
+	public function actionReplicateAsRecurring()
+	{
+
+		$request = Craft::$app->request;
+		$attributes = [];
+
+		$id = $request->getRequiredParam('id');
+
+		/** @var RecurringOrderBehavior $order */
+		$order = Commerce::getInstance()->orders->getOrderById($id);
+
+		try
+		{
+			/** @var Order $order */
+			$success = RecurringOrders::getInstance()->orders->replicateAsRecurring($order);
+			if ($success)
+			{
+				return $this->returnSuccessResponse();
+			}
+		}
+		catch(\Throwable $e)
+		{
+			return $this->returnErrorResponse($e->getMessage());
+		}
+
+		// TODO: Translate.
+		return $this->returnErrorResponse("Something went wrong while replicating the order.");
+
+	}
+
 	/**
 	 * @return Response|null
 	 *
@@ -175,5 +205,7 @@ class OrdersController extends BaseWebController
 		return $this->returnErrorResponse("Could not update the Order.");
 
 	}
+
+
 
 }
