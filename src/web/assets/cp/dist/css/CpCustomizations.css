@@ -1,0 +1,12 @@
+@font-face {
+	font-family: 'Recurring-Orders';
+	src:  url('../fonts/recurring-orders.eot?ygu1lv');
+	src:  url('../fonts/recurring-orders.eot?ygu1lv#iefix') format('embedded-opentype'),
+	url('../fonts/recurring-orders.ttf?ygu1lv') format('truetype'),
+	url('../fonts/recurring-orders.woff?ygu1lv') format('woff'),
+	url('../fonts/recurring-orders.svg?ygu1lv#recurring-orders') format('svg');
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
+	unicode-range: U+E900;
+}

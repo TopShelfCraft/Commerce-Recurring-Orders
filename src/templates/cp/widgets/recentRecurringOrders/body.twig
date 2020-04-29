@@ -37,3 +37,17 @@ new Craft.VueAdminTable({
     tableData: {{ tableData|json_encode|raw }}
 });
 {% endjs %}
+
+<style>
+{% css %}
+    .widget[class*=recentrecurringorderswidget] .widget-heading h2:before {
+        content: "\e900";
+        font-family: 'recurring-orders', system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        display: inline-block;
+        font-weight: 400;
+        font-size: 80%;
+        margin-right: 0.7em;
+        color: rgba(42,99,99,0.8);
+    }
+{% endcss %}
+</style>
