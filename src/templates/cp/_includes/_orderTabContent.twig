@@ -9,7 +9,7 @@
     order.hasRecurrenceStatus
     or not (
         ((derivedOrders | length) and hideControlsForOriginatingOrder)
-        or (order.parentId and hideControlsForGeneratedOrder)
+        or (order.parentOrderId and hideControlsForGeneratedOrder)
     )
 %}
 
