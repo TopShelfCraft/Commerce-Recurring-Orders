@@ -9,6 +9,7 @@ return [
 	"Actively Recurring" => "Actively Recurring",
 	"Cancel" => "Cancel",
 	"Date Interval" => "Date Interval",
+	"Derived Recurring Orders" => "Derived Recurring Orders",
 	"Error Count" => "Error Count",
 	"Error Reason" => "Error Reason",
 	"every {interval}" => "every {interval}",
