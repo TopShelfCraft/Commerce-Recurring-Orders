@@ -44,12 +44,12 @@ abstract class BaseWebController extends Controller
 	 *
 	 * @throws BadRequestHttpException from `redirectToPostedUrl()` if the redirect param was tampered with.
 	 */
-	protected function returnSuccessResponse($returnUrlObject = null)
+	protected function returnSuccessResponse($returnUrlObject = null, $jsonParams = [])
 	{
 
 		if (Craft::$app->getRequest()->getAcceptsJson())
 		{
-			return $this->asJson(['success' => true]);
+			return $this->asJson(['success' => true] + $jsonParams);
 		}
 
 		return $this->redirectToPostedUrl($returnUrlObject, Craft::$app->getRequest()->getReferrer());
