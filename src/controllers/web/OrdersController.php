@@ -194,7 +194,7 @@ class OrdersController extends BaseWebController
 		catch (\Exception $e)
 		{
 			RecurringOrders::error($e->getMessage());
-			$this->returnErrorResponse($e->getMessage());
+			return $this->returnErrorResponse($e->getMessage());
 		}
 
 		/*
@@ -226,7 +226,7 @@ class OrdersController extends BaseWebController
 
 		}
 
-		$this->returnSuccessResponse(null, ['paymentSource' => $paymentSource]);
+		return $this->returnSuccessResponse(null, ['paymentSource' => $paymentSource]);
 
 	}
 
