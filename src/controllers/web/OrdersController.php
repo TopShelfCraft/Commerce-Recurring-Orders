@@ -17,6 +17,10 @@ use yii\web\Response;
 class OrdersController extends BaseWebController
 {
 
+	protected $allowAnonymous = [
+		'add-payment-source'
+	];
+
 	/**
 	 * @return Response|null
 	 *
@@ -202,14 +206,21 @@ class OrdersController extends BaseWebController
 		$paymentForm->setAttributes($request->getBodyParams(), false);
 		$description = (string)$request->getBodyParam('description');
 
+		$transaction = Craft::$app->db->getTransaction() ?? Craft::$app->db->beginTransaction();
+
 		try
 		{
 			$paymentSource = $commerce->paymentSources->createPaymentSource($user->id, $gateway, $paymentForm, $description);
+			$order->paymentSourceId = $paymentSource->id;
+			Craft::$app->elements->saveElement($order);
+			$transaction->commit();
 		}
 		catch (\Throwable $e) {
 
 			Craft::$app->getErrorHandler()->logException($e);
 			RecurringOrders::error($e->getMessage());
+
+			$transaction->rollBack();
 
 			return $this->returnErrorResponse(Commerce::t('Could not create the payment source.'));
 
