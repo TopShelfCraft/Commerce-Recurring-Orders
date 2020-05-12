@@ -359,7 +359,6 @@ class OrdersController extends BaseWebController
 		else
 		{
 			// TODO: Translate.
-			RecurringOrders::error("Could not create a User to save Payment Source on Order.");
 			$errors = $user->getErrors();
 			RecurringOrders::error($errors);
 			throw new Exception("Could not create a User to save Payment Source on Order.");
