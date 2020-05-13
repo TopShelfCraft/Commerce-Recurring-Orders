@@ -257,7 +257,6 @@ class RecurringOrders extends Plugin
 			[$this->orders, 'afterCompleteOrder']
 		);
 
-
 		/*
 		 * Extra processing when Craft assembles its list of CP nav links.
 		 */

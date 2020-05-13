@@ -131,6 +131,13 @@ class Orders extends Component
 
 		/** @var RecurringOrderBehavior $order */
 
+		// Email (In case we're trying to add a customer email and create a Payment Source in the same request.)
+
+		if ($email = $request->getParam('email'))
+		{
+			$order->setEmail($email);
+		}
+
 		// Order fields
 
 		if ($status = $request->getParam('makeRecurring.status'))
@@ -602,7 +609,7 @@ class Orders extends Component
 		}
 
 		// Can't create a user without an email
-		if (!$order->email)
+		if (!$order->getEmail())
 		{
 			// TODO: Translate
 			throw new Exception("Can't create a User without an email.");
@@ -617,7 +624,7 @@ class Orders extends Component
 		}
 
 		// Customer already a user? Commerce will link them up later.
-		$user = User::find()->email($order->email)->status(null)->one();
+		$user = User::find()->email($order->getEmail())->status(null)->one();
 		if ($user)
 		{
 			return $user;

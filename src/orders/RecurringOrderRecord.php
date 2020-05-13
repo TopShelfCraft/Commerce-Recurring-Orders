@@ -61,7 +61,7 @@ class RecurringOrderRecord extends BaseRecord
 				$value = IntervalHelper::durationInSeconds($this->recurrenceInterval);
 			}
 			// TODO: Move this into validation and make it Yii-ish
-			if (!IntervalHelper::isValidInterval($value))
+			if ($value && !IntervalHelper::isValidInterval($value))
 			{
 				// TODO: Translate.
 				throw new Exception("{$value} is not a valid interval.");
