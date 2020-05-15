@@ -31,6 +31,31 @@
 </style>
 
 
+{% if order.parentOrderId %}
+
+<div class="meta">
+
+    <h3 class="order-title">
+        {{ recurringOrders.t("Generated Order") }}
+    </h3>
+
+    <div id="recurringOrder-parentOrder" class="field">
+        <div class="heading">
+            <label for="recurringOrder-parentOrder">
+                {# TODO: Translate. #}
+                Generated from
+            </label>
+        </div>
+        <div class="input ltr">
+            {{ order.parentOrder.getLink | raw }}
+        </div>
+    </div>
+
+</div>
+
+{% endif %}
+
+
 
 {% if derivedOrders | length %}
 
