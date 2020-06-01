@@ -5,6 +5,7 @@ use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;;
+use craft\events\ModelEvent;
 use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use topshelfcraft\recurringorders\misc\PaymentSourcesHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
@@ -110,8 +111,10 @@ class Orders extends Component
 	 *
 	 * @throws \Exception
 	 */
-	public function beforeSaveOrder(Order $order)
+	public function handleOrderBeforeSave(ModelEvent $event)
 	{
+
+		$order = $event->sender;
 
 		$request = Craft::$app->request;
 
@@ -182,8 +185,10 @@ class Orders extends Component
 	 *
 	 * @throws \Exception to interrupt the Order Save event if the RecurringOrderRecord cannot be saved.
 	 */
-	public function afterSaveOrder(Order $order)
+	public function handleOrderAfterSave(ModelEvent $event)
 	{
+
+		$order = $event->sender;
 
 		/** @var RecurringOrderBehavior $order */
 
@@ -204,7 +209,7 @@ class Orders extends Component
 	/**
 	 * @param Event $event
 	 */
-	public function afterCompleteOrder(Event $event)
+	public function handleAfterCompleteOrder(Event $event)
 	{
 
 		$order = $event->sender;
@@ -221,6 +226,64 @@ class Orders extends Component
 		}
 
 		$this->replicateAsRecurring($order);
+
+	}
+
+	/**
+	 * @param ProcessPaymentEvent $event
+	 */
+	public function handleAfterProcessPaymentEvent(ProcessPaymentEvent $event)
+	{
+
+		if (!$event->response->isSuccessful())
+		{
+			return;
+		}
+
+		// TODO: Make dynamic.
+		$capturePaymentSource = true;
+
+		$order = $event->order;
+
+		if ($order->paymentSourceId || !$capturePaymentSource)
+		{
+			return;
+		}
+
+		if (!$order->getUser())
+		{
+			// TODO: Log error.
+			return;
+		}
+
+		try
+		{
+			$description = Craft::$app->request->getParam('recurringOrders.paymentSource.description');
+			$paymentSource = Commerce::getInstance()->paymentSources->createPaymentSource($order->getUser()->id, $order->getGateway(), $event->form, $description);
+		}
+		catch (\Exception $e)
+		{
+			// TODO: Log error.
+			return;
+		}
+
+		/** @var RecurringOrderBehavior $order */
+
+		if ($order->hasRecurrenceStatus() && !$order->getPaymentSourceId())
+		{
+			$order->setPaymentSourceId($paymentSource->id);
+		}
+
+		$spec = $order->getSpec();
+		if (!$spec->isEmpty() && !$spec->getPaymentSourceId())
+		{
+			$spec->setPaymentSourceId($paymentSource->id);
+		}
+
+		/*
+		 * This event preceeds a call to Payments::updateOrderPaidInformation(), which will save the Order,
+		 * and thereby save our Recurring Orders record.
+		 */
 
 	}
 

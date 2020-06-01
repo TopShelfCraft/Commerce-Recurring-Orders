@@ -5,12 +5,10 @@ use Craft;
 use craft\base\Plugin;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
+use craft\commerce\services\Payments;
 use craft\console\Application as ConsoleApplication;
-use craft\events\ElementEvent;
-use craft\events\RegisterCpNavItemsEvent;
 use craft\helpers\FileHelper;
 use craft\services\Dashboard;
-use craft\services\Elements;
 use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
@@ -222,30 +220,27 @@ class RecurringOrders extends Plugin
 		 * Extra processing before an Order element is saved
 		 */
 		Event::on(
-			Elements::class,
-			Elements::EVENT_BEFORE_SAVE_ELEMENT,
-			function (ElementEvent $event) {
-				$element = $event->element;
-				if ($element instanceof Order)
-				{
-					$this->orders->beforeSaveOrder($element);
-				}
-			}
+			Order::class,
+			Order::EVENT_BEFORE_SAVE,
+			[$this->orders, 'handleOrderBeforeSave']
 		);
 
 		/*
 		 * Extra processing after an Order element is saved
 		 */
 		Event::on(
-			Elements::class,
-			Elements::EVENT_AFTER_SAVE_ELEMENT,
-			function (ElementEvent $event) {
-				$element = $event->element;
-				if ($element instanceof Order)
-				{
-					$this->orders->afterSaveOrder($element);
-				}
-			}
+			Order::class,
+			Order::EVENT_AFTER_SAVE,
+			[$this->orders, 'handleOrderAfterSave']
+		);
+
+		/*
+		 * Extra processing after a Payment is processed
+		 */
+		Event::on(
+			Payments::class,
+			Payments::EVENT_AFTER_PROCESS_PAYMENT,
+			[$this->orders, 'handleAfterProcessPaymentEvent']
 		);
 
 		/*
@@ -254,7 +249,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_AFTER_COMPLETE_ORDER,
-			[$this->orders, 'afterCompleteOrder']
+			[$this->orders, 'handleAfterCompleteOrder']
 		);
 
 		/*
@@ -263,7 +258,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Cp::class,
 			Cp::EVENT_REGISTER_CP_NAV_ITEMS,
-			[$this->cpCustomizations, 'modifyCpNavItems']
+			[$this->cpCustomizations, 'handleModifyCpNavItems']
 		);
 
 		/*
@@ -272,7 +267,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_SORT_OPTIONS,
-			[$this->cpCustomizations, 'registerSortOptions']
+			[$this->cpCustomizations, 'handleRegisterSortOptions']
 		);
 
 		/*
@@ -281,7 +276,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_TABLE_ATTRIBUTES,
-			[$this->cpCustomizations, 'registerTableAttributes']
+			[$this->cpCustomizations, 'handleRegisterTableAttributes']
 		);
 
 		/*
@@ -290,7 +285,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_DEFAULT_TABLE_ATTRIBUTES,
-			[$this->cpCustomizations, 'registerDefaultTableAttributes']
+			[$this->cpCustomizations, 'handleRegisterDefaultTableAttributes']
 		);
 
 		/*
@@ -299,7 +294,7 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_SET_TABLE_ATTRIBUTE_HTML,
-			[$this->cpCustomizations, 'setTableAttributeHtml']
+			[$this->cpCustomizations, 'handleSetTableAttributeHtml']
 		);
 
 		/*
@@ -308,13 +303,13 @@ class RecurringOrders extends Plugin
 		Event::on(
 			Order::class,
 			Order::EVENT_REGISTER_SOURCES,
-			[$this->cpCustomizations, 'registerSources']
+			[$this->cpCustomizations, 'handleRegisterSources']
 		);
 
 		Event::on(
 			Dashboard::class,
 			Dashboard::EVENT_REGISTER_WIDGET_TYPES,
-			[$this->cpCustomizations, 'registerWidgetTypes']
+			[$this->cpCustomizations, 'handleRegisterWidgetTypes']
 		);
 
 	}

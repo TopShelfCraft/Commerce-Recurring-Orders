@@ -29,7 +29,7 @@ class CpCustomizations extends Component
 	 *
 	 * @param RegisterCpNavItemsEvent $event
 	 */
-	public function modifyCpNavItems(RegisterCpNavItemsEvent $event)
+	public function handleModifyCpNavItems(RegisterCpNavItemsEvent $event)
 	{
 
 		$settings = RecurringOrders::getInstance()->getSettings();
@@ -84,7 +84,7 @@ class CpCustomizations extends Component
 	/**
 	 * @param RegisterElementSourcesEvent $event
 	 */
-	public function registerSources(RegisterElementSourcesEvent $event)
+	public function handleRegisterSources(RegisterElementSourcesEvent $event)
 	{
 
 		if (!RecurringOrders::getInstance()->getSettings()->addOrderElementSources)
@@ -153,7 +153,7 @@ class CpCustomizations extends Component
 	/**
 	 * @param RegisterElementSortOptionsEvent $event
 	 */
-	public function registerSortOptions(RegisterElementSortOptionsEvent $event)
+	public function handleRegisterSortOptions(RegisterElementSortOptionsEvent $event)
 	{
 		$event->sortOptions = $event->sortOptions + [
 				'recurringOrders.status' => RecurringOrders::t('Recurrence Status'),
@@ -166,7 +166,7 @@ class CpCustomizations extends Component
 	/**
 	 * @param RegisterElementTableAttributesEvent $event
 	 */
-	public function registerTableAttributes(RegisterElementTableAttributesEvent $event)
+	public function handleRegisterTableAttributes(RegisterElementTableAttributesEvent $event)
 	{
 		$event->tableAttributes = $event->tableAttributes + [
 				'recurrenceStatus' => RecurringOrders::t('Recurrence Status'),
@@ -181,7 +181,7 @@ class CpCustomizations extends Component
 	/**
 	 * @param RegisterElementDefaultTableAttributesEvent $event
 	 */
-	public function registerDefaultTableAttributes(RegisterElementDefaultTableAttributesEvent $event)
+	public function handleRegisterDefaultTableAttributes(RegisterElementDefaultTableAttributesEvent $event)
 	{
 		$event->tableAttributes = $event->tableAttributes + ['recurrenceStatus'];
 	}
@@ -195,7 +195,7 @@ class CpCustomizations extends Component
 	 * @throws \Twig\Error\SyntaxError
 	 * @throws \yii\base\InvalidConfigException
 	 */
-	public function setTableAttributeHtml(SetElementTableAttributeHtmlEvent $event)
+	public function handleSetTableAttributeHtml(SetElementTableAttributeHtmlEvent $event)
 	{
 
 		/** @var RecurringOrderBehavior $order */
@@ -240,7 +240,7 @@ class CpCustomizations extends Component
 	/**
 	 * @param RegisterComponentTypesEvent $event
 	 */
-	public function registerWidgetTypes(RegisterComponentTypesEvent $event)
+	public function handleRegisterWidgetTypes(RegisterComponentTypesEvent $event)
 	{
 		$event->types[] = RecentGeneratedOrdersWidget::class;
 		$event->types[] = RecentRecurringOrdersWidget::class;
