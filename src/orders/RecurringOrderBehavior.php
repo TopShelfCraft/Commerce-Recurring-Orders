@@ -433,4 +433,12 @@ class RecurringOrderBehavior extends Behavior
 
 	}
 
+	/**
+	 * @return RecurringOrderHistoryRecord[]
+	 */
+	public function getRecurringOrderHistory()
+	{
+		return RecurringOrderHistoryRecord::findAll(['orderId' => $this->owner->id]);
+	}
+
 }

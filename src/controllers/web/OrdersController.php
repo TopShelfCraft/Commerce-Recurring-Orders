@@ -2,24 +2,19 @@
 namespace topshelfcraft\recurringorders\controllers\web;
 
 use Craft;
-use craft\base\Element;
-use craft\commerce\base\Gateway;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
-use craft\elements\User;
-use craft\helpers\DateTimeHelper;
+use craft\helpers\StringHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
-use yii\base\Exception;
 use yii\web\Response;
 
+/**
+ * @todo Ensure GET or POST request.
+ */
 class OrdersController extends BaseWebController
 {
-
-	protected $allowAnonymous = [
-		'add-payment-source'
-	];
 
 	/**
 	 * @return Response|null
@@ -51,7 +46,7 @@ class OrdersController extends BaseWebController
 
 		if ($success)
 		{
-			return $this->returnSuccessResponse();
+			return $this->_returnOrderEditSuccessResponse($order);
 		}
 
 		// TODO: Translate.
@@ -68,39 +63,40 @@ class OrdersController extends BaseWebController
 	{
 
 		$request = Craft::$app->request;
-		$attributes = [];
 
 		$id = $request->getRequiredParam('id');
 
 		/** @var RecurringOrderBehavior $order */
 		$order = Commerce::getInstance()->orders->getOrderById($id);
 
-		if ($status = $request->getParam('status'))
+		if ($status = $request->getParam('status', RecurringOrderRecord::STATUS_ACTIVE))
 		{
-			$attributes['status'] = $status;
+			$order->setRecurrenceStatus($status);
 		}
 
 		if ($recurrenceInterval = $request->getParam('recurrenceInterval'))
 		{
-			$attributes['recurrenceInterval'] = $recurrenceInterval;
+			$order->setRecurrenceInterval($recurrenceInterval);
 		}
 
 		if ($nextRecurrence = $request->getParam('nextRecurrence'))
 		{
-			$attributes['nextRecurrence'] = DateTimeHelper::toDateTime($nextRecurrence);
+			$order->setNextRecurrence($nextRecurrence);
 		}
 
-		$resetNextRecurrence = self::normalizeBoolean(
-			$request->getParam('resetNextRecurrence', false)
-		);
+		if ($resetNextRecurrence = self::normalizeBoolean($request->getParam('resetNextRecurrence')))
+		{
+			$order->resetNextRecurrence();
+		}
 
 		try
 		{
 			/** @var Order $order */
-			$success = RecurringOrders::getInstance()->orders->makeOrderRecurring($order, $attributes, $resetNextRecurrence);
+			$success = Craft::$app->elements->saveElement($order);
 			if ($success)
 			{
-				return $this->returnSuccessResponse();
+				/** @var Order $order */
+				return $this->_returnOrderEditSuccessResponse($order, "Recurring Order activated.");
 			}
 		}
 		catch(\Exception $e)
@@ -117,7 +113,6 @@ class OrdersController extends BaseWebController
 	{
 
 		$request = Craft::$app->request;
-		$attributes = [];
 
 		$id = $request->getRequiredParam('id');
 
@@ -130,7 +125,7 @@ class OrdersController extends BaseWebController
 			$success = RecurringOrders::getInstance()->orders->replicateAsRecurring($order);
 			if ($success)
 			{
-				return $this->returnSuccessResponse();
+				return $this->_returnOrderEditSuccessResponse($order);
 			}
 		}
 		catch(\Throwable $e)
@@ -146,98 +141,12 @@ class OrdersController extends BaseWebController
 	/**
 	 * @return Response|null
 	 *
-	 * @throws \yii\base\InvalidConfigException
-	 * @throws \yii\web\BadRequestHttpException
-	 */
-	public function actionAddPaymentSource()
-	{
-
-		$request = Craft::$app->getRequest();
-		$commerce = Commerce::getInstance();
-
-		/*
-		 * Identify the  Order
-		 */
-
-		$orderId = $request->getRequiredBodyParam('orderId');
-		$order = $commerce->orders->getOrderById($orderId);
-
-		if (!$order)
-		{
-			// TODO: Translate
-			return $this->returnErrorResponse("Can't find an Order by that ID.");
-		}
-
-		/*
-		 * Identify the Gateway
-		 */
-
-		$gatewayId = $request->getBodyParam('gatewayId') ?? $order->gatewayId;
-
-		/** @var Gateway $gateway */
-		$gateway = $commerce->gateways->getGatewayById($gatewayId);
-
-		if (!$gateway || !$gateway->supportsPaymentSources()) {
-
-			$error = Commerce::t('There is no gateway selected that supports payment sources.');
-			return $this->returnErrorResponse($error);
-		}
-
-		/*
-		 * Ensure a User
-		 */
-
-		try
-		{
-			$user = $this->_ensureOrderUser($order);
-		}
-		catch (\Exception $e)
-		{
-			RecurringOrders::error($e->getMessage());
-			return $this->returnErrorResponse($e->getMessage());
-		}
-
-		/*
-		 * Process the payment form
-		 */
-
-		// Get the payment method' gateway adapter's expected form model
-		$paymentForm = $gateway->getPaymentFormModel();
-		$paymentForm->setAttributes($request->getBodyParams(), false);
-		$description = (string)$request->getBodyParam('description');
-
-		$transaction = Craft::$app->db->getTransaction() ?? Craft::$app->db->beginTransaction();
-
-		try
-		{
-			$paymentSource = $commerce->paymentSources->createPaymentSource($user->id, $gateway, $paymentForm, $description);
-			$order->paymentSourceId = $paymentSource->id;
-			Craft::$app->elements->saveElement($order);
-			$transaction->commit();
-		}
-		catch (\Throwable $e) {
-
-			Craft::$app->getErrorHandler()->logException($e);
-			RecurringOrders::error($e->getMessage());
-
-			$transaction->rollBack();
-
-			return $this->returnErrorResponse(Commerce::t('Could not create the payment source.'));
-
-		}
-
-		return $this->returnSuccessResponse(null, ['paymentSource' => $paymentSource]);
-
-	}
-
-	/**
-	 * @return Response|null
-	 *
 	 * @throws \yii\web\BadRequestHttpException if `id` param is not provided.
 	 */
 	public function actionPauseRecurringOrder()
 	{
-		return $this->_actionUpdateWithStatus(RecurringOrderRecord::STATUS_PAUSED);
+		// TODO: Translate
+		return $this->_actionUpdateWithStatus(RecurringOrderRecord::STATUS_PAUSED, "Recurring Order paused.");
 	}
 
 	/**
@@ -247,7 +156,19 @@ class OrdersController extends BaseWebController
 	 */
 	public function actionCancelRecurringOrder()
 	{
-		return $this->_actionUpdateWithStatus(RecurringOrderRecord::STATUS_CANCELLED);
+		// TODO: Translate.
+		return $this->_actionUpdateWithStatus(RecurringOrderRecord::STATUS_CANCELLED, "Recurring Order cancelled.");
+	}
+
+	private function _getRequiredRequestOrder()
+	{
+		$id = Craft::$app->request->getRequiredParam('id');
+		$order = Commerce::getInstance()->orders->getOrderById($id);
+		if (!$order)
+		{
+
+		}
+		return $order;
 	}
 
 	/**
@@ -256,27 +177,31 @@ class OrdersController extends BaseWebController
 	 * @return Response|null
 	 *
 	 * @throws \yii\web\BadRequestHttpException if `id` param is not provided.
+	 * @throws \yii\base\InvalidConfigException from `_returnOrderEditSuccessResponse`
+	 * @throws \Throwable if reasons
 	 */
-	private function _actionUpdateWithStatus($status)
+	private function _actionUpdateWithStatus($status, $successMessage = null)
 	{
 
 		$request = Craft::$app->request;
 
 		$id = $request->getRequiredParam('id');
 
+		$order = Commerce::getInstance()->orders->getOrderById($id);
+
 		try
 		{
 
-			$recurringOrder = RecurringOrderRecord::findOne($id);
-
-			if (!$recurringOrder)
+			/** @var RecurringOrderBehavior $order */
+			if (!$order || !$order->hasRecurrenceStatus())
 			{
-				// TODO: Translate.
-				return $this->returnErrorResponse("Order is not Recurring.");
+				// TODO: Swap this for an Exception
+				return $this->returnErrorResponse("Recurring Order does not exist.");
 			}
 
-			$recurringOrder->status = $status;
-			$success = $recurringOrder->save();
+			$order->setRecurrenceStatus($status);
+			/** @var Order $order */
+			$success = Craft::$app->elements->saveElement($order);
 
 		}
 		catch(\Exception $e)
@@ -286,7 +211,7 @@ class OrdersController extends BaseWebController
 
 		if ($success)
 		{
-			return $this->returnSuccessResponse();
+			return $this->_returnOrderEditSuccessResponse($order, $successMessage);
 		}
 
 		// TODO: Translate.
@@ -296,75 +221,29 @@ class OrdersController extends BaseWebController
 
 	/**
 	 * @param Order $order
+	 * @param array $jsonParams
 	 *
-	 * @return User
+	 * @return Response
 	 *
+	 * @throws \yii\base\InvalidConfigException from `getPathInfo()` if the path info cannot be determined due to unexpected server configuration
+	 * @throws \yii\web\BadRequestHttpException from `redirectToPostedUrl()` if the redirect param was tampered with.
 	 */
-	public function _ensureOrderUser(Order $order)
+	private function _returnOrderEditSuccessResponse(Order $order, $flashMessage = null)
 	{
 
-		// Do we already have a User?
-		if ($order->getUser())
+		$request = Craft::$app->request;
+		$defaultRedirectUrl = $request->isGet ? $request->getReferrer() : $request->getPathInfo();
+
+		if ($request->getIsCpRequest() || StringHelper::contains($defaultRedirectUrl, $order->getCpEditUrl(), false))
 		{
-			return $order->getUser();
-		}
-
-		// Can't create a user without an email
-		if (!$order->email)
-		{
-			// TODO: Translate
-			throw new Exception("Can't create a User without an email.");
-		}
-
-		// Need to associate the new User to the order's Customer
-		$customer = $order->getCustomer();
-		if (!$customer)
-		{
-			// TODO: Translate
-			throw new Exception("The Order must have a Customer before saving a Payment Source.");
-		}
-
-		// Customer already a user? Commerce will link them up later.
-		$user = User::find()->email($order->email)->status(null)->one();
-		if ($user)
-		{
-			return $user;
-		}
-
-		// Create a new user
-		$user = new User();
-		$user->email = $order->email;
-		$user->unverifiedEmail = $order->email;
-		$user->newPassword = null;
-		$user->username = $order->email;
-		$user->firstName = $order->billingAddress->firstName ?? '';
-		$user->lastName = $order->billingAddress->lastName ?? '';
-		$user->pending = true;
-		$user->setScenario(Element::SCENARIO_ESSENTIALS); // Don't validate required custom fields.
-
-		if (Craft::$app->elements->saveElement($user))
-		{
-
-			// Delete auto generated customer that was just created by Customers::afterSaveUserHandler()
-			$autoGeneratedCustomer = Commerce::getInstance()->customers->getCustomerByUserId($user->id);
-			if ($autoGeneratedCustomer) {
-				Commerce::getInstance()->customers->deleteCustomer($autoGeneratedCustomer);
+			if (!empty($flashMessage))
+			{
+				Craft::$app->session->setNotice($flashMessage);
 			}
-
-			// Re-associate the new user to the Order's customer.
-			$customer->userId = $user->id;
-			Commerce::getInstance()->customers->saveCustomer($customer, false);
-
-		}
-		else
-		{
-			// TODO: Translate.
-			$errors = $user->getErrors();
-			RecurringOrders::error($errors);
-			throw new Exception("Could not create a User to save Payment Source on Order.");
+			$defaultRedirectUrl .= '#recurringOrdersTab';
 		}
 
-		return $user;
+		return $this->returnSuccessResponse($order, ['orderId' => $order->id], $defaultRedirectUrl);
 
 	}
 

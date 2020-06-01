@@ -37,22 +37,23 @@ abstract class BaseWebController extends Controller
 	}
 
 	/**
-	 * @param $returnUrl
 	 * @param $returnUrlObject
+	 * @param array $jsonParams
+	 * @param null $defaultRedirectUrl
 	 *
 	 * @return Response
 	 *
 	 * @throws BadRequestHttpException from `redirectToPostedUrl()` if the redirect param was tampered with.
 	 */
-	protected function returnSuccessResponse($returnUrlObject = null, $jsonParams = [])
+	protected function returnSuccessResponse($returnUrlObject = null, $jsonParams = [], $defaultRedirectUrl = null)
 	{
 
-		if (Craft::$app->getRequest()->getAcceptsJson())
+		if (Craft::$app->request->getAcceptsJson())
 		{
 			return $this->asJson(['success' => true] + $jsonParams);
 		}
 
-		return $this->redirectToPostedUrl($returnUrlObject, Craft::$app->getRequest()->getReferrer());
+		return $this->redirectToPostedUrl($returnUrlObject, $defaultRedirectUrl);
 
 	}
 

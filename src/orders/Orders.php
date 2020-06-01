@@ -3,19 +3,14 @@ namespace topshelfcraft\recurringorders\orders;
 
 use Craft;
 use craft\base\Component;
-use craft\base\Element;
-use craft\commerce\base\Gateway;
 use craft\commerce\elements\Order;
-use craft\commerce\models\PaymentSource;
-use craft\commerce\Plugin as Commerce;
-use craft\elements\User;
+use craft\commerce\Plugin as Commerce;;
 use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use topshelfcraft\recurringorders\misc\PaymentSourcesHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\Exception;
-use yii\base\InvalidArgumentException;
 
 class Orders extends Component
 {
@@ -103,11 +98,7 @@ class Orders extends Component
 
 		return $order->saveRecurringOrdersRecord();
 
-		// TODO: Deprecate this.
-
 	}
-
-
 
 	/**
 	 * Intercepts Order Save events *before* saving begins, and, if it appears we're in the middle of an Action request,
@@ -131,13 +122,6 @@ class Orders extends Component
 
 		/** @var RecurringOrderBehavior $order */
 
-		// Email (In case we're trying to add a customer email and create a Payment Source in the same request.)
-
-		if ($email = $request->getParam('email'))
-		{
-			$order->setEmail($email);
-		}
-
 		// Order fields
 
 		if ($status = $request->getParam('makeRecurring.status'))
@@ -160,12 +144,6 @@ class Orders extends Component
 			$order->setResetNextRecurrenceOnSave(self::normalizeBoolean($resetNextRecurrence));
 		}
 
-		if ($paymentSourceAttributes = $request->getParam('makeRecurring.paymentSource'))
-		{
-			$paymentSource = $this->createPaymentSource($order, $paymentSourceAttributes);
-			$order->setPaymentSourceId($paymentSource->id);
-		}
-
 		if (($paymentSourceId = $request->getParam('makeRecurring.paymentSourceId')) !== null)
 		{
 			$order->setPaymentSourceId($paymentSourceId ?: null);
@@ -175,7 +153,7 @@ class Orders extends Component
 
 		if ($specStatus = $request->getParam('makeRecurring.spec.status'))
 		{
-			$order->setRecurrenceStatus($specStatus);
+			$order->getSpec()->setStatus($specStatus);
 		}
 
 		if ($specRecurrenceInterval = $request->getParam('makeRecurring.spec.recurrenceInterval'))
@@ -186,12 +164,6 @@ class Orders extends Component
 		if ($specNextRecurrence = $request->getParam('makeRecurring.spec.nextRecurrence'))
 		{
 			$order->getSpec()->setNextRecurrence($specNextRecurrence);
-		}
-
-		if ($specPaymentSourceAttributes = $request->getParam('makeRecurring.spec.paymentSource'))
-		{
-			$specPaymentSource = $this->createPaymentSource($order, $specPaymentSourceAttributes);
-			$order->getSpec()->setPaymentSourceId($specPaymentSource->id);
 		}
 
 		if (($specPaymentSourceId = $request->getParam('makeRecurring.spec.paymentSourceId')) !== null)
@@ -527,144 +499,6 @@ class Orders extends Component
 	public function getPaymentSourceFormOptionsByOrder(Order $order)
 	{
 		return PaymentSourcesHelper::getPaymentSourceFormOptionsByOrder($order);
-	}
-
-	/**
-	 * @param Order $order
-	 * @param $attributes
-	 *
-	 * @return PaymentSource|null
-	 *
-	 * @throws Exception
-	 */
-	public function createPaymentSource(Order $order, $attributes)
-	{
-
-		/*
-		 * Identify the Gateway
-		 */
-
-		$gatewayId = $attributes['gatewayId'] ?? $order->gatewayId;
-
-		/** @var Gateway $gateway */
-		$gateway = Commerce::getInstance()->gateways->getGatewayById($gatewayId);
-
-		if (!$gateway || !$gateway->supportsPaymentSources()) {
-			$error = Commerce::t('There is no gateway selected that supports payment sources.');
-			throw new InvalidArgumentException($error);
-		}
-
-		/*
-		 * Ensure a User
-		 */
-
-		try
-		{
-			$user = $this->_ensureOrderUser($order);
-		}
-		catch (\Throwable $e)
-		{
-			$error = Commerce::t('Could not create a User for Order.');
-			throw new Exception($error);
-		}
-
-		/*
-		 * Process the payment form
-		 */
-
-		// Get the payment method' gateway adapter's expected form model
-		$paymentForm = $gateway->getPaymentFormModel();
-		$paymentForm->setAttributes($attributes, false);
-		$description = (string)($attributes['description'] ?? '');
-
-		try
-		{
-			$paymentSource = Commerce::getInstance()->paymentSources->createPaymentSource($user->id, $gateway, $paymentForm, $description);
-			return $paymentSource;
-		}
-		catch (\Throwable $e) {
-			$error = Commerce::t('Could not create the payment source.');
-			throw new Exception($error);
-		}
-
-	}
-
-	/**
-	 * @param Order $order
-	 *
-	 * @return User
-	 *
-	 * @throws Exception
-	 * @throws \Throwable
-	 * @throws \craft\errors\ElementNotFoundException
-	 * @throws \yii\base\InvalidConfigException
-	 */
-	public function _ensureOrderUser(Order $order)
-	{
-
-		// Do we already have a User?
-		if ($order->getUser())
-		{
-			return $order->getUser();
-		}
-
-		// Can't create a user without an email
-		if (!$order->getEmail())
-		{
-			// TODO: Translate
-			throw new Exception("Can't create a User without an email.");
-		}
-
-		// Need to associate the new User to the order's Customer
-		$customer = $order->getCustomer();
-		if (!$customer)
-		{
-			// TODO: Translate
-			throw new Exception("The Order must have a Customer before saving a Payment Source.");
-		}
-
-		// Customer already a user? Commerce will link them up later.
-		$user = User::find()->email($order->getEmail())->status(null)->one();
-		if ($user)
-		{
-			return $user;
-		}
-
-		// Create a new user
-		$user = new User();
-		$user->email = $order->email;
-		$user->unverifiedEmail = $order->email;
-		$user->newPassword = null;
-		$user->username = $order->email;
-		$user->firstName = $order->billingAddress->firstName ?? '';
-		$user->lastName = $order->billingAddress->lastName ?? '';
-		$user->pending = true;
-		$user->setScenario(Element::SCENARIO_ESSENTIALS); // Don't validate required custom fields.
-
-		if (Craft::$app->elements->saveElement($user))
-		{
-
-			// Delete auto generated customer that was just created by Customers::afterSaveUserHandler()
-			$autoGeneratedCustomer = Commerce::getInstance()->customers->getCustomerByUserId($user->id);
-			if ($autoGeneratedCustomer) {
-				Commerce::getInstance()->customers->deleteCustomer($autoGeneratedCustomer);
-			}
-
-			// Re-associate the new user to the Order's customer.
-			$customer->userId = $user->id;
-			Commerce::getInstance()->customers->saveCustomer($customer, false);
-
-		}
-		else
-		{
-			// TODO: Translate.
-			$errors = $user->getErrors();
-			RecurringOrders::error($errors);
-			throw new Exception("Could not create a User to own this order.");
-		}
-
-		return $user;
-
 	}
 
 }
