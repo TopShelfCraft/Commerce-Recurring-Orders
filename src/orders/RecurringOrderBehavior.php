@@ -6,6 +6,7 @@ use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
+use craft\events\ModelEvent;
 use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\misc\IntervalHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
@@ -28,6 +29,22 @@ use yii\base\Behavior;
  */
 class RecurringOrderBehavior extends Behavior
 {
+
+	/**
+	 * @event \yii\base\Event This event is raised when an Order's Recurrence Status is created or changed.
+	 *
+	 * ```php
+	 * use craft\commerce\elements\Order;
+	 * use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
+	 * use topshelfcraft\recurringorders\orders\RecurrenceStatusChangeEvent;
+	 *
+	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_RECURRENCE_STATUS_CHANGE, function(RecurrenceStatusChangeEvent $event) {
+	 *     // @var Order $order
+	 *     $order = $event->sender;
+	 * });
+	 * ```
+	 */
+	const EVENT_RECURRENCE_STATUS_CHANGE = 'recurrenceStatusChange';
 
 	/**
 	 * @var RecurringOrderRecord
@@ -429,7 +446,26 @@ class RecurringOrderBehavior extends Behavior
 		$record->setAttributes($attributes, false);
 		$record->id = $this->owner->id; // In case we started earlier with a new (un-saved) Order element.
 
-		return $record->save();
+		$recurrenceStatusChanged = $record->isAttributeChanged('status');
+		$oldStatus = $record->getOldAttribute('status');
+
+		$saved = $record->save();
+
+		// Extra processing if the Recurrence Status changed
+		if ($saved && $recurrenceStatusChanged)
+		{
+
+			// Raising the 'recurrenceStatusChange' event, from the owner Order
+			if ($this->owner->hasEventHandlers(self::EVENT_RECURRENCE_STATUS_CHANGE)) {
+				$event = new RecurrenceStatusChangeEvent([
+					'oldStatus' => $oldStatus,
+				]);
+				$this->owner->trigger(self::EVENT_RECURRENCE_STATUS_CHANGE, $event);
+			}
+
+		}
+
+		return $saved;
 
 	}
 

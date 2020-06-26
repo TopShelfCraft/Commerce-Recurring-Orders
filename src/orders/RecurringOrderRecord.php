@@ -101,7 +101,7 @@ class RecurringOrderRecord extends BaseRecord
 	public function save($runValidation = true, $attributeNames = null)
 	{
 
-		$transaction = Craft::$app->db->getTransaction() ?? Craft::$app->db->beginTransaction();
+		// TODO: Wrap in transaction?
 
 		/*
 		 * We're doing this inside of save() rather than afterSave() because save() resets dirty attributes status.
@@ -129,14 +129,7 @@ class RecurringOrderRecord extends BaseRecord
 			}
 		}
 
-		if ($saved)
-		{
-			$transaction->commit();
-			return true;
-		}
-
-		$transaction->rollBack();
-		return false;
+		return $saved;
 
 	}
 

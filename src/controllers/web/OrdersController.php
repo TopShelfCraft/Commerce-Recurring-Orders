@@ -8,6 +8,7 @@ use craft\helpers\StringHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -160,56 +161,41 @@ class OrdersController extends BaseWebController
 		return $this->_actionUpdateWithStatus(RecurringOrderRecord::STATUS_CANCELLED, "Recurring Order cancelled.");
 	}
 
+	/**
+	 * @return Order
+	 *
+	 * @throws BadRequestHttpException
+	 */
 	private function _getRequiredRequestOrder()
 	{
 		$id = Craft::$app->request->getRequiredParam('id');
 		$order = Commerce::getInstance()->orders->getOrderById($id);
-		if (!$order)
+		if ($order)
 		{
-
+			return $order;
 		}
-		return $order;
+		throw new BadRequestHttpException('Could not identify an Order from the request parameters.');
 	}
 
 	/**
 	 * @param $status
+	 * @param string $successMessage
 	 *
 	 * @return Response|null
 	 *
-	 * @throws \yii\web\BadRequestHttpException if `id` param is not provided.
-	 * @throws \yii\base\InvalidConfigException from `_returnOrderEditSuccessResponse`
+	 * @throws BadRequestHttpException if the request doesn't specify a valid Order.
 	 * @throws \Throwable if reasons
 	 */
 	private function _actionUpdateWithStatus($status, $successMessage = null)
 	{
 
-		$request = Craft::$app->request;
+		$order = $this->_getRequiredRequestOrder();
 
-		$id = $request->getRequiredParam('id');
+		/** @var RecurringOrderBehavior $order */
+		$order->setRecurrenceStatus($status);
 
-		$order = Commerce::getInstance()->orders->getOrderById($id);
-
-		try
-		{
-
-			/** @var RecurringOrderBehavior $order */
-			if (!$order || !$order->hasRecurrenceStatus())
-			{
-				// TODO: Swap this for an Exception
-				return $this->returnErrorResponse("Recurring Order does not exist.");
-			}
-
-			$order->setRecurrenceStatus($status);
-			/** @var Order $order */
-			$success = Craft::$app->elements->saveElement($order);
-
-		}
-		catch(\Exception $e)
-		{
-			$success = false;
-		}
-
-		if ($success)
+		/** @var Order $order */
+		if (Craft::$app->elements->saveElement($order))
 		{
 			return $this->_returnOrderEditSuccessResponse($order, $successMessage);
 		}
@@ -234,7 +220,7 @@ class OrdersController extends BaseWebController
 		$request = Craft::$app->request;
 		$defaultRedirectUrl = $request->isGet ? $request->getReferrer() : $request->getPathInfo();
 
-		if ($request->getIsCpRequest() || StringHelper::contains($defaultRedirectUrl, $order->getCpEditUrl(), false))
+		if (StringHelper::contains($defaultRedirectUrl, $order->getCpEditUrl(), false))
 		{
 			if (!empty($flashMessage))
 			{
