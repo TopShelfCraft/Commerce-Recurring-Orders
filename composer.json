@@ -34,9 +34,6 @@
 		"developerUrl": "https://steadfast.design",
 		"developerEmail": "support@steadfast.design",
 		"documentationUrl": "https://steadfast.design",
-		"schemaVersion": "0.0.7.0",
-		"hasCpSettings": false,
-		"hasCpSection": false,
 		"class": "topshelfcraft\\recurringorders\\RecurringOrders"
 	}
 }

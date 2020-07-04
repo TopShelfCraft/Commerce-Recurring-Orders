@@ -39,6 +39,22 @@ use yii\base\Event;
 class RecurringOrders extends Plugin
 {
 
+	/**
+	 * @var bool
+	 */
+	public $hasCpSettings = false;
+
+	/**
+	 * @var bool
+	 */
+	public $hasCpSection = false;
+
+	/**
+	 * @var string
+	 */
+	public $schemaVersion = '0.0.31.0';
+
+
 	/*
      * Public methods
      * ===========================================================================

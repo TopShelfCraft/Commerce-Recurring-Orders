@@ -6,11 +6,12 @@ use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
-use craft\events\ModelEvent;
+use craft\events\CancelableEvent;
 use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\misc\IntervalHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\Behavior;
+use yii\base\Event;
 
 /**
  * @property string|null $recurrenceStatus
@@ -31,7 +32,7 @@ class RecurringOrderBehavior extends Behavior
 {
 
 	/**
-	 * @event \yii\base\Event This event is raised when an Order's Recurrence Status is created or changed.
+	 * @event RecurrenceStatusChangeEvent This event is raised when an Order's Recurrence Status is created or changed.
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
@@ -39,12 +40,45 @@ class RecurringOrderBehavior extends Behavior
 	 * use topshelfcraft\recurringorders\orders\RecurrenceStatusChangeEvent;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_RECURRENCE_STATUS_CHANGE, function(RecurrenceStatusChangeEvent $event) {
+	 *     $oldStatus = $event->oldStatus;
 	 *     // @var Order $order
 	 *     $order = $event->sender;
 	 * });
 	 * ```
 	 */
 	const EVENT_RECURRENCE_STATUS_CHANGE = 'recurrenceStatusChange';
+
+	/**
+	 * @event craft\events\CancelableEvent This event is raised before an order is marked Imminent.
+	 *
+	 * ```php
+	 * use craft\commerce\elements\Order;
+	 * use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
+	 * use craft\events\CancelableEvent;
+	 *
+	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_BEFORE_MARK_ORDER_IMMINENT, function(CancelableEvent $event) {
+	 *     $event->isValid = false;
+	 * });
+	 * ```
+	 */
+	const EVENT_BEFORE_MARK_ORDER_IMMINENT = 'beforeMarkOrderImminent';
+
+	/**
+	 * @event yii\base\Event
+	 *
+	 * ```php
+	 * use craft\commerce\elements\Order;
+	 * use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
+	 * use yii\base\Event;
+	 *
+	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_ORDER_MARKED_IMMINENT, function(Event $event) {
+	 *     // @var Order $order
+	 *     $order = $event->sender;
+	 * });
+	 * ```
+	 */
+	const EVENT_ORDER_MARKED_IMMINENT = 'orderMarkedImminent';
+
 
 	/**
 	 * @var RecurringOrderRecord
@@ -466,6 +500,52 @@ class RecurringOrderBehavior extends Behavior
 		}
 
 		return $saved;
+
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isImminient()
+	{
+		return ($record = $this->_getRecord())
+			&& !empty($record->dateMarkedImminent)
+			&& $record->dateMarkedImminent > (new \DateTime());
+	}
+
+	/**
+	 * @return bool
+	 *
+	 * @throws \yii\db\Exception
+	 */
+	public function markImminent()
+	{
+
+		// Raising the 'beforeMarkOrderImminent' event, from the owner Order
+		$event = new CancelableEvent();
+		$this->owner->trigger(self::EVENT_BEFORE_MARK_ORDER_IMMINENT, $event);
+
+		if (!$event->isValid)
+		{
+			return false;
+		}
+
+		$saved = $this->saveRecurringOrdersRecord([
+			'dateMarkedImminent' => new \DateTime()
+		]);
+
+		if (!$saved)
+		{
+			return false;
+		}
+
+		// Raising the 'orderMarkedImminent' event, from the owner Order
+		if ($this->owner->hasEventHandlers(self::EVENT_ORDER_MARKED_IMMINENT)) {
+			$event = new Event();
+			$this->owner->trigger(self::EVENT_ORDER_MARKED_IMMINENT, $event);
+		}
+
+		return true;
 
 	}
 

@@ -6,6 +6,7 @@ use craft\commerce\elements\Order;
 use craft\helpers\Console;
 use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\misc\IntervalHelper;
+use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use yii\console\ExitCode;
 
 /**
@@ -27,6 +28,38 @@ class DevController extends BaseConsoleController
 			)
 		);
 		return ExitCode::OK;
+
+	}
+
+	/**
+	 * @param $orderId
+	 *
+	 * @return int
+	 *
+	 * @throws \yii\db\Exception if Record cannot be saved.
+	 */
+	public function actionMarkOrderImminent($orderId)
+	{
+
+		$order = Order::findOne($orderId);
+
+		if (!$order)
+		{
+			$this->_writeError("Order not found.");
+			return ExitCode::UNSPECIFIED_ERROR;
+		}
+
+		/** @var RecurringOrderBehavior $order **/
+		$success = $order->markImminent();
+
+		if ($success)
+		{
+			$this->_writeLine("Order marked Imminent. ✅");
+			return ExitCode::OK;
+		}
+
+		$this->_writeError("Order NOT marked Imminent. 🚫️");
+		return ExitCode::UNSPECIFIED_ERROR;
 
 	}
 

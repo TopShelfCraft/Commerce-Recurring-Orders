@@ -20,6 +20,8 @@ use yii\base\Exception;
  * @property mixed $spec
  * @property mixed $originatingOrderId
  * @property mixed $parentOrderId
+ * @property \DateTime $dateMarkedImminent
+ * @property \DateTime $retryDate
  */
 class RecurringOrderRecord extends BaseRecord
 {
@@ -44,6 +46,8 @@ class RecurringOrderRecord extends BaseRecord
 	protected $dateTimeAttributes = [
 		'lastRecurrence',
 		'nextRecurrence',
+		'dateMarkedImminent',
+		'retryDate',
 	];
 
 	/**
