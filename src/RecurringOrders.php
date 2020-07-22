@@ -251,15 +251,6 @@ class RecurringOrders extends Plugin
 		);
 
 		/*
-		 * Extra processing after a Payment is processed
-		 */
-		Event::on(
-			Payments::class,
-			Payments::EVENT_AFTER_PROCESS_PAYMENT,
-			[$this->orders, 'handleAfterProcessPaymentEvent']
-		);
-
-		/*
 		 * Extra processing after an Order is Completed
 		 */
 		Event::on(

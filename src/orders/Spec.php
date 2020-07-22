@@ -125,7 +125,7 @@ class Spec extends Model
 	/**
 	 * @return int|null
 	 */
-	public function getPaymentSourceId()
+	public function getRecurrencePaymentSourceId()
 	{
 		return $this->paymentSourceId;
 	}
@@ -133,7 +133,7 @@ class Spec extends Model
 	/**
 	 * @param $value
 	 */
-	public function setPaymentSourceId($value)
+	public function setRecurrencePaymentSourceId($value)
 	{
 		$this->paymentSourceId = ((int)$value ?: null);
 	}

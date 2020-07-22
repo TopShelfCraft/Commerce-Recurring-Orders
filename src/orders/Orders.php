@@ -151,7 +151,7 @@ class Orders extends Component
 
 		if (($paymentSourceId = $request->getParam('makeRecurring.paymentSourceId')) !== null)
 		{
-			$order->setPaymentSourceId($paymentSourceId ?: null);
+			$order->setRecurrencePaymentSourceId($paymentSourceId ?: null);
 		}
 
 		// Spec fields
@@ -173,7 +173,7 @@ class Orders extends Component
 
 		if (($specPaymentSourceId = $request->getParam('makeRecurring.spec.paymentSourceId')) !== null)
 		{
-			$order->getSpec()->setPaymentSourceId($specPaymentSourceId ?: null);
+			$order->getSpec()->setRecurrencePaymentSourceId($specPaymentSourceId ?: null);
 		}
 
 	}
@@ -228,71 +228,6 @@ class Orders extends Component
 		}
 
 		$this->replicateAsRecurring($order);
-
-	}
-
-	/**
-	 * @param ProcessPaymentEvent $event
-	 */
-	public function handleAfterProcessPaymentEvent(ProcessPaymentEvent $event)
-	{
-
-		if (!$event->response->isSuccessful())
-		{
-			return;
-		}
-
-		// TODO: Make dynamic.
-		$capturePaymentSource = true;
-
-		$order = $event->order;
-
-		if ($order->paymentSourceId || !$capturePaymentSource)
-		{
-			return;
-		}
-
-		try
-		{
-			if (!$order->getUser())
-			{
-				// TODO: Log error?
-				return;
-			}
-		}
-		catch (InvalidConfigException $e)
-		{
-			return;
-		}
-
-		try
-		{
-			$description = Craft::$app->request->getParam('recurringOrders.paymentSource.description');
-			$paymentSource = Commerce::getInstance()->paymentSources->createPaymentSource($order->getUser()->id, $order->getGateway(), $event->form, $description);
-		}
-		catch (\Exception $e)
-		{
-			// TODO: Log error.
-			return;
-		}
-
-		/** @var RecurringOrderBehavior $order */
-
-		if ($order->hasRecurrenceStatus() && !$order->getPaymentSourceId())
-		{
-			$order->setPaymentSourceId($paymentSource->id);
-		}
-
-		$spec = $order->getSpec();
-		if (!$spec->isEmpty() && !$spec->getPaymentSourceId())
-		{
-			$spec->setPaymentSourceId($paymentSource->id);
-		}
-
-		/*
-		 * This event preceeds a call to Payments::updateOrderPaidInformation(), which will save the Order,
-		 * and thereby save our Recurring Orders record.
-		 */
 
 	}
 
@@ -354,7 +289,7 @@ class Orders extends Component
 
 			$newOrder->setRecurrenceStatus($spec->getStatus() ?: RecurringOrderRecord::STATUS_ACTIVE);
 			$newOrder->setRecurrenceInterval($spec->getRecurrenceInterval());
-			$newOrder->setPaymentSourceId($spec->getPaymentSourceId());
+			$newOrder->setRecurrencePaymentSourceId($spec->getRecurrencePaymentSourceId());
 
 			try
 			{
@@ -416,6 +351,7 @@ class Orders extends Component
 		$clone = new Order();
 		$clone->number = Commerce::getInstance()->getCarts()->generateCartNumber();
 		$clone->setAttributes($attributes, false);
+
 		Craft::$app->elements->saveElement($clone);
 
 		$lineItems = [];
@@ -458,24 +394,28 @@ class Orders extends Component
 		/*
 		 * Check Payment Source
 		 */
-		$paymentSource = $newOrder->getPaymentSource();
+		$paymentSource = $parentOrder->getRecurrencePaymentSource();
 
 		if (!$paymentSource)
 		{
-//			$success = false;
-//			// TODO: Translate?
-//			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
-//			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
-//			// TODO: Trigger error and return early
+			$success = false;
+			// TODO: Translate?
+			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
+			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
+			// TODO: Trigger error and return early
 		}
 
-		// TODO: Check for line item availability errors (ERROR_PRODUCT_UNAVAILABLE)
+		/*
+		 * TODO: Check for line item availability errors (ERROR_PRODUCT_UNAVAILABLE)
+		 */
 
-		// TODO: Check for discount errors (ERROR_DISCOUNT_UNAVAILABLE)
+		/*
+		 * TODO: Check for discount errors (ERROR_DISCOUNT_UNAVAILABLE)
+		 */
 
-		// TODO: Check for Payment Source expiration (ERROR_PAYMENT_SOURCE_EXPIRED)
-
-		// TODO: (Start transaction...)
+		/*
+		 * TODO: (Start transaction...)
+		 */
 
 		/*
 		 * Save the new Order...
@@ -512,10 +452,10 @@ class Orders extends Component
 
 		try
 		{
-//			$paymentForm = $newOrder->getGateway()->getPaymentFormModel();
-//			$paymentForm->populateFromPaymentSource($paymentSource);
-//			// Only bother trying the payment if we've been successful so far.
-//			$success && Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
+			$paymentForm = $newOrder->getGateway()->getPaymentFormModel();
+			$paymentForm->populateFromPaymentSource($paymentSource);
+			// Only bother trying the payment if we've been successful so far.
+			$success && Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
 		}
 		catch(\Throwable $e)
 		{

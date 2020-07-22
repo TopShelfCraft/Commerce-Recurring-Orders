@@ -165,7 +165,7 @@
                     {% include '_includes/forms/select' with {
                         id: 'makeRecurring-paymentSourceId',
                         name: 'makeRecurring[paymentSourceId]',
-                        value: order.getPaymentSourceId(),
+                        value: order.getRecurrencePaymentSourceId(),
                         options: recurringOrders.orders.getPaymentSourceFormOptionsByOrder(order),
                     } %}
                 </span>

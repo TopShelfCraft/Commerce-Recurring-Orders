@@ -299,7 +299,7 @@ class RecurringOrderBehavior extends Behavior
 	/**
 	 * @return int|null
 	 */
-	public function getPaymentSourceId()
+	public function getRecurrencePaymentSourceId()
 	{
 		return $this->_getRecord() ? $this->_getRecord()->paymentSourceId : null;
 	}
@@ -307,7 +307,7 @@ class RecurringOrderBehavior extends Behavior
 	/**
 	 * @param $value
 	 */
-	public function setPaymentSourceId($value)
+	public function setRecurrencePaymentSourceId($value)
 	{
 		$this->_getOrMakeRecord()->paymentSourceId = ((int)$value ?: null);
 	}
@@ -315,10 +315,10 @@ class RecurringOrderBehavior extends Behavior
 	/**
 	 * @return PaymentSource|null
 	 */
-	public function getPaymentSource()
+	public function getRecurrencePaymentSource()
 	{
-		return $this->getPaymentSourceId()
-			? Commerce::getInstance()->paymentSources->getPaymentSourceById($this->getPaymentSourceId())
+		return $this->getRecurrencePaymentSourceId()
+			? Commerce::getInstance()->paymentSources->getPaymentSourceById($this->getRecurrencePaymentSourceId())
 			: null;
 	}
 
