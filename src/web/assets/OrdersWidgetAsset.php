@@ -14,7 +14,7 @@ class OrdersWidgetAsset extends AssetBundle
     public function init()
     {
 
-		$this->sourcePath = __DIR__ . '/dist';
+		$this->sourcePath = __DIR__ . '/orderswidget/dist';
 
         $this->depends = [
             CpAsset::class,

@@ -25,8 +25,9 @@ class OrdersController extends BaseWebController
 	public function actionProcessOrderRecurrence()
 	{
 
-		$request = Craft::$app->request;
+		$this->requirePostRequest();
 
+		$request = Craft::$app->request;
 		$id = $request->getRequiredParam('id');
 		$order = Commerce::getInstance()->orders->getOrderById($id);
 
@@ -50,8 +51,12 @@ class OrdersController extends BaseWebController
 			return $this->_returnOrderEditSuccessResponse($order);
 		}
 
+		/** @var RecurringOrderBehavior $order */
 		// TODO: Translate.
-		return $this->returnErrorResponse("Could not process this Order Recurrence.");
+		return $this->returnErrorResponse(
+			"Could not process this Order Recurrence."
+			. ($order->getRecurrenceErrorReason() ? ' (' . $order->getRecurrenceErrorReason() . ')': '')
+		);
 
 	}
 
@@ -135,7 +140,7 @@ class OrdersController extends BaseWebController
 		}
 
 		// TODO: Translate.
-		return $this->returnErrorResponse("Something went wrong while replicating the order.");
+		return $this->returnErrorResponse("Something went wrong while replicating the order: " . $order->getRecurrenceErrorReason());
 
 	}
 

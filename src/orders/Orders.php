@@ -377,18 +377,11 @@ class Orders extends Component
 
 		/** @var RecurringOrderBehavior $parentOrder */
 
-		// TODO: Only pass if the Parent Order has a Recurrence Schedule?
 		if (!$parentOrder->hasRecurrenceStatus())
 		{
-			// TODO: Translate?
 			throw new Exception("Cannot process recurrence on a non-recurring Order.");
 		}
 
-		$newOrder = $this->getLightClone($parentOrder);
-		/** @var RecurringOrderBehavior $newOrder */
-		$newOrder->parentOrderId = $parentOrder->id;
-
-		$success = true;
 		$errorReason = null;
 
 		/*
@@ -398,12 +391,18 @@ class Orders extends Component
 
 		if (!$paymentSource)
 		{
-			$success = false;
-			// TODO: Translate?
 			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
 			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
-			// TODO: Trigger error and return early
+			goto processError;
 		}
+
+		/*
+		 * Create the new Order.
+		 */
+
+		$newOrder = $this->getLightClone($parentOrder);
+		/** @var RecurringOrderBehavior $newOrder */
+		$newOrder->parentOrderId = $parentOrder->id;
 
 		/*
 		 * TODO: Check for line item availability errors (ERROR_PRODUCT_UNAVAILABLE)
@@ -423,7 +422,7 @@ class Orders extends Component
 
 		try
 		{
-			$success = $success && Craft::$app->getElements()->saveElement($newOrder);
+			$success = Craft::$app->getElements()->saveElement($newOrder);
 		}
 		catch(\Throwable $e)
 		{
@@ -431,19 +430,11 @@ class Orders extends Component
 			RecurringOrders::error($e->getMessage());
 		}
 
-		/*
-		 * Complete the Order...
-		 */
-
-		try
+		if (!$success)
 		{
-			$newOrder->recalculate();
-			$success = $success && $newOrder->markAsComplete();
-		}
-		catch(\Throwable $e)
-		{
-			$success = false;
-			RecurringOrders::error($e->getMessage());
+			RecurringOrders::error("Could not save the Generated Order.");
+			$errorReason = RecurringOrderRecord::ERROR_UNKNOWN;
+			goto processError;
 		}
 
 		/*
@@ -454,14 +445,14 @@ class Orders extends Component
 		{
 			$paymentForm = $newOrder->getGateway()->getPaymentFormModel();
 			$paymentForm->populateFromPaymentSource($paymentSource);
-			// Only bother trying the payment if we've been successful so far.
-			$success && Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
+			Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
 		}
 		catch(\Throwable $e)
 		{
-			$success = false;
+			RecurringOrders::error("Could not process payment for the Generated Order.");
 			RecurringOrders::error($e->getMessage());
 			$errorReason = RecurringOrderRecord::ERROR_PAYMENT_ISSUE;
+			goto processError;
 		}
 
 		// TODO: (Commit/rollback transaction.)
@@ -470,24 +461,21 @@ class Orders extends Component
 		 * Process success!
 		 */
 
-		if ($success)
-		{
+		$this->makeOrderRecurring($parentOrder, [
+			'status' => RecurringOrderRecord::STATUS_ACTIVE,
+			'errorReason' => null,
+			'errorCount' => null,
+		], true);
 
-			$this->makeOrderRecurring($parentOrder, [
-				'status' => RecurringOrderRecord::STATUS_ACTIVE,
-				'errorReason' => null,
-				'errorCount' => null,
-			], true);
+		// TODO: Trigger success events.
 
-			// TODO: Trigger success events.
-
-			return true;
-
-		}
+		return true;
 
 		/*
-		 * Process remaining errors.  :-/
+		 * Process error.  :-/
 		 */
+
+		processError:
 
 		$this->makeOrderRecurring($parentOrder, [
 			'status' => RecurringOrderRecord::STATUS_ERROR,

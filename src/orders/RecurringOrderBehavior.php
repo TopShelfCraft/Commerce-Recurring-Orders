@@ -362,6 +362,14 @@ class RecurringOrderBehavior extends Behavior
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isDerived()
+	{
+		return (bool) $this->getOriginatingOrderId();
+	}
+
+	/**
 	 * @return int|null
 	 */
 	public function getParentOrderId()
@@ -385,6 +393,14 @@ class RecurringOrderBehavior extends Behavior
 		return $this->getParentOrderId()
 			? Commerce::getInstance()->orders->getOrderById($this->getParentOrderId())
 			: null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isGenerated()
+	{
+		return (bool) $this->getParentOrderId();
 	}
 
 	/**

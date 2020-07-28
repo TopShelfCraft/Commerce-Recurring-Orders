@@ -12,7 +12,7 @@ class CpCustomizationsAsset extends AssetBundle
 	public function init()
 	{
 
-		$this->sourcePath = __DIR__ . '/dist';
+		$this->sourcePath = __DIR__ . '/cpcustomizations/dist';
 
 		$this->depends = [
 //			CpAsset::class,
