@@ -443,6 +443,15 @@ class Orders extends Component
 
 		try
 		{
+			/*
+			 * Gotta set the Payment Source on the new order first, because it will determine which Gateway gets used
+			 * for the payment.
+			 *
+			 * (For some reason, using `$paymentSource->getGateway()->getPaymentFormModel()` directly,
+			 * without invoking `$newOrder->setPaymentSource()` as an intermediate step,
+			 * produced a "Non-numeric value" error, which I haven't tracked down yet.) ^MR 2020-07-29
+			 */
+			$newOrder->setPaymentSource($paymentSource);
 			$paymentForm = $newOrder->getGateway()->getPaymentFormModel();
 			$paymentForm->populateFromPaymentSource($paymentSource);
 			Commerce::getInstance()->getPayments()->processPayment($newOrder, $paymentForm, $redirect, $transaction);
