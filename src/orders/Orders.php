@@ -219,10 +219,9 @@ class Orders extends Component
 
 		/*
 		 * To prevent an infinite spiral of derived or generated orders, bail early if this newly completed order
-		 * already has an Originating Order marked on it (i.e. it is already "derived")
-		 * or if it has a Parent Order (i.e. it is already "generated").
+		 * already has an Originating Order (i.e. it is "derived"), or if it has a Parent Order (i.e. it is "generated").
 		 */
-		if ($order->getOriginatingOrderId() || $order->getParentOrderId())
+		if ($order->isGenerated() || $order->isDerived())
 		{
 			return;
 		}
