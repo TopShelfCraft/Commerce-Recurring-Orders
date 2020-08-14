@@ -5,13 +5,13 @@ use Craft;
 use craft\base\Plugin;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
-use craft\commerce\services\Payments;
 use craft\console\Application as ConsoleApplication;
 use craft\helpers\FileHelper;
 use craft\services\Dashboard;
 use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
+use michaelrog\paymentsourcestools\PaymentSourcesTools;
 use topshelfcraft\recurringorders\config\Settings;
 use topshelfcraft\recurringorders\orders\Orders;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
@@ -90,6 +90,7 @@ class RecurringOrders extends Plugin
 		$this->_registerEventHandlers();
 		$this->_attachVariableGlobal();
 		$this->_registerTemplateHooks();
+		$this->_initPaymentSourceTools();
 
 		// Register controllers via namespace map
 
@@ -319,6 +320,16 @@ class RecurringOrders extends Plugin
 			[$this->cpCustomizations, 'handleRegisterWidgetTypes']
 		);
 
+	}
+
+	/**
+	 * Import/initialize extra Payment Sources functionality
+	 *
+	 * @throws \yii\base\InvalidConfigException
+	 */
+	private function _initPaymentSourceTools()
+	{
+		PaymentSourcesTools::registerModule();
 	}
 
 }
