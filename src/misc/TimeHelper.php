@@ -17,6 +17,19 @@ class TimeHelper
 	}
 
 	/**
+	 * @param $interval
+	 *
+	 * @return \DateTime
+	 *
+	 * @throws \Exception
+	 */
+	public static function fromNow($interval)
+	{
+		$interval = static::normalizeInterval($interval);
+		return static::now()->add($interval);
+	}
+
+	/**
 	 * Normalizes a time duration value into a DateInterval
 	 *
 	 * Accepted formats:

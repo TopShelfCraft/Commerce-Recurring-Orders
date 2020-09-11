@@ -502,7 +502,7 @@ class Orders extends Component
 			'status' => RecurringOrderRecord::STATUS_ERROR,
 			'errorReason' => $errorReason,
 			'errorCount' => $parentOrder->getRecurrenceErrorCount() + 1,
-			'retryDate' => TimeHelper::now()->add($retryInterval),
+			'retryDate' => TimeHelper::fromNow($retryInterval),
 		], false);
 
 		// TODO: Trigger error events.

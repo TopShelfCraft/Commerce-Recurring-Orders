@@ -487,7 +487,7 @@ class RecurringOrderBehavior extends Behavior
 			RecurringOrders::error("Next Recurrence cannot be reset because Recurrence Interval is not defined.");
 			return;
 		}
-		$newDate = (new \DateTime())->add(TimeHelper::normalizeInterval($this->getRecurrenceInterval()));
+		$newDate = TimeHelper::fromNow($this->getRecurrenceInterval());
 		$this->setNextRecurrence($newDate);
 	}
 

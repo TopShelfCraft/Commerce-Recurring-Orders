@@ -76,7 +76,7 @@ class CountUpcomingRecurrencesWidget extends Widget
 		$humanDuration = $interval ? DateTimeHelper::humanDurationFromInterval($interval) : null;
 
 		$nextRecurrenceThreshold = $interval
-			? (new \DateTime())->add($interval)->getTimestamp()
+			? TimeHelper::fromNow($interval)->getTimestamp()
 			: strtotime('tomorrow');
 
 		/** @var RecurringOrderQuery $query */
