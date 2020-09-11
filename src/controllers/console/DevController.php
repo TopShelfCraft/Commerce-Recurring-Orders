@@ -5,7 +5,8 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\helpers\Console;
 use craft\helpers\DateTimeHelper;
-use topshelfcraft\recurringorders\misc\IntervalHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrder;
+use topshelfcraft\recurringorders\misc\TimeHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use yii\console\ExitCode;
 
@@ -24,7 +25,7 @@ class DevController extends BaseConsoleController
 	{
 		$this->_writeLine(
 			DateTimeHelper::humanDurationFromInterval(
-				IntervalHelper::normalizeInterval($interval)
+				TimeHelper::normalizeInterval($interval)
 			)
 		);
 		return ExitCode::OK;
@@ -49,7 +50,7 @@ class DevController extends BaseConsoleController
 			return ExitCode::UNSPECIFIED_ERROR;
 		}
 
-		/** @var RecurringOrderBehavior $order **/
+		/** @var RecurringOrder $order **/
 		$success = $order->markImminent();
 
 		if ($success)

@@ -5,8 +5,16 @@ use craft\helpers\ConfigHelper;
 use craft\helpers\StringHelper;
 use yii\base\Exception;
 
-class IntervalHelper
+class TimeHelper
 {
+
+	/**
+	 * @return \DateTime
+	 */
+	public static function now()
+	{
+		return new \DateTime();
+	}
 
 	/**
 	 * Normalizes a time duration value into a DateInterval

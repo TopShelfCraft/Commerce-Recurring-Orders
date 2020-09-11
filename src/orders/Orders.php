@@ -5,8 +5,10 @@ use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\events\ProcessPaymentEvent;
-use craft\commerce\Plugin as Commerce;;
+use craft\commerce\Plugin as Commerce;
 use craft\events\ModelEvent;
+use topshelfcraft\recurringorders\meta\RecurringOrder;
+use topshelfcraft\recurringorders\misc\TimeHelper;
 use topshelfcraft\recurringorders\misc\NormalizeTrait;
 use topshelfcraft\recurringorders\misc\PaymentSourcesHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
@@ -84,7 +86,7 @@ class Orders extends Component
 	public function makeOrderRecurring(Order $order, $attributes = [], $resetNextRecurrence = false)
 	{
 
-		/** @var RecurringOrderBehavior $order */
+		/** @var RecurringOrder $order */
 
 		// Default status, if none provided
 		if (!isset($attributes['status']))
@@ -116,6 +118,7 @@ class Orders extends Component
 	public function handleOrderBeforeSave(ModelEvent $event)
 	{
 
+		/** @var RecurringOrder $order */
 		$order = $event->sender;
 
 		$request = Craft::$app->request;
@@ -124,8 +127,6 @@ class Orders extends Component
 		{
 			return;
 		}
-
-		/** @var RecurringOrderBehavior $order */
 
 		// Order fields
 
@@ -190,9 +191,8 @@ class Orders extends Component
 	public function handleOrderAfterSave(ModelEvent $event)
 	{
 
+		/** @var RecurringOrder $order */
 		$order = $event->sender;
-
-		/** @var RecurringOrderBehavior $order */
 
 		if ($order->getResetNextRecurrenceOnSave())
 		{
@@ -272,17 +272,17 @@ class Orders extends Component
 	private function _prepareDerivedOrders(Order $originatingOrder)
 	{
 
+		/** @var RecurringOrder $originatingOrder **/
+
 		$derivedOrders = [];
 
-		/** @var RecurringOrderBehavior $originatingOrder **/
 		$spec = $originatingOrder->getSpec();
 
 		if (!$spec->isEmpty())
 		{
 
+			/** @var RecurringOrder $newOrder */
 			$newOrder = $this->getLightClone($originatingOrder);
-
-			/** @var RecurringOrderBehavior $newOrder */
 
 			$newOrder->setOriginatingOrderId($originatingOrder->id);
 
@@ -367,21 +367,24 @@ class Orders extends Component
 	/**
 	 * @param Order $parentOrder
 	 *
-	 * @return bool
+	 * @return true
 	 *
 	 * @throws Exception
+	 * @throws \Exception from `processOrderRecurrenceError()`
+	 *
+	 * @todo Remove return value.
 	 */
 	public function processOrderRecurrence(Order $parentOrder)
 	{
 
-		/** @var RecurringOrderBehavior $parentOrder */
+		// TODO: Use a specific Exception instead of generic Yii Exception.
+
+		/** @var RecurringOrder $parentOrder */
 
 		if (!$parentOrder->hasRecurrenceStatus())
 		{
 			throw new Exception("Cannot process recurrence on a non-recurring Order.");
 		}
-
-		$errorReason = null;
 
 		/*
 		 * Check Payment Source
@@ -390,17 +393,16 @@ class Orders extends Component
 
 		if (!$paymentSource)
 		{
-			RecurringOrders::error("Cannot process Recurring Order because Payment Source is missing.");
-			$errorReason = RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE;
-			goto processError;
+			$this->processOrderRecurrenceError($parentOrder, RecurringOrderRecord::ERROR_NO_PAYMENT_SOURCE);
+			throw new Exception("Cannot process Recurring Order because Payment Source is missing.");
 		}
 
 		/*
 		 * Create the new Order.
 		 */
 
+		/** @var RecurringOrder $newOrder */
 		$newOrder = $this->getLightClone($parentOrder);
-		/** @var RecurringOrderBehavior $newOrder */
 		$newOrder->parentOrderId = $parentOrder->id;
 
 		/*
@@ -431,9 +433,8 @@ class Orders extends Component
 
 		if (!$success)
 		{
-			RecurringOrders::error("Could not save the Generated Order.");
-			$errorReason = RecurringOrderRecord::ERROR_UNKNOWN;
-			goto processError;
+			$this->processOrderRecurrenceError($parentOrder, RecurringOrderRecord::ERROR_UNKNOWN);
+			throw new Exception("Could not save the Generated Order.");
 		}
 
 		/*
@@ -457,10 +458,8 @@ class Orders extends Component
 		}
 		catch(\Throwable $e)
 		{
-			RecurringOrders::error("Could not process payment for the Generated Order.");
-			RecurringOrders::error($e->getMessage());
-			$errorReason = RecurringOrderRecord::ERROR_PAYMENT_ISSUE;
-			goto processError;
+			$this->processOrderRecurrenceError($parentOrder, RecurringOrderRecord::ERROR_PAYMENT_ISSUE);
+			throw new Exception("Could not process payment for the Generated Order.");
 		}
 
 		// TODO: (Commit/rollback transaction.)
@@ -470,30 +469,43 @@ class Orders extends Component
 		 */
 
 		$this->makeOrderRecurring($parentOrder, [
+			// TODO: Should we be resetting to Active every time? Or only if it was previously in error status?
 			'status' => RecurringOrderRecord::STATUS_ACTIVE,
 			'errorReason' => null,
 			'errorCount' => null,
+			'retryDate' => null,
+			'lastRecurrence' => TimeHelper::now(),
+			'dateMarkedImminent' => null,
 		], true);
 
 		// TODO: Trigger success events.
 
 		return true;
 
-		/*
-		 * Process error.  :-/
-		 */
+	}
 
-		processError:
+	/**
+	 * @param Order $parentOrder
+	 * @param string $errorReason
+	 *
+	 * @throws \Exception
+	 */
+	public function processOrderRecurrenceError(Order $parentOrder, string $errorReason)
+	{
+
+		/** @var RecurringOrder $parentOrder */
+
+		$settings = RecurringOrders::getInstance()->getSettings();
+		$retryInterval = TimeHelper::normalizeInterval($settings->retryInterval);
 
 		$this->makeOrderRecurring($parentOrder, [
 			'status' => RecurringOrderRecord::STATUS_ERROR,
 			'errorReason' => $errorReason,
-			'errorCount' => intval($parentOrder->getRecurrenceErrorCount()) + 1,
+			'errorCount' => $parentOrder->getRecurrenceErrorCount() + 1,
+			'retryDate' => TimeHelper::now()->add($retryInterval),
 		], false);
 
 		// TODO: Trigger error events.
-
-		return false;
 
 	}
 

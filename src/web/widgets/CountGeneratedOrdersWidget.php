@@ -7,7 +7,8 @@ use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
-use topshelfcraft\recurringorders\misc\IntervalHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
+use topshelfcraft\recurringorders\misc\TimeHelper;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 
@@ -71,15 +72,15 @@ class CountGeneratedOrdersWidget extends Widget
 	public function getBodyHtml()
 	{
 
-		$interval = $this->dateRangeInterval ? IntervalHelper::normalizeInterval($this->dateRangeInterval) : null;
+		$interval = $this->dateRangeInterval ? TimeHelper::normalizeInterval($this->dateRangeInterval) : null;
 		$humanDuration = $interval ? DateTimeHelper::humanDurationFromInterval($interval) : null;
 
 		$dateOrderedThreshold = $interval
 			? (new \DateTime())->sub($interval)->getTimestamp()
 			: strtotime('today');
 
+		/** @var RecurringOrderQuery $query */
 		$query = Order::find()->isCompleted();
-		/** @var RecurringOrderQueryBehavior $query */
 		$query->hasParentOrder();
 		$query->dateOrdered('>'.$dateOrderedThreshold);
 
@@ -146,7 +147,7 @@ class CountGeneratedOrdersWidget extends Widget
 		$rules[] = [
 			'dateRangeInterval',
 			function ($attribute, $params, $validator) {
-				if ($this->$attribute && !IntervalHelper::isValidInterval($this->$attribute))
+				if ($this->$attribute && !TimeHelper::isValidInterval($this->$attribute))
 				{
 					$this->addError($attribute, 'The Date Range Interval is not valid.');
 				}

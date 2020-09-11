@@ -3,6 +3,10 @@ namespace topshelfcraft\recurringorders\controllers\console;
 
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
+use topshelfcraft\recurringorders\meta\RecurringOrder;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
+use topshelfcraft\recurringorders\misc\TimeHelper;
+use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\console\ExitCode;
@@ -84,12 +88,14 @@ class OrdersController extends BaseConsoleController
 
 	/**
 	 * @return int
+	 *
+	 * @todo Should probably be a pass-through to a service method.
 	 */
 	public function actionProcessOutstandingOrders()
 	{
 
+		/** @var RecurringOrderQuery $query */
 		$query = Order::find();
-		/** @var RecurringOrderQueryBehavior $query */
 
 		$outstandingOrders = $query->isOutstanding()->all();
 

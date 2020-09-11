@@ -40,6 +40,11 @@ class RecurringOrderQueryBehavior extends Behavior
 	/**
 	 * @var mixed
 	 */
+	public $recurrenceRetryDate;
+
+	/**
+	 * @var mixed
+	 */
 	public $recurrenceInterval;
 
 	/**
@@ -51,6 +56,11 @@ class RecurringOrderQueryBehavior extends Behavior
 	 * @var mixed
 	 */
 	public $nextRecurrence;
+
+	/**
+	 * @var mixed
+	 */
+	public $dateMarkedImminent;
 
 	/**
 	 * @var bool
@@ -73,9 +83,14 @@ class RecurringOrderQueryBehavior extends Behavior
 	public $parentOrderId;
 
 	/**
-	 * @var mixed
+	 * @var bool|null
 	 */
 	public $isOutstanding;
+
+	/**
+	 * @var bool|null
+	 */
+	public $isMarkedImminent;
 
 	/**
 	 * @inheritdoc
@@ -147,6 +162,17 @@ class RecurringOrderQueryBehavior extends Behavior
 	 *
 	 * @return OrderQuery
 	 */
+	public function recurrenceRetryDate($value)
+	{
+		$this->recurrenceRetryDate = $value;
+		return $this->owner;
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @return OrderQuery
+	 */
 	public function recurrenceInterval($value)
 	{
 		$this->recurrenceInterval = $value;
@@ -172,6 +198,39 @@ class RecurringOrderQueryBehavior extends Behavior
 	public function nextRecurrence($value)
 	{
 		$this->nextRecurrence = $value;
+		return $this->owner;
+	}
+
+	/**
+	 * @param bool|null $value
+	 *
+	 * @return OrderQuery
+	 */
+	public function isOutstanding($value = true)
+	{
+		$this->isOutstanding = is_null($value) ? null : (bool) $value;
+		return $this->owner;
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @return OrderQuery
+	 */
+	public function dateMarkedImminent($value)
+	{
+		$this->dateMarkedImminent = $value;
+		return $this->owner;
+	}
+
+	/**
+	 * @param bool|null $value
+	 *
+	 * @return OrderQuery
+	 */
+	public function isMarkedImminent($value = true)
+	{
+		$this->isMarkedImminent = is_null($value) ? null : (bool) $value;
 		return $this->owner;
 	}
 
@@ -216,17 +275,6 @@ class RecurringOrderQueryBehavior extends Behavior
 	public function parentOrderId($value)
 	{
 		$this->parentOrderId = $value;
-		return $this->owner;
-	}
-
-	/**
-	 * @param mixed $value
-	 *
-	 * @return OrderQuery
-	 */
-	public function isOutstanding($value = true)
-	{
-		$this->isOutstanding = is_null($value) ? $value : (bool) $value;
 		return $this->owner;
 	}
 
@@ -278,6 +326,11 @@ class RecurringOrderQueryBehavior extends Behavior
 			$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.errorCount', $this->recurrenceErrorCount));
 		}
 
+		if ($this->recurrenceRetryDate)
+		{
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.retryDate', $this->recurrenceRetryDate));
+		}
+
 		if ($this->recurrenceInterval !== null)
 		{
 			$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.recurrenceInterval', $this->recurrenceInterval));
@@ -291,6 +344,31 @@ class RecurringOrderQueryBehavior extends Behavior
 		if ($this->nextRecurrence)
 		{
 			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', $this->nextRecurrence));
+		}
+
+		if ($this->isOutstanding)
+		{
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.time()));
+		}
+
+		if ($this->isEligibleForRecurrence)
+		{
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.time()));
+			$orderQuery->subQuery->andWhere([
+				'or',
+				['is', '[[recurringOrders.retryDate]]', null],
+				['<', '[[recurringOrders.retryDate]]', time()],
+			]);
+		}
+
+		if ($this->dateMarkedImminent)
+		{
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.dateMarkedImminent', $this->dateMarkedImminent));
+		}
+
+		if ($this->isMarkedImminent)
+		{
+			$orderQuery->subQuery->andWhere([($this->dateMarkedImminent ? 'is not' : 'is'), '[[recurringOrders.dateMarkedImminent]]', null]);
 		}
 
 		if ($this->hasOriginatingOrder !== null) {
@@ -309,11 +387,6 @@ class RecurringOrderQueryBehavior extends Behavior
 		if ($this->parentOrderId)
 		{
 			$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.parentOrderId', $this->parentOrderId));
-		}
-
-		if ($this->isOutstanding)
-		{
-			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.time()));
 		}
 
 	}

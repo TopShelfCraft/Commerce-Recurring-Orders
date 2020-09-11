@@ -6,6 +6,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\widgets\Orders as OrdersWidget;
 use craft\helpers\StringHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 
@@ -94,8 +95,8 @@ class RecentGeneratedOrdersWidget extends OrdersWidget
 
 		$orderStatusId = $this->orderStatusId;
 
+		/** @var RecurringOrderQuery $query */
 		$query = Order::find();
-		/** @var RecurringOrderQueryBehavior $query */
 
 		$query->isCompleted(true);
 		$query->dateOrdered(':notempty:');

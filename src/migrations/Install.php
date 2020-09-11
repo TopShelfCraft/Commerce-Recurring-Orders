@@ -45,8 +45,6 @@ class Install extends Migration
 				'id' => $this->integer()->notNull(),
 
 				'status' => $this->string(),
-				'errorReason' => $this->string(),
-				'errorCount' => $this->integer()->unsigned(),
 				'recurrenceInterval' => $this->string(),
 				'lastRecurrence' => $this->dateTime(),
 				'nextRecurrence' => $this->dateTime(),
@@ -54,6 +52,8 @@ class Install extends Migration
 				'spec' => $this->string(1023),
 				'originatingOrderId' => $this->integer(),
 				'parentOrderId' => $this->integer(),
+				'errorReason' => $this->string(),
+				'errorCount' => $this->integer()->unsigned(),
 
 				'dateCreated' => $this->dateTime()->notNull(),
 				'dateUpdated' => $this->dateTime()->notNull(),

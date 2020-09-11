@@ -5,6 +5,7 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\StringHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrder;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
@@ -29,6 +30,8 @@ class OrdersController extends BaseWebController
 
 		$request = Craft::$app->request;
 		$id = $request->getRequiredParam('id');
+
+		/** @var RecurringOrder|null $order */
 		$order = Commerce::getInstance()->orders->getOrderById($id);
 
 		if (!$order)
@@ -51,7 +54,6 @@ class OrdersController extends BaseWebController
 			return $this->_returnOrderEditSuccessResponse($order);
 		}
 
-		/** @var RecurringOrderBehavior $order */
 		// TODO: Translate.
 		return $this->returnErrorResponse(
 			"Could not process this Order Recurrence."
@@ -72,7 +74,7 @@ class OrdersController extends BaseWebController
 
 		$id = $request->getRequiredParam('id');
 
-		/** @var RecurringOrderBehavior $order */
+		/** @var RecurringOrder $order */
 		$order = Commerce::getInstance()->orders->getOrderById($id);
 
 		if ($status = $request->getParam('status', RecurringOrderRecord::STATUS_ACTIVE))
@@ -122,7 +124,7 @@ class OrdersController extends BaseWebController
 
 		$id = $request->getRequiredParam('id');
 
-		/** @var RecurringOrderBehavior $order */
+		/** @var RecurringOrder $order */
 		$order = Commerce::getInstance()->orders->getOrderById($id);
 
 		try
@@ -196,7 +198,7 @@ class OrdersController extends BaseWebController
 
 		$order = $this->_getRequiredRequestOrder();
 
-		/** @var RecurringOrderBehavior $order */
+		/** @var RecurringOrder $order */
 		$order->setRecurrenceStatus($status);
 
 		/** @var Order $order */

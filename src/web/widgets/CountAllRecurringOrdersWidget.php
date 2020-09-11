@@ -6,6 +6,7 @@ use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
 use craft\helpers\StringHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
@@ -71,8 +72,8 @@ class CountAllRecurringOrdersWidget extends Widget
 	public function getBodyHtml()
 	{
 
+		/** @var RecurringOrderQuery $query */
 		$query = Order::find()->isCompleted();
-		/** @var RecurringOrderQueryBehavior $query */
 		$query->hasRecurrenceStatus(true);
 		if ($this->recurrenceStatus)
 		{

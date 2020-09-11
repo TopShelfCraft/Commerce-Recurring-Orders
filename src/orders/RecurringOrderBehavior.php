@@ -1,14 +1,14 @@
 <?php
 namespace topshelfcraft\recurringorders\orders;
 
-use Craft;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\events\CancelableEvent;
 use craft\helpers\DateTimeHelper;
-use topshelfcraft\recurringorders\misc\IntervalHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
+use topshelfcraft\recurringorders\misc\TimeHelper;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\Behavior;
 use yii\base\Event;
@@ -16,14 +16,16 @@ use yii\base\Event;
 /**
  * @property string|null $recurrenceStatus
  * @property string|null $recurrenceInterval
- * @property string|null $recurrenceErrorReason
- * @property int|null $recurrenceErrorCount
  * @property \DateTime|null $lastRecurrence
  * @property \DateTime|null $nextRecurrence
+ * @property \DateTime|null $dateMarkedImminent
  * @property int|null $paymentSourceId
  * @property mixed $spec
  * @property string|null $originatingOrderId
  * @property string|null $parentOrderId
+ * @property string|null $recurrenceErrorReason
+ * @property int|null $recurrenceErrorCount
+ * @property \DateTime|null $retryDate
  * @property bool $resetNextRecurrenceOnSave
  *
  * @property Order $owner
@@ -213,7 +215,7 @@ class RecurringOrderBehavior extends Behavior
 			try
 			{
 				return DateTimeHelper::humanDurationFromInterval(
-					IntervalHelper::normalizeInterval($this->getRecurrenceInterval())
+					TimeHelper::normalizeInterval($this->getRecurrenceInterval())
 				);
 			}
 			catch (\Exception $e)
@@ -241,11 +243,11 @@ class RecurringOrderBehavior extends Behavior
 	}
 
 	/**
-	 * @return int|null
+	 * @return int
 	 */
 	public function getRecurrenceErrorCount()
 	{
-		return $this->_getRecord() ? $this->_getRecord()->errorCount : null;
+		return (int)($this->_getRecord() ? $this->_getRecord()->errorCount : null);
 	}
 
 	/**
@@ -254,6 +256,25 @@ class RecurringOrderBehavior extends Behavior
 	public function setRecurrenceErrorCount($value)
 	{
 		$this->_getOrMakeRecord()->errorCount = $value;
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getRetryDate()
+	{
+		return $this->_getRecord() ? $this->_getRecord()->retryDate : null;
+	}
+
+	/**
+	 * @param $value
+	 *
+	 * @throws \Exception if DateTimeHelper cannot convert the value to a DateTime
+	 */
+	public function setRetryDate($value)
+	{
+		// TODO: Typecasting and validation should probably go in the Record.
+		$this->_getOrMakeRecord()->retryDate = (DateTimeHelper::toDateTime($value) ?: null);
 	}
 
 	/**
@@ -294,6 +315,22 @@ class RecurringOrderBehavior extends Behavior
 	{
 		// TODO: Typecasting and validation should probably go in the Record.
 		$this->_getOrMakeRecord()->nextRecurrence = (DateTimeHelper::toDateTime($value) ?: null);
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getDateMarkedImminent()
+	{
+		return $this->_getRecord() ? $this->_getRecord()->dateMarkedImminent : null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isMarkedImminent()
+	{
+		return ($record = $this->_getRecord()) && !empty($record->dateMarkedImminent);
 	}
 
 	/**
@@ -408,8 +445,8 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function findDerivedOrders()
 	{
+		/** @var RecurringOrderQuery $query */
 		$query = Order::find();
-		/** @var RecurringOrderQueryBehavior $query */
 		return $query->originatingOrderId($this->owner->id);
 	}
 
@@ -418,8 +455,8 @@ class RecurringOrderBehavior extends Behavior
 	 */
 	public function findGeneratedOrders()
 	{
+		/** @var RecurringOrderQuery $query */
 		$query = Order::find();
-		/** @var RecurringOrderQueryBehavior $query */
 		return $query->parentOrderId($this->owner->id);
 	}
 
@@ -450,7 +487,7 @@ class RecurringOrderBehavior extends Behavior
 			RecurringOrders::error("Next Recurrence cannot be reset because Recurrence Interval is not defined.");
 			return;
 		}
-		$newDate = (new \DateTime())->add(IntervalHelper::normalizeInterval($this->getRecurrenceInterval()));
+		$newDate = (new \DateTime())->add(TimeHelper::normalizeInterval($this->getRecurrenceInterval()));
 		$this->setNextRecurrence($newDate);
 	}
 
@@ -521,16 +558,6 @@ class RecurringOrderBehavior extends Behavior
 
 	/**
 	 * @return bool
-	 */
-	public function isImminient()
-	{
-		return ($record = $this->_getRecord())
-			&& !empty($record->dateMarkedImminent)
-			&& $record->dateMarkedImminent > (new \DateTime());
-	}
-
-	/**
-	 * @return bool
 	 *
 	 * @throws \yii\db\Exception
 	 */
@@ -547,7 +574,7 @@ class RecurringOrderBehavior extends Behavior
 		}
 
 		$saved = $this->saveRecurringOrdersRecord([
-			'dateMarkedImminent' => new \DateTime()
+			'dateMarkedImminent' => TimeHelper::now()
 		]);
 
 		if (!$saved)

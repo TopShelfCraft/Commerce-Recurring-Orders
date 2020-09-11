@@ -3,7 +3,7 @@ namespace topshelfcraft\recurringorders\orders;
 
 use Craft;
 use topshelfcraft\recurringorders\base\BaseRecord;
-use topshelfcraft\recurringorders\misc\IntervalHelper;
+use topshelfcraft\recurringorders\misc\TimeHelper;
 use yii\base\Exception;
 
 /**
@@ -11,16 +11,16 @@ use yii\base\Exception;
  *
  * @property int $id
  * @property string $status
- * @property string $errorReason
- * @property int $errorCount
  * @property string $recurrenceInterval
  * @property \DateTime $lastRecurrence
  * @property \DateTime $nextRecurrence
+ * @property \DateTime $dateMarkedImminent
  * @property int $paymentSourceId
  * @property mixed $spec
  * @property mixed $originatingOrderId
  * @property mixed $parentOrderId
- * @property \DateTime $dateMarkedImminent
+ * @property string $errorReason
+ * @property int $errorCount
  * @property \DateTime $retryDate
  */
 class RecurringOrderRecord extends BaseRecord
@@ -63,10 +63,10 @@ class RecurringOrderRecord extends BaseRecord
 		{
 			if ($value instanceof \DateInterval)
 			{
-				$value = IntervalHelper::durationInSeconds($this->recurrenceInterval);
+				$value = TimeHelper::durationInSeconds($this->recurrenceInterval);
 			}
 			// TODO: Move this into validation and make it Yii-ish
-			if ($value && !IntervalHelper::isValidInterval($value))
+			if ($value && !TimeHelper::isValidInterval($value))
 			{
 				// TODO: Translate.
 				throw new Exception("{$value} is not a valid interval.");

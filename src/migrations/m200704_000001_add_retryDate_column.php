@@ -15,7 +15,7 @@ class m200704_000001_add_retryDate_column extends Migration
 	 */
 	public function safeUp(): bool
 	{
-		$this->addColumn(RecurringOrderRecord::tableName(), 'retryDate', $this->dateTime()->after('dateMarkedImminent'));
+		$this->addColumn(RecurringOrderRecord::tableName(), 'retryDate', $this->dateTime()->after('errorCount'));
 		return true;
 	}
 

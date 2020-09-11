@@ -5,6 +5,7 @@ use Craft;
 use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\helpers\StringHelper;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use topshelfcraft\recurringorders\web\assets\OrdersWidgetAsset;
@@ -111,8 +112,8 @@ class RecentRecurringOrdersWidget extends Widget
     private function _getOrders(): array
     {
 
+        /** @var RecurringOrderQuery $query */
         $query = Order::find();
-        /** @var RecurringOrderQueryBehavior $query */
 
         $query->isCompleted(true);
         $query->dateOrdered(':notempty:');

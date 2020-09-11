@@ -12,6 +12,7 @@ use craft\events\RegisterElementSourcesEvent;
 use craft\events\RegisterElementTableAttributesEvent;
 use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
+use topshelfcraft\recurringorders\meta\RecurringOrder;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use topshelfcraft\recurringorders\web\widgets\CountAllRecurringOrdersWidget;
@@ -198,7 +199,7 @@ class CpCustomizations extends Component
 	public function handleSetTableAttributeHtml(SetElementTableAttributeHtmlEvent $event)
 	{
 
-		/** @var RecurringOrderBehavior $order */
+		/** @var RecurringOrder $order */
 		$order = $event->sender;
 
 		$attribute = $event->attribute;

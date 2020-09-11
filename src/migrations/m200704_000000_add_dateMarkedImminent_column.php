@@ -15,7 +15,7 @@ class m200704_000000_add_dateMarkedImminent_column extends Migration
 	 */
 	public function safeUp(): bool
 	{
-		$this->addColumn(RecurringOrderRecord::tableName(), 'dateMarkedImminent', $this->dateTime()->after('parentOrderId'));
+		$this->addColumn(RecurringOrderRecord::tableName(), 'dateMarkedImminent', $this->dateTime()->after('nextRecurrence'));
 		return true;
 	}
 

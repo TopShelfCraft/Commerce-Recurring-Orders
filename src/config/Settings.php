@@ -32,9 +32,19 @@ class Settings extends Model
 	public $hideRecurrenceControlsForOriginatingOrders = true;
 
 	/**
+	 * @var string|int
+	 */
+	public $imminenceInterval = 'P1W';
+
+	/**
 	 * @var array
 	 */
 	public $recurrenceIntervalOptions;
+
+	/**
+	 * @var string|int
+	 */
+	public $retryInterval = 'P1D';
 
 	/**
 	 * @var bool
@@ -48,7 +58,7 @@ class Settings extends Model
 	 */
 	public function getRecurrenceIntervalOptions($addBlankOption = true)
 	{
-		return array_merge(['' => ''], $this->recurrenceIntervalOptions);
+		return $addBlankOption ? array_merge(['' => ''], $this->recurrenceIntervalOptions) : $this->recurrenceIntervalOptions;
 	}
 
 }

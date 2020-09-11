@@ -5,6 +5,7 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\AdminTable;
+use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -125,8 +126,7 @@ class CpDataController extends BaseWebController
 			return $this->asErrorJson(Commerce::t('Unable to retrieve the Parent Order.'));
 		}
 
-		/** @var RecurringOrderQueryBehavior $orderQuery */
-
+		/** @var RecurringOrderQuery $orderQuery */
 		$orderQuery = Order::find()
 			->isCompleted()
 			->parentOrderId($parentOrder->id);
