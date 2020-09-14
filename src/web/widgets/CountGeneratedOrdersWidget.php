@@ -76,7 +76,7 @@ class CountGeneratedOrdersWidget extends Widget
 		$humanDuration = $interval ? DateTimeHelper::humanDurationFromInterval($interval) : null;
 
 		$dateOrderedThreshold = $interval
-			? (new \DateTime())->sub($interval)->getTimestamp()
+			? TimeHelper::now()->sub($interval)->getTimestamp()
 			: strtotime('today');
 
 		/** @var RecurringOrderQuery $query */
