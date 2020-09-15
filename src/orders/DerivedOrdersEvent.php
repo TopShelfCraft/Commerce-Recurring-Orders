@@ -2,7 +2,6 @@
 namespace topshelfcraft\recurringorders\orders;
 
 use craft\commerce\elements\Order;
-use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\Event;
 
 class DerivedOrdersEvent extends Event

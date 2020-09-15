@@ -13,7 +13,6 @@ use craft\events\RegisterElementTableAttributesEvent;
 use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
 use topshelfcraft\recurringorders\meta\RecurringOrder;
-use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use topshelfcraft\recurringorders\web\widgets\CountAllRecurringOrdersWidget;
 use topshelfcraft\recurringorders\web\widgets\CountGeneratedOrdersWidget;

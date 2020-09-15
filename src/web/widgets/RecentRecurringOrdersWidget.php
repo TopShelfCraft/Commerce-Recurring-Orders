@@ -6,7 +6,6 @@ use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\helpers\StringHelper;
 use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
-use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use topshelfcraft\recurringorders\web\assets\OrdersWidgetAsset;
 

@@ -4,7 +4,9 @@ namespace topshelfcraft\recurringorders\orders;
 use craft\commerce\elements\db\OrderQuery;
 use craft\events\CancelableEvent;
 use craft\helpers\Db;
+use topshelfcraft\recurringorders\misc\TimeHelper;
 use yii\base\Behavior;
+use yii\base\Exception;
 
 /**
  * @property OrderQuery $owner
@@ -86,6 +88,11 @@ class RecurringOrderQueryBehavior extends Behavior
 	 * @var bool|null
 	 */
 	public $isOutstanding;
+
+	/**
+	 * @var true|null
+	 */
+	public $isEligibleForRecurrence;
 
 	/**
 	 * @var bool|null
@@ -209,6 +216,21 @@ class RecurringOrderQueryBehavior extends Behavior
 	public function isOutstanding($value = true)
 	{
 		$this->isOutstanding = is_null($value) ? null : (bool) $value;
+		return $this->owner;
+	}
+
+	/**
+	 * @param true|null $value
+	 *
+	 * @return OrderQuery
+	 */
+	public function isEligibleForRecurrence($value = true)
+	{
+		if ($value === false)
+		{
+			throw new Exception("Negative query not implemented for this scope.");
+		}
+		$this->isEligibleForRecurrence = is_null($value) ? null : true;
 		return $this->owner;
 	}
 
@@ -348,16 +370,16 @@ class RecurringOrderQueryBehavior extends Behavior
 
 		if ($this->isOutstanding)
 		{
-			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.time()));
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.TimeHelper::now()->getTimestamp()));
 		}
 
 		if ($this->isEligibleForRecurrence)
 		{
-			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.time()));
+			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.TimeHelper::now()->getTimestamp()));
 			$orderQuery->subQuery->andWhere([
 				'or',
 				['is', '[[recurringOrders.retryDate]]', null],
-				['<', '[[recurringOrders.retryDate]]', time()],
+				Db::parseDateParam('recurringOrders.retryDate', '<'.TimeHelper::now()->getTimestamp()),
 			]);
 		}
 

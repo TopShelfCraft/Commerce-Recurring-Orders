@@ -6,7 +6,6 @@ use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\StringHelper;
 use topshelfcraft\recurringorders\meta\RecurringOrder;
-use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\web\BadRequestHttpException;

@@ -7,7 +7,6 @@ use craft\helpers\Console;
 use craft\helpers\DateTimeHelper;
 use topshelfcraft\recurringorders\meta\RecurringOrder;
 use topshelfcraft\recurringorders\misc\TimeHelper;
-use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use yii\console\ExitCode;
 
 /**

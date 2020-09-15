@@ -1,7 +1,6 @@
 <?php
 namespace topshelfcraft\recurringorders\misc;
 
-use craft\base\Plugin;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;

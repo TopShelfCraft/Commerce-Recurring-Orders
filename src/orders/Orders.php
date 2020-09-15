@@ -4,7 +4,6 @@ namespace topshelfcraft\recurringorders\orders;
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
-use craft\commerce\events\ProcessPaymentEvent;
 use craft\commerce\Plugin as Commerce;
 use craft\events\ModelEvent;
 use topshelfcraft\recurringorders\meta\RecurringOrder;
@@ -15,7 +14,6 @@ use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\Exception;
-use yii\base\InvalidConfigException;
 
 class Orders extends Component
 {

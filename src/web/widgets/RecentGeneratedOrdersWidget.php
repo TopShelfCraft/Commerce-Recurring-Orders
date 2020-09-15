@@ -7,7 +7,6 @@ use craft\commerce\Plugin as Commerce;
 use craft\commerce\widgets\Orders as OrdersWidget;
 use craft\helpers\StringHelper;
 use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
-use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 
 /**

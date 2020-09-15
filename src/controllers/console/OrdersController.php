@@ -3,11 +3,10 @@ namespace topshelfcraft\recurringorders\controllers\console;
 
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
+use craft\helpers\Db;
 use topshelfcraft\recurringorders\meta\RecurringOrder;
 use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
 use topshelfcraft\recurringorders\misc\TimeHelper;
-use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
-use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 use yii\console\ExitCode;
 
@@ -89,28 +88,80 @@ class OrdersController extends BaseConsoleController
 	/**
 	 * @return int
 	 *
-	 * @todo Should probably be a pass-through to a service method.
+	 * @todo Should be a pass-through to a service method.
 	 */
-	public function actionProcessOutstandingOrders()
+	public function actionProcessEligibleRecurrences()
 	{
 
 		/** @var RecurringOrderQuery $query */
 		$query = Order::find();
 
-		$outstandingOrders = $query->isOutstanding()->all();
+		$eligibleOrders = $query->isEligibleForRecurrence()->all();
 
 		$success = true;
 
-		foreach ($outstandingOrders as $order)
+		foreach ($eligibleOrders as $order)
 		{
 
 			try
 			{
-				$success = RecurringOrders::getInstance()->orders->processOrderRecurrence($order) && $success;
+				$this->_writeLine("Processing recurrence for Order {$order->id}...");
+				RecurringOrders::getInstance()->orders->processOrderRecurrence($order);
 			}
 			catch (\Exception $e)
 			{
-				$this->_writeError("Error while processing recurrence for Order {$order->id}: " . $e->getMessage());
+				$success = false;
+				$this->_writeError("Exception while processing recurrence for Order {$order->id}: " . $e->getMessage());
+			}
+
+		}
+
+		return $success ? ExitCode::OK : ExitCode::UNSPECIFIED_ERROR;
+
+	}
+
+	/**
+	 * @return int
+	 *
+	 * @todo Should be a pass-through to a service method.
+	 */
+	public function actionProcessImminentOrders()
+	{
+
+		/** @var $query RecurringOrderQuery */
+		$query = Order::find();
+
+		try
+		{
+			$settings = RecurringOrders::getInstance()->getSettings();
+			$cutoff = TimeHelper::fromNow($settings->imminenceInterval);
+		}
+		catch (\Exception $e)
+		{
+			$this->_writeError("The imminenceInterval setting is invalid: " . $e->getMessage());
+			return ExitCode::UNSPECIFIED_ERROR;
+		}
+
+		$imminentOrders = $query->nextRecurrence('<' . $cutoff->getTimestamp())->all();
+		$success = true;
+
+		foreach ($imminentOrders as $order)
+		{
+
+			/** @var RecurringOrder $order */
+
+			try
+			{
+				// TODO: Add generic "Imminent Order Observed" event.
+				if (!$order->isMarkedImminent())
+				{
+					$order->markImminent();
+				}
+			}
+			catch (\Exception $e)
+			{
+				$this->_writeError("Exception marking Order {$order->id} as Imminent: " . $e->getMessage());
+				$success = false;
 			}
 
 		}

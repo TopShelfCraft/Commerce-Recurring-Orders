@@ -9,7 +9,6 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
 use topshelfcraft\recurringorders\misc\TimeHelper;
-use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
 use topshelfcraft\recurringorders\RecurringOrders;
 
 class CountGeneratedOrdersWidget extends Widget
