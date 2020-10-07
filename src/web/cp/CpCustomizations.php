@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders\web;
+namespace topshelfcraft\recurringorders\web\cp;
 
 use Craft;
 use craft\base\Component;

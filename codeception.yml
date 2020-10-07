@@ -1,0 +1,27 @@
+actor: Tester
+paths:
+    tests: tests
+    log: tests/_output
+    data: tests/_data
+    support: tests/_support
+    envs: tests/_envs
+bootstrap: _bootstrap.php
+params:
+    - tests/.env
+modules:
+    config:
+        \craft\test\Craft:
+            configFile: "tests/_craft/config/test.php"
+            entryUrl: "https://craft.test/index.php"
+            projectConfig: {}
+            migrations: []
+            plugins:
+                commerce:
+                    class: '\craft\commerce\Plugin'
+                    handle: commerce
+                recurring-orders:
+                    class: '\steadfast\recurringorders\RecurringOrders'
+                    handle: recurring-orders
+            cleanup: true
+            transaction: true
+            dbSetup: { clean: true, setupCraft: true }

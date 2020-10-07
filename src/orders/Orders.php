@@ -354,9 +354,11 @@ class Orders extends Component
 		$lineItems = [];
 		foreach ($order->getLineItems() as $lineItem)
 		{
-			$lineItems[] = Commerce::getInstance()->lineItems->createLineItem($order->id, $lineItem->purchasableId, $lineItem->getOptions(), $lineItem->qty, $lineItem->note);
+			$lineItems[] = Commerce::getInstance()->lineItems->createLineItem($clone->id, $lineItem->purchasableId, $lineItem->getOptions(), $lineItem->qty, $lineItem->note, $clone);
 		}
 		$clone->setLineItems($lineItems);
+
+		Craft::$app->elements->saveElement($clone);
 
 		return $clone;
 
@@ -401,7 +403,7 @@ class Orders extends Component
 
 		/** @var RecurringOrder $newOrder */
 		$newOrder = $this->getLightClone($parentOrder);
-		$newOrder->parentOrderId = $parentOrder->id;
+		$newOrder->setParentOrderId($parentOrder->id);
 
 		/*
 		 * TODO: Check for line item availability errors (ERROR_PRODUCT_UNAVAILABLE)

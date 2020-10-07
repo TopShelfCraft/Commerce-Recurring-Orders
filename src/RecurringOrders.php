@@ -16,7 +16,7 @@ use topshelfcraft\recurringorders\config\Settings;
 use topshelfcraft\recurringorders\orders\Orders;
 use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
 use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
-use topshelfcraft\recurringorders\web\CpCustomizations;
+use topshelfcraft\recurringorders\web\cp\CpCustomizations;
 use yii\base\Event;
 
 /**
