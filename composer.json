@@ -2,7 +2,7 @@
 	"name": "steadfast/recurring-orders",
 	"description": "Recurring Orders functionality for Craft Commerce 3.x",
 	"type": "craft-plugin",
-	"version": "0.0.38",
+	"version": "0.0.39",
 	"license": "proprietary",
 	"authors": [
 		{
