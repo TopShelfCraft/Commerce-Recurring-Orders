@@ -386,6 +386,15 @@ class Orders extends Component
 			throw new Exception("Cannot process recurrence on a non-recurring Order.");
 		}
 
+		if ($parentOrder->getRecurrenceStatus() === RecurringOrderRecord::STATUS_ERROR)
+		{
+			$errorLimit = RecurringOrders::getInstance()->getSettings()->maxRecurrenceErrorCount;
+			if ($errorLimit && ($parentOrder->getRecurrenceErrorCount() >= $errorLimit))
+			{
+				throw new Exception("Skipping recurrence processing; Recurrence Error limit reached.");
+			}
+		}
+
 		/*
 		 * Check Payment Source
 		 */

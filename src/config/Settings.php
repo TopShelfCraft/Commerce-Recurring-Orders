@@ -37,6 +37,11 @@ class Settings extends Model
 	public $imminenceInterval = 'P1W';
 
 	/**
+	 * @var int|null
+	 */
+	public $maxRecurrenceErrorCount = null;
+
+	/**
 	 * @var array
 	 */
 	public $recurrenceIntervalOptions;
