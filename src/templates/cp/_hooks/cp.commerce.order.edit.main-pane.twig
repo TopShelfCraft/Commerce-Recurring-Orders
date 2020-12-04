@@ -2,7 +2,12 @@
 </div>
 
 {# Shove in the content for the Recurring Orders tab. #}
+
 <div id="recurringOrdersTab" class="hidden">
-    {% include 'recurring-orders/cp/_includes/_orderTabContent' %}
+    {% include 'recurring-orders/cp/_includes/_orderTabContentDynamic' %}
+</div>
+
+<div id="static-recurringOrdersTab" class="hidden">
+    {% include 'recurring-orders/cp/_includes/_orderTabContentStatic' %}
 
 {# (Mend our earlier usurpation by leaving off the closing tag of our tag, thus restoring symmetry to the HTML.) #}

@@ -80,7 +80,7 @@
 
     <div id="recurringOrders_orderControls">
 
-        {% include 'recurring-orders/cp/_includes/_orderControls' %}
+        {% include 'recurring-orders/cp/_includes/_orderControlsDynamic' %}
 
     </div>
 
@@ -88,21 +88,21 @@
 
 
 
-{% if order.hasRecurrenceStatus %}
+{#{% if order.hasRecurrenceStatus %}#}
 
 {#    {% set generatedOrders = order.findGeneratedOrders().all() %}#}
 
-    <div id="recurringOrders_generatedRecurrences">
+{#    <div id="recurringOrders_generatedRecurrences">#}
 
-        <h3 class="order-title" style="margin: 3em 0 14px;">
-            {{ recurringOrders.t("Generated Orders") }}
-        </h3>
+{#        <h3 class="order-title" style="margin: 3em 0 14px;">#}
+{#            {{ recurringOrders.t("Generated Orders") }}#}
+{#        </h3>#}
 
-        {% include 'recurring-orders/cp/_includes/_generatedOrdersTable' %}
+{#        {% include 'recurring-orders/cp/_includes/_generatedOrdersTable' %}#}
 
-    </div>
+{#    </div>#}
 
-{% endif %}
+{#{% endif %}#}
 
 
 {% if recurringOrderHistory | length > 1 %}

@@ -286,10 +286,16 @@ class CpCustomizations extends Component
 	public static function cpCommerceOrderEditHook(array &$context)
 	{
 
-		$context['tabs'][] = [
+		$context['tabs']['recurringOrdersTab'] = [
 			'label' => RecurringOrders::t('Recurring Orders'),
 			'url' => '#recurringOrdersTab',
-			'class' => null,
+			'class' => 'custom-tab',
+		];
+
+		$context['tabs']['static-recurringOrdersTab'] = [
+			'label' => RecurringOrders::t('Recurring Orders'),
+			'url' => '#static-recurringOrdersTab',
+			'class' => 'custom-tab static',
 		];
 
 		// Add supplemental info to Order screen titles
