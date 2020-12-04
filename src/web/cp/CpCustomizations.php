@@ -227,12 +227,12 @@ class CpCustomizations extends Component
 
 		if ($attribute === 'originatingOrder') {
 			// TODO: Eager load Originating orders when this table attribute is active
-			$event->html = $order->getOriginatingOrderId() ? $order->getOriginatingOrder()->getLink() : '';
+			$event->html = ($originatingOrder = $order->getOriginatingOrderId()) ? $originatingOrder->getOriginatingOrder()->getLink() : '';
 		}
 
 		if ($attribute === 'parentOrder') {
 			// TODO: Eager-load Parent orders when this table attribute is active
-			$event->html = $order->getParentOrderId() ? $order->getParentOrder()->getLink() : '';
+			$event->html = ($parentOrder = $order->getParentOrder()) ? $parentOrder->getLink() : '';
 		}
 
 	}

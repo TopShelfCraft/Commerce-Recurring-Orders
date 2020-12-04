@@ -9,6 +9,7 @@
 </div>
 
 {% set tableData = [] %}
+{# TODO: Translate #}
 {% for order in orders %}
     {% set tableData = tableData|merge([{
         title: order.reference,
@@ -16,7 +17,7 @@
         orderStatus: order.orderStatus ? (order.orderStatus.labelHtml | raw) : '',
         paid: order.totalPaid|currency(order.currency),
         date: order.dateOrdered|datetime('short'),
-        parentOrder: order.getParentOrder().getLink(),
+        parentOrder: order.getParentOrder().getLink() ?? '',
     }]) %}
 {% endfor %}
 

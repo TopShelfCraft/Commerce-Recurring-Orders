@@ -49,7 +49,8 @@
             </label>
         </div>
         <div class="input ltr">
-            {{ order.parentOrder.getLink | raw }}
+            {# TODO: Add a "Deleted" message/hint? #}
+            {{ (order.parentOrder.getLink ?? order.parentOrderId) | raw }}
         </div>
     </div>
 
