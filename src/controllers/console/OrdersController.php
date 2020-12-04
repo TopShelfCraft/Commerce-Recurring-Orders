@@ -98,6 +98,8 @@ class OrdersController extends BaseConsoleController
 
 		$eligibleOrders = $query->isEligibleForRecurrence()->all();
 
+		$this->_writeLine(count($eligibleOrders) . " orders eligible for recurrence.");
+
 		$success = true;
 
 		foreach ($eligibleOrders as $order)

@@ -5,6 +5,7 @@ use craft\commerce\elements\db\OrderQuery;
 use craft\events\CancelableEvent;
 use craft\helpers\Db;
 use topshelfcraft\recurringorders\misc\TimeHelper;
+use topshelfcraft\recurringorders\RecurringOrders;
 use yii\base\Behavior;
 use yii\base\Exception;
 
@@ -375,12 +376,30 @@ class RecurringOrderQueryBehavior extends Behavior
 
 		if ($this->isEligibleForRecurrence)
 		{
+
+			// Only select orders with eligible status.
+			$eligibleStatuses = [
+				RecurringOrderRecord::STATUS_ACTIVE,
+				RecurringOrderRecord::STATUS_ERROR,
+			];
+			$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.status', $eligibleStatuses));
+
+			// Only select orders where the Next Recurrence is past.
 			$orderQuery->subQuery->andWhere(Db::parseDateParam('recurringOrders.nextRecurrence', '<'.TimeHelper::now()->getTimestamp()));
+
+			// Only select orders where the Retry Date is null or past.
 			$orderQuery->subQuery->andWhere([
 				'or',
 				['is', '[[recurringOrders.retryDate]]', null],
 				Db::parseDateParam('recurringOrders.retryDate', '<'.TimeHelper::now()->getTimestamp()),
 			]);
+
+			// If we have configured a max error count, only select orders where the Error Count is less than the limit.
+			if ($errorLimit = (int) RecurringOrders::getInstance()->getSettings()->maxRecurrenceErrorCount)
+			{
+				$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.errorCount', $errorLimit, '<'));
+			}
+
 		}
 
 		if ($this->dateMarkedImminent)
