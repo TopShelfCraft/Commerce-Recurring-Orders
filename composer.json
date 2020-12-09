@@ -19,6 +19,7 @@
 		"source": "https://github.com/steadfastdesign/recurring-orders"
 	},
 	"require": {
+		"php": ">=7.1",
 		"craftcms/commerce": "^3.2",
 		"michaelrog/craft-payment-sources-tools-module": "^3.0"
 	},
@@ -31,7 +32,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"topshelfcraft\\recurringorders\\": "src/"
+			"steadfast\\recurringorders\\": "src/"
 		}
 	},
 	"extra": {
@@ -41,6 +42,6 @@
 		"developerUrl": "https://steadfast.design",
 		"developerEmail": "support@steadfast.design",
 		"documentationUrl": "https://steadfast.design",
-		"class": "topshelfcraft\\recurringorders\\RecurringOrders"
+		"class": "steadfast\\recurringorders\\RecurringOrders"
 	}
 }

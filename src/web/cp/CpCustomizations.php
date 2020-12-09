@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders\web\cp;
+namespace steadfast\recurringorders\web\cp;
 
 use Craft;
 use craft\base\Component;
@@ -12,13 +12,13 @@ use craft\events\RegisterElementSourcesEvent;
 use craft\events\RegisterElementTableAttributesEvent;
 use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
-use topshelfcraft\recurringorders\meta\RecurringOrder;
-use topshelfcraft\recurringorders\RecurringOrders;
-use topshelfcraft\recurringorders\web\widgets\CountAllRecurringOrdersWidget;
-use topshelfcraft\recurringorders\web\widgets\CountGeneratedOrdersWidget;
-use topshelfcraft\recurringorders\web\widgets\RecentGeneratedOrdersWidget;
-use topshelfcraft\recurringorders\web\widgets\RecentRecurringOrdersWidget;
-use topshelfcraft\recurringorders\web\widgets\CountUpcomingRecurrencesWidget;
+use steadfast\recurringorders\meta\RecurringOrder;
+use steadfast\recurringorders\RecurringOrders;
+use steadfast\recurringorders\web\widgets\CountAllRecurringOrdersWidget;
+use steadfast\recurringorders\web\widgets\CountGeneratedOrdersWidget;
+use steadfast\recurringorders\web\widgets\RecentGeneratedOrdersWidget;
+use steadfast\recurringorders\web\widgets\RecentRecurringOrdersWidget;
+use steadfast\recurringorders\web\widgets\CountUpcomingRecurrencesWidget;
 use yii\base\Exception;
 
 class CpCustomizations extends Component

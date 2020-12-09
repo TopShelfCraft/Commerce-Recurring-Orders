@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders\misc;
+namespace steadfast\recurringorders\misc;
 
 trait NormalizeTrait
 {

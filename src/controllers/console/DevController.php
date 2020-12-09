@@ -1,12 +1,12 @@
 <?php
-namespace topshelfcraft\recurringorders\controllers\console;
+namespace steadfast\recurringorders\controllers\console;
 
 use Craft;
 use craft\commerce\elements\Order;
 use craft\helpers\Console;
 use craft\helpers\DateTimeHelper;
-use topshelfcraft\recurringorders\meta\RecurringOrder;
-use topshelfcraft\recurringorders\misc\TimeHelper;
+use steadfast\recurringorders\meta\RecurringOrder;
+use steadfast\recurringorders\misc\TimeHelper;
 use yii\console\ExitCode;
 
 /**

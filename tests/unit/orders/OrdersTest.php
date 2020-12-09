@@ -9,7 +9,7 @@ use craft\commerce\elements\Product;
 use craft\commerce\models\Customer;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\test\fixtures\elements\ProductFixture;
-use topshelfcraft\recurringorders\RecurringOrders;
+use steadfast\recurringorders\RecurringOrders;
 use UnitTester;
 
 class OrdersTest extends Unit

@@ -1,11 +1,11 @@
 <?php
-namespace topshelfcraft\recurringorders\controllers\web;
+namespace steadfast\recurringorders\controllers\web;
 
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\AdminTable;
-use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
+use steadfast\recurringorders\meta\RecurringOrderQuery;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;

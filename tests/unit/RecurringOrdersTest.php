@@ -4,9 +4,9 @@ namespace steadfast\tests;
 
 use Craft;
 use Codeception\Test\Unit;
-use topshelfcraft\recurringorders\orders\Orders;
-use topshelfcraft\recurringorders\RecurringOrders;
-use topshelfcraft\recurringorders\web\cp\CpCustomizations;
+use steadfast\recurringorders\orders\Orders;
+use steadfast\recurringorders\RecurringOrders;
+use steadfast\recurringorders\web\cp\CpCustomizations;
 use UnitTester;
 
 class RecurringOrdersTest extends Unit

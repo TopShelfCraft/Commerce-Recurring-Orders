@@ -1,7 +1,7 @@
 <?php
-namespace topshelfcraft\recurringorders\orders;
+namespace steadfast\recurringorders\orders;
 
-use topshelfcraft\recurringorders\base\BaseRecord;
+use steadfast\recurringorders\base\BaseRecord;
 
 /**
  * A snapshot of the status and recurrence interval for a Recurring Order when it was updated.

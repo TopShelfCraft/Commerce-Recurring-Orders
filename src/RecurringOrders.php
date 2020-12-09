@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders;
+namespace steadfast\recurringorders;
 
 use Craft;
 use craft\base\Plugin;
@@ -12,11 +12,11 @@ use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
 use michaelrog\paymentsourcestools\PaymentSourcesTools;
-use topshelfcraft\recurringorders\config\Settings;
-use topshelfcraft\recurringorders\orders\Orders;
-use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
-use topshelfcraft\recurringorders\orders\RecurringOrderQueryBehavior;
-use topshelfcraft\recurringorders\web\cp\CpCustomizations;
+use steadfast\recurringorders\config\Settings;
+use steadfast\recurringorders\orders\Orders;
+use steadfast\recurringorders\orders\RecurringOrderBehavior;
+use steadfast\recurringorders\orders\RecurringOrderQueryBehavior;
+use steadfast\recurringorders\web\cp\CpCustomizations;
 use yii\base\Event;
 
 /**

@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders\web\assets;
+namespace steadfast\recurringorders\web\assets;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;

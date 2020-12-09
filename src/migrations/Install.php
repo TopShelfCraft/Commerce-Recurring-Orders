@@ -1,13 +1,13 @@
 <?php
-namespace topshelfcraft\recurringorders\migrations;
+namespace steadfast\recurringorders\migrations;
 
 use craft\commerce\records\Order;
 use craft\commerce\records\PaymentSource;
 use craft\db\Migration;
 use craft\records\User;
-use topshelfcraft\recurringorders\orders\GeneratedOrderRecord;
-use topshelfcraft\recurringorders\orders\RecurringOrderHistoryRecord;
-use topshelfcraft\recurringorders\orders\RecurringOrderRecord;
+use steadfast\recurringorders\orders\GeneratedOrderRecord;
+use steadfast\recurringorders\orders\RecurringOrderHistoryRecord;
+use steadfast\recurringorders\orders\RecurringOrderRecord;
 
 class Install extends Migration
 {

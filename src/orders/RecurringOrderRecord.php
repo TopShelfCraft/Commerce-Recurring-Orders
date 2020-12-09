@@ -1,9 +1,9 @@
 <?php
-namespace topshelfcraft\recurringorders\orders;
+namespace steadfast\recurringorders\orders;
 
 use Craft;
-use topshelfcraft\recurringorders\base\BaseRecord;
-use topshelfcraft\recurringorders\misc\TimeHelper;
+use steadfast\recurringorders\base\BaseRecord;
+use steadfast\recurringorders\misc\TimeHelper;
 use yii\base\Exception;
 
 /**

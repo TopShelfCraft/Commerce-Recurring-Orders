@@ -1,9 +1,9 @@
 <?php
-namespace topshelfcraft\recurringorders\controllers\web;
+namespace steadfast\recurringorders\controllers\web;
 
 use Craft;
 use craft\web\Controller;
-use topshelfcraft\recurringorders\misc\NormalizeTrait;
+use steadfast\recurringorders\misc\NormalizeTrait;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 

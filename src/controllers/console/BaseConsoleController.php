@@ -1,7 +1,7 @@
 <?php
-namespace topshelfcraft\recurringorders\controllers\console;
+namespace steadfast\recurringorders\controllers\console;
 
-use topshelfcraft\recurringorders\misc\NormalizeTrait;
+use steadfast\recurringorders\misc\NormalizeTrait;
 use yii\console\Controller;
 use yii\helpers\Console;
 

@@ -1,8 +1,8 @@
 <?php
-namespace topshelfcraft\recurringorders\meta;
+namespace steadfast\recurringorders\meta;
 
 use craft\commerce\elements\Order;
-use topshelfcraft\recurringorders\orders\RecurringOrderBehavior;
+use steadfast\recurringorders\orders\RecurringOrderBehavior;
 
 /**
  * @mixin RecurringOrderBehavior

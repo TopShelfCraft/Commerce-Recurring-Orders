@@ -1,16 +1,16 @@
 <?php
-namespace topshelfcraft\recurringorders\orders;
+namespace steadfast\recurringorders\orders;
 
 use Craft;
 use craft\base\Component;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\events\ModelEvent;
-use topshelfcraft\recurringorders\meta\RecurringOrder;
-use topshelfcraft\recurringorders\misc\TimeHelper;
-use topshelfcraft\recurringorders\misc\NormalizeTrait;
-use topshelfcraft\recurringorders\misc\PaymentSourcesHelper;
-use topshelfcraft\recurringorders\RecurringOrders;
+use steadfast\recurringorders\meta\RecurringOrder;
+use steadfast\recurringorders\misc\TimeHelper;
+use steadfast\recurringorders\misc\NormalizeTrait;
+use steadfast\recurringorders\misc\PaymentSourcesHelper;
+use steadfast\recurringorders\RecurringOrders;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\Exception;
@@ -25,7 +25,7 @@ class Orders extends Component
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use topshelfcraft\recurringorders\orders\DerivedOrdersEvent;
+	 * use steadfast\recurringorders\orders\DerivedOrdersEvent;
 	 *
 	 * Event::on(Orders::class, Order::EVENT_AFTER_PREPARE_DERIVED_ORDERS, function(DerivedOrdersEvent $event) {
 	 *     // @var Order $order
@@ -42,7 +42,7 @@ class Orders extends Component
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use topshelfcraft\recurringorders\orders\DerivedOrdersEvent;
+	 * use steadfast\recurringorders\orders\DerivedOrdersEvent;
 	 *
 	 * Event::on(Orders::class, Order::EVENT_AFTER_COMPLETE_DERIVED_ORDERS, function(DerivedOrdersEvent $event) {
 	 *     // @var Order $order

@@ -1,5 +1,5 @@
 <?php
-namespace topshelfcraft\recurringorders\web\widgets;
+namespace steadfast\recurringorders\web\widgets;
 
 use Craft;
 use craft\base\Widget;
@@ -7,9 +7,9 @@ use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
-use topshelfcraft\recurringorders\meta\RecurringOrderQuery;
-use topshelfcraft\recurringorders\misc\TimeHelper;
-use topshelfcraft\recurringorders\RecurringOrders;
+use steadfast\recurringorders\meta\RecurringOrderQuery;
+use steadfast\recurringorders\misc\TimeHelper;
+use steadfast\recurringorders\RecurringOrders;
 
 class CountUpcomingRecurrencesWidget extends Widget
 {
