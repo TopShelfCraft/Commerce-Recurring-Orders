@@ -96,11 +96,11 @@ class RecurringOrders extends Plugin
 
 		if (Craft::$app instanceof ConsoleApplication)
 		{
-			$this->controllerNamespace = 'topshelfcraft\\recurringorders\\controllers\\console';
+			$this->controllerNamespace = 'steadfast\\recurringorders\\controllers\\console';
 		}
 		if (Craft::$app instanceof WebApplication)
 		{
-			$this->controllerNamespace = 'topshelfcraft\\recurringorders\\controllers\\web';
+			$this->controllerNamespace = 'steadfast\\recurringorders\\controllers\\web';
 		}
 
 	}
