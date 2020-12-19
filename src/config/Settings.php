@@ -52,6 +52,11 @@ class Settings extends Model
 	public $retryInterval = 'P1D';
 
 	/**
+	 *
+	 */
+	public $showUserPaymentSourcesTab = true;
+
+	/**
 	 * @var bool
 	 */
 	public $showUserRecurringOrdersTab = true;

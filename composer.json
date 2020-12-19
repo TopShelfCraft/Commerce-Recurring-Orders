@@ -2,7 +2,7 @@
 	"name": "steadfast/recurring-orders",
 	"description": "Recurring Orders functionality for Craft Commerce 3.x",
 	"type": "craft-plugin",
-	"version": "0.0.41",
+	"version": "0.0.42",
 	"license": "proprietary",
 	"authors": [
 		{
@@ -21,7 +21,7 @@
 	"require": {
 		"php": ">=7.1",
 		"craftcms/commerce": "^3.2",
-		"michaelrog/craft-payment-sources-tools-module": "^3.0"
+		"topshelfcraft/payment-source-tools-base": "^3.2"
 	},
 	"require-dev": {
 		"codeception/codeception": "^4.1",

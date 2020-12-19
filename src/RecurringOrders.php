@@ -11,7 +11,7 @@ use craft\services\Dashboard;
 use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
-use michaelrog\paymentsourcestools\PaymentSourcesTools;
+use topshelfcraft\paymentsourcetools\base\PaymentSourceToolsBase;
 use steadfast\recurringorders\config\Settings;
 use steadfast\recurringorders\orders\Orders;
 use steadfast\recurringorders\orders\RecurringOrderBehavior;
@@ -329,7 +329,11 @@ class RecurringOrders extends Plugin
 	 */
 	private function _initPaymentSourceTools()
 	{
-		PaymentSourcesTools::registerModule();
+		if ($this->getSettings()->showUserPaymentSourcesTab)
+		{
+			PaymentSourceToolsBase::registerModule();
+			PaymentSourceToolsBase::getInstance()->getSettings()->addPaymentSourcesUserTab = true;
+		}
 	}
 
 }
