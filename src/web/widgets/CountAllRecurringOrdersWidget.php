@@ -1,15 +1,15 @@
 <?php
-namespace steadfast\recurringorders\web\widgets;
+namespace beSteadfast\RecurringOrders\web\widgets;
 
 use Craft;
 use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
 use craft\helpers\StringHelper;
-use steadfast\recurringorders\meta\RecurringOrderQuery;
-use steadfast\recurringorders\orders\RecurringOrderRecord;
-use steadfast\recurringorders\RecurringOrders;
-use steadfast\recurringorders\web\assets\OrdersWidgetAsset;
+use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
+use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
+use beSteadfast\RecurringOrders\RecurringOrders;
+use beSteadfast\RecurringOrders\web\assets\OrdersWidgetAsset;
 
 class CountAllRecurringOrdersWidget extends Widget
 {

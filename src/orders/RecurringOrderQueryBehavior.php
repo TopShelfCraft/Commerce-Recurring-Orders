@@ -1,11 +1,11 @@
 <?php
-namespace steadfast\recurringorders\orders;
+namespace beSteadfast\RecurringOrders\orders;
 
 use craft\commerce\elements\db\OrderQuery;
 use craft\events\CancelableEvent;
 use craft\helpers\Db;
-use steadfast\recurringorders\misc\TimeHelper;
-use steadfast\recurringorders\RecurringOrders;
+use beSteadfast\RecurringOrders\misc\TimeHelper;
+use beSteadfast\RecurringOrders\RecurringOrders;
 use yii\base\Behavior;
 use yii\base\Exception;
 

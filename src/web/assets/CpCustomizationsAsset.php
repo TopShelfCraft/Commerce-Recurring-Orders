@@ -1,5 +1,5 @@
 <?php
-namespace steadfast\recurringorders\web\assets;
+namespace beSteadfast\RecurringOrders\web\assets;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;

@@ -1,8 +1,8 @@
 <?php
-namespace steadfast\recurringorders\meta;
+namespace beSteadfast\RecurringOrders\meta;
 
 use craft\commerce\elements\db\OrderQuery;
-use steadfast\recurringorders\orders\RecurringOrderQueryBehavior;
+use beSteadfast\RecurringOrders\orders\RecurringOrderQueryBehavior;
 
 /**
  * @mixin RecurringOrderQueryBehavior

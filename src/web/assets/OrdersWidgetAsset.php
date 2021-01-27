@@ -1,5 +1,5 @@
 <?php
-namespace steadfast\recurringorders\web\assets;
+namespace beSteadfast\RecurringOrders\web\assets;
 
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
 use craft\web\AssetBundle;

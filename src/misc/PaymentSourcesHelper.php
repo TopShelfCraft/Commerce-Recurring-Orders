@@ -1,5 +1,5 @@
 <?php
-namespace steadfast\recurringorders\misc;
+namespace beSteadfast\RecurringOrders\misc;
 
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;

@@ -1,12 +1,10 @@
 <?php
+namespace beSteadfast\test;
 
-namespace steadfast\tests;
-
-use Craft;
 use Codeception\Test\Unit;
-use steadfast\recurringorders\orders\Orders;
-use steadfast\recurringorders\RecurringOrders;
-use steadfast\recurringorders\web\cp\CpCustomizations;
+use beSteadfast\RecurringOrders\orders\Orders;
+use beSteadfast\RecurringOrders\RecurringOrders;
+use beSteadfast\RecurringOrders\web\cp\CpCustomizations;
 use UnitTester;
 
 class RecurringOrdersTest extends Unit

@@ -1,7 +1,7 @@
 <?php
-namespace steadfast\recurringorders\orders;
+namespace beSteadfast\RecurringOrders\orders;
 
-use steadfast\recurringorders\base\BaseRecord;
+use beSteadfast\RecurringOrders\base\BaseRecord;
 
 /**
  * A snapshot of the status and recurrence interval for a Recurring Order when it was updated.

@@ -1,6 +1,5 @@
 <?php
-
-namespace steadfast\tests;
+namespace beSteadfast\test;
 
 use Craft;
 use Codeception\Test\Unit;

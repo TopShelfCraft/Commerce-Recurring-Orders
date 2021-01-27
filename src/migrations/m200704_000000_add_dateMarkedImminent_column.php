@@ -1,8 +1,8 @@
 <?php
-namespace steadfast\recurringorders\migrations;
+namespace beSteadfast\RecurringOrders\migrations;
 
 use craft\db\Migration;
-use steadfast\recurringorders\orders\RecurringOrderRecord;
+use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
 
 /**
  * The class name is the UTC timestamp in the format of mYYMMDD_HHMMSS_migrationName

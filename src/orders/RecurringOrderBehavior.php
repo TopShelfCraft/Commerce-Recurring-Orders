@@ -1,5 +1,5 @@
 <?php
-namespace steadfast\recurringorders\orders;
+namespace beSteadfast\RecurringOrders\orders;
 
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
@@ -7,9 +7,9 @@ use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\events\CancelableEvent;
 use craft\helpers\DateTimeHelper;
-use steadfast\recurringorders\meta\RecurringOrderQuery;
-use steadfast\recurringorders\misc\TimeHelper;
-use steadfast\recurringorders\RecurringOrders;
+use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
+use beSteadfast\RecurringOrders\misc\TimeHelper;
+use beSteadfast\RecurringOrders\RecurringOrders;
 use yii\base\Behavior;
 use yii\base\Event;
 
@@ -38,8 +38,8 @@ class RecurringOrderBehavior extends Behavior
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use steadfast\recurringorders\orders\RecurringOrderBehavior;
-	 * use steadfast\recurringorders\orders\RecurrenceStatusChangeEvent;
+	 * use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
+	 * use beSteadfast\RecurringOrders\orders\RecurrenceStatusChangeEvent;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_RECURRENCE_STATUS_CHANGE, function(RecurrenceStatusChangeEvent $event) {
 	 *     $oldStatus = $event->oldStatus;
@@ -55,7 +55,7 @@ class RecurringOrderBehavior extends Behavior
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use steadfast\recurringorders\orders\RecurringOrderBehavior;
+	 * use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
 	 * use craft\events\CancelableEvent;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_BEFORE_MARK_ORDER_IMMINENT, function(CancelableEvent $event) {
@@ -70,7 +70,7 @@ class RecurringOrderBehavior extends Behavior
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use steadfast\recurringorders\orders\RecurringOrderBehavior;
+	 * use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
 	 * use yii\base\Event;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_ORDER_MARKED_IMMINENT, function(Event $event) {

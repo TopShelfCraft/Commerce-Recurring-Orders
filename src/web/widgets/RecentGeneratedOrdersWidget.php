@@ -1,13 +1,13 @@
 <?php
-namespace steadfast\recurringorders\web\widgets;
+namespace beSteadfast\RecurringOrders\web\widgets;
 
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\widgets\Orders as OrdersWidget;
 use craft\helpers\StringHelper;
-use steadfast\recurringorders\meta\RecurringOrderQuery;
-use steadfast\recurringorders\RecurringOrders;
+use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
+use beSteadfast\RecurringOrders\RecurringOrders;
 
 /**
  * @property string|false $bodyHtml the widget's body HTML

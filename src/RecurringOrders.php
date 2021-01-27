@@ -1,5 +1,5 @@
 <?php
-namespace steadfast\recurringorders;
+namespace beSteadfast\RecurringOrders;
 
 use Craft;
 use craft\base\Plugin;
@@ -12,11 +12,11 @@ use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
 use topshelfcraft\paymentsourcetools\base\PaymentSourceToolsBase;
-use steadfast\recurringorders\config\Settings;
-use steadfast\recurringorders\orders\Orders;
-use steadfast\recurringorders\orders\RecurringOrderBehavior;
-use steadfast\recurringorders\orders\RecurringOrderQueryBehavior;
-use steadfast\recurringorders\web\cp\CpCustomizations;
+use beSteadfast\RecurringOrders\config\Settings;
+use beSteadfast\RecurringOrders\orders\Orders;
+use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
+use beSteadfast\RecurringOrders\orders\RecurringOrderQueryBehavior;
+use beSteadfast\RecurringOrders\web\cp\CpCustomizations;
 use yii\base\Event;
 
 /**
@@ -96,11 +96,11 @@ class RecurringOrders extends Plugin
 
 		if (Craft::$app instanceof ConsoleApplication)
 		{
-			$this->controllerNamespace = 'steadfast\\recurringorders\\controllers\\console';
+			$this->controllerNamespace = 'beSteadfast\\RecurringOrders\\controllers\\console';
 		}
 		if (Craft::$app instanceof WebApplication)
 		{
-			$this->controllerNamespace = 'steadfast\\recurringorders\\controllers\\web';
+			$this->controllerNamespace = 'beSteadfast\\RecurringOrders\\controllers\\web';
 		}
 
 	}

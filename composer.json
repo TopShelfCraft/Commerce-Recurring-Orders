@@ -1,8 +1,8 @@
 {
-	"name": "steadfast/recurring-orders",
+	"name": "besteadfast/commerce-recurring-orders",
 	"description": "Recurring Orders functionality for Craft Commerce 3.x",
 	"type": "craft-plugin",
-	"version": "0.0.42",
+	"version": "0.0.43",
 	"license": "proprietary",
 	"authors": [
 		{
@@ -15,8 +15,8 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/steadfastdesign/recurring-orders/issues",
-		"source": "https://github.com/steadfastdesign/recurring-orders"
+		"issues": "https://github.com/beSteadfast/Commerce-Recurring-Orders/issues",
+		"source": "https://github.com/beSteadfast/Commerce-Recurring-Orders"
 	},
 	"require": {
 		"php": ">=7.1",
@@ -32,16 +32,16 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"steadfast\\recurringorders\\": "src/"
+			"beSteadfast\\RecurringOrders\\": "src/"
 		}
 	},
 	"extra": {
-		"name": "Recurring Orders",
+		"name": "Recurring Orders for Craft Commerce",
 		"handle": "recurring-orders",
 		"developer": "Steadfast Design",
 		"developerUrl": "https://steadfast.design",
 		"developerEmail": "support@steadfast.design",
 		"documentationUrl": "https://steadfast.design",
-		"class": "steadfast\\recurringorders\\RecurringOrders"
+		"class": "beSteadfast\\RecurringOrders\\RecurringOrders"
 	}
 }

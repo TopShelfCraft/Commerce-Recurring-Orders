@@ -20,7 +20,7 @@ modules:
                     class: '\craft\commerce\Plugin'
                     handle: commerce
                 recurring-orders:
-                    class: '\steadfast\recurringorders\RecurringOrders'
+                    class: '\beSteadfast\RecurringOrders\RecurringOrders'
                     handle: recurring-orders
             cleanup: true
             transaction: true
