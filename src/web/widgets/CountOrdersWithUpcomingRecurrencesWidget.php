@@ -65,7 +65,7 @@ class CountOrdersWithUpcomingRecurrencesWidget extends Widget
 		$number = $query->count();
 
 		// TODO: Translate
-		$descriptor = "Upcoming Order " . ($number == 1 ? 'Recurrence' : 'Recurrences');
+		$descriptor = ($number == 1 ? 'Order' : 'Orders') . " with Upcoming Recurrences";
 
 		// TODO: Translate
 		$timeFrame = RecurringOrders::t('Next {interval}', ['interval' => $humanDuration]);
