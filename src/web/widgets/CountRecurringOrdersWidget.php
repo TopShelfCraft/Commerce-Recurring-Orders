@@ -1,53 +1,27 @@
 <?php
 namespace beSteadfast\RecurringOrders\web\widgets;
 
+use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
+use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
+use beSteadfast\RecurringOrders\RecurringOrders;
 use Craft;
 use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
 use craft\helpers\StringHelper;
-use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
-use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
-use beSteadfast\RecurringOrders\RecurringOrders;
-use beSteadfast\RecurringOrders\web\assets\OrdersWidgetAsset;
 
-class CountAllRecurringOrdersWidget extends Widget
+class CountRecurringOrdersWidget extends Widget
 {
 
 	/**
 	 * @var string
 	 */
-	protected $handle = 'recurring-orders--count-all-recurring-orders';
+	protected $handle = 'recurring-orders--count-recurring-orders';
 
 	/**
 	 * @var string|null
 	 */
 	public $recurrenceStatus;
-
-	/**
-	 * @inheritDoc
-	 */
-	public static function isSelectable(): bool
-	{
-		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public static function displayName(): string
-	{
-		// TODO: Translate.
-		return RecurringOrders::t('Count All Recurring Orders');
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public static function icon(): string
-	{
-		return Craft::getAlias('@recurring-orders/icon-mask.svg');
-	}
 
 	/**
 	 * @inheritDoc
@@ -78,16 +52,19 @@ class CountAllRecurringOrdersWidget extends Widget
 		{
 			if ($this->recurrenceStatus === RecurringOrderRecord::STATUS_UNSCHEDULED)
 			{
+				$query->recurrenceStatus(RecurringOrderRecord::STATUS_ACTIVE);
 				$query->hasRecurrenceSchedule(false);
 			}
 			else
 			{
+				$query->hasRecurrenceSchedule(true);
 				$query->recurrenceStatus($this->recurrenceStatus);
 			}
 		}
 
 		$number = $query->count();
 
+		// TODO: Translate
 		$descriptor =  RecurringOrders::t($number == 1 ? 'Recurring Order' : 'Recurring Orders');
 
 		$timeFrame = $this->recurrenceStatus ? RecurringOrders::t('_status:' . $this->recurrenceStatus) : null;
@@ -111,20 +88,10 @@ class CountAllRecurringOrdersWidget extends Widget
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	public static function maxColspan()
-	{
-		return 1;
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function getSettingsHtml(): string
 	{
-
-		Craft::$app->getView()->registerAssetBundle(OrdersWidgetAsset::class);
 
 		$id = $this->handle . StringHelper::randomString();
 		$namespaceId = Craft::$app->getView()->namespaceInputId($id);
@@ -138,6 +105,43 @@ class CountAllRecurringOrdersWidget extends Widget
 			'statuses' => RecurringOrders::getInstance()->orders->getAllRecurrenceStatuses(),
 		]);
 
+	}
+
+	/*
+	 * Static
+	 */
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function displayName(): string
+	{
+		// TODO: Translate.
+		return RecurringOrders::t('Count Recurring Orders');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function icon(): string
+	{
+		return Craft::getAlias('@recurring-orders/icon-mask.svg');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function isSelectable(): bool
+	{
+		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function maxColspan()
+	{
+		return 1;
 	}
 
 }

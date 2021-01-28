@@ -1,13 +1,14 @@
 <?php
 namespace beSteadfast\RecurringOrders\web\widgets;
 
+use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
+use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
+use beSteadfast\RecurringOrders\RecurringOrders;
+use beSteadfast\RecurringOrders\web\assets\OrdersWidgetAsset;
 use Craft;
 use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\helpers\StringHelper;
-use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
-use beSteadfast\RecurringOrders\RecurringOrders;
-use beSteadfast\RecurringOrders\web\assets\OrdersWidgetAsset;
 
 class RecentRecurringOrdersWidget extends Widget
 {
@@ -30,34 +31,11 @@ class RecentRecurringOrdersWidget extends Widget
     /**
      * @inheritdoc
      */
-    public static function isSelectable(): bool
-    {
-		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function displayName(): string
-    {
-        return RecurringOrders::t( 'Recently Created Recurring Orders');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function icon(): string
-    {
-		return Craft::getAlias('@recurring-orders/icon-mask.svg');
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getTitle(): string
     {
+    	// TODO: Translate
         if ($this->recurrenceStatus) {
-			return RecurringOrders::t( 'Recently Created Recurring Orders') . ' - ' . RecurringOrders::t('_status:'.$this->recurrenceStatus);
+			return RecurringOrders::t( 'Recent Recurring Orders') . ' - ' . RecurringOrders::t('_status:'.$this->recurrenceStatus);
         }
         return static::displayName();
     }
@@ -116,16 +94,56 @@ class RecentRecurringOrdersWidget extends Widget
 
         $query->isCompleted(true);
         $query->dateOrdered(':notempty:');
-        $query->hasRecurrenceSchedule(true);
+        $query->hasRecurrenceStatus(true);
         $query->limit($this->limit);
         $query->orderBy('dateOrdered DESC');
 
-        if ($this->recurrenceStatus) {
-            $query->recurrenceStatus($this->recurrenceStatus);
+        if ($this->recurrenceStatus)
+        {
+        	// TODO: This is... fragile?
+            if ($this->recurrenceStatus === RecurringOrderRecord::STATUS_UNSCHEDULED)
+			{
+				$query->recurrenceStatus(RecurringOrderRecord::STATUS_ACTIVE);
+				$query->hasRecurrenceSchedule(false);
+			}
+            else
+			{
+				$query->recurrenceStatus($this->recurrenceStatus);
+				$query->hasRecurrenceSchedule(true);
+			}
         }
 
         return $query->all();
 
     }
+
+    /*
+     * Static
+     */
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function displayName(): string
+	{
+		// TODO: Translate
+		return RecurringOrders::t( 'Recent Recurring Orders');
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function icon(): string
+	{
+		return Craft::getAlias('@recurring-orders/icon-mask.svg');
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function isSelectable(): bool
+	{
+		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
+	}
 
 }

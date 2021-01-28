@@ -8,6 +8,7 @@ return [
 	"_status:unscheduled" => "Unscheduled",
 	"Actively Recurring" => "Actively Recurring",
 	"Cancel" => "Cancel",
+	"Count Orders with Upcoming Recurrences" => "Count Orders with Upcoming Recurrences",
 	"Date Interval" => "Date Interval",
 	"Derived Recurring Orders" => "Derived Recurring Orders",
 	"Error Count" => "Error Count",
@@ -35,5 +36,4 @@ return [
 	"Resume" => "Resume",
 	"Status" => "Status",
 	"Upcoming Order Recurrences" => "Upcoming Order Recurrences",
-	"(Leave blank to show Recurrences pending for Today.)" => "(Leave blank to show Recurrences pending for Today.)",
 ];

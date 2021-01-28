@@ -1,6 +1,13 @@
 <?php
 namespace beSteadfast\RecurringOrders\web\cp;
 
+use beSteadfast\RecurringOrders\meta\RecurringOrder;
+use beSteadfast\RecurringOrders\RecurringOrders;
+use beSteadfast\RecurringOrders\web\widgets\CountGeneratedOrdersWidget;
+use beSteadfast\RecurringOrders\web\widgets\CountRecurringOrdersWidget;
+use beSteadfast\RecurringOrders\web\widgets\RecentGeneratedOrdersWidget;
+use beSteadfast\RecurringOrders\web\widgets\RecentRecurringOrdersWidget;
+use beSteadfast\RecurringOrders\web\widgets\CountOrdersWithUpcomingRecurrencesWidget;
 use Craft;
 use craft\base\Component;
 use craft\commerce\Plugin as Commerce;
@@ -12,13 +19,6 @@ use craft\events\RegisterElementSourcesEvent;
 use craft\events\RegisterElementTableAttributesEvent;
 use craft\events\SetElementTableAttributeHtmlEvent;
 use craft\web\View;
-use beSteadfast\RecurringOrders\meta\RecurringOrder;
-use beSteadfast\RecurringOrders\RecurringOrders;
-use beSteadfast\RecurringOrders\web\widgets\CountAllRecurringOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\CountGeneratedOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\RecentGeneratedOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\RecentRecurringOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\CountUpcomingRecurrencesWidget;
 use yii\base\Exception;
 
 class CpCustomizations extends Component
@@ -244,9 +244,9 @@ class CpCustomizations extends Component
 	{
 		$event->types[] = RecentGeneratedOrdersWidget::class;
 		$event->types[] = RecentRecurringOrdersWidget::class;
-		$event->types[] = CountAllRecurringOrdersWidget::class;
+		$event->types[] = CountRecurringOrdersWidget::class;
 		$event->types[] = CountGeneratedOrdersWidget::class;
-		$event->types[] = CountUpcomingRecurrencesWidget::class;
+		$event->types[] = CountOrdersWithUpcomingRecurrencesWidget::class;
 	}
 
 	/**

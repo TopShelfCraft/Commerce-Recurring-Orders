@@ -2,10 +2,10 @@
 namespace beSteadfast\RecurringOrders\web\assets;
 
 use craft\web\AssetBundle;
-use craft\web\assets\cp\CpAsset;
 
 class CpCustomizationsAsset extends AssetBundle
 {
+
 	/**
 	 * @inheritdoc
 	 */
@@ -13,10 +13,6 @@ class CpCustomizationsAsset extends AssetBundle
 	{
 
 		$this->sourcePath = __DIR__ . '/cpcustomizations/dist';
-
-		$this->depends = [
-//			CpAsset::class,
-		];
 
 		$this->css[] = 'css/CpCustomizations.css';
 

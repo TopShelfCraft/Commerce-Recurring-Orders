@@ -1,0 +1,39 @@
+{% from "_includes/forms" import select %}
+{% from "_includes/forms" import text %}
+
+<div id="{{ id }}">
+
+    <div class="field">
+
+        <div class="heading">
+            <label>{{ "Date Interval"|t('recurring-orders') }}</label>
+        </div>
+
+        <div class="flex">
+
+            {{ text({
+                type: 'number',
+                name: 'dateRangeQty',
+                value: widget.dateRangeQty ?? 1,
+                inputmode: 'numeric',
+                size: 2,
+                errors: widget.getErrors('dateRangeQty')
+            }) }}
+
+            {# TODO: Translate #}
+            {{ select({
+                name: 'dateRangeUnit',
+                value: widget.dateRangeUnit ?? 'days',
+                errors: widget.getErrors('dateRangeUnit'),
+                options: {
+                    'D': "days",
+                    'W': "weeks",
+                    'M': "months",
+                }
+            }) }}
+
+        </div>
+
+    </div>
+
+</div>

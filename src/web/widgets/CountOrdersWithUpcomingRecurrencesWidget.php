@@ -8,17 +8,26 @@ use Craft;
 use craft\base\Widget;
 use craft\commerce\elements\Order;
 use craft\commerce\web\assets\statwidgets\StatWidgetsAsset;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 
-class CountGeneratedOrdersWidget extends Widget
+class CountOrdersWithUpcomingRecurrencesWidget extends Widget
 {
-
-	use DateRangeWidgetTrait;
 
 	/**
 	 * @var string
 	 */
-	protected $handle = 'recurring-orders--count-generated-orders';
+	protected $handle = 'recurring-orders--count-orders-with-upcoming-recurrences';
+
+	/**
+	 * @var int
+	 */
+	public $dateRangeQty;
+
+	/**
+	 * @var string
+	 */
+	public $dateRangeUnit;
 
 	/**
 	 * @inheritDoc
@@ -42,37 +51,24 @@ class CountGeneratedOrdersWidget extends Widget
 	public function getBodyHtml()
 	{
 
-		if ($this->dateRange && $this->dateRange !== TimeHelper::DATE_RANGE_CUSTOM)
-		{
+		$dateRangeInterval = 'P' . $this->dateRangeQty . $this->dateRangeUnit;
+		$interval = TimeHelper::normalizeInterval($dateRangeInterval);
+		$humanDuration = $interval ? DateTimeHelper::humanDurationFromInterval($interval) : null;
 
-			$weekStartDay = 1;
-
-			if ($user = Craft::$app->getUser()->getIdentity())
-			{
-				$weekStartDay = $user->getPreference('weekStartDay');
-			}
-
-			$this->setDatesFromRange($this->dateRange, $weekStartDay);
-
-		}
+		$nextRecurrenceThreshold = TimeHelper::fromNow($interval)->getTimestamp();
 
 		/** @var RecurringOrderQuery $query */
 		$query = Order::find()->isCompleted();
-		$query->hasParentOrder();
-
-		$query->dateOrdered([
-			'and',
-			$this->startDate ? '>='.$this->startDate : 'not null',
-			$this->endDate ? '<'.$this->endDate : 'not null',
-		]);
+		$query->hasRecurrenceSchedule();
+		$query->nextRecurrence('<'.$nextRecurrenceThreshold);
 
 		$number = $query->count();
 
 		// TODO: Translate
-		$descriptor = "Generated " . ($number == 1 ? 'Order' : 'Orders');
+		$descriptor = "Upcoming Order " . ($number == 1 ? 'Recurrence' : 'Recurrences');
 
 		// TODO: Translate
-		$timeFrame = TimeHelper::getDateRangeWording($this->dateRange, $this->startDate, $this->endDate);
+		$timeFrame = RecurringOrders::t('Next {interval}', ['interval' => $humanDuration]);
 
 		$id = $this->handle . StringHelper::randomString();
 		$namespaceId = Craft::$app->getView()->namespaceInputId($id);
@@ -101,7 +97,7 @@ class CountGeneratedOrdersWidget extends Widget
 		$id = 'total-orders' . StringHelper::randomString();
 		$namespaceId = Craft::$app->getView()->namespaceInputId($id);
 
-		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/countGeneratedOrders/settings', [
+		return Craft::$app->getView()->renderTemplate('recurring-orders/cp/widgets/countOrdersWithUpcomingRecurrences/settings', [
 			'id' => $id,
 			'namespaceId' => $namespaceId,
 			'widget' => $this,
@@ -119,7 +115,7 @@ class CountGeneratedOrdersWidget extends Widget
 	public static function displayName(): string
 	{
 		// TODO: Translate
-		return RecurringOrders::t( 'Count Generated Orders');
+		return RecurringOrders::t( 'Count Orders with Upcoming Recurrences');
 	}
 
 	/**

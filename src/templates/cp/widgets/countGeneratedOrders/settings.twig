@@ -1,14 +1,5 @@
-{% import "_includes/forms" as forms %}
-
 <div id="{{ id }}">
 
-    {{ forms.textField({
-        label: "Date Interval"|t('recurring-orders'),
-        name: 'dateRangeInterval',
-        value: widget.dateRangeInterval,
-        instructions: "(Leave blank to show Generated Orders for Today.)"|t('recurring-orders'),
-        errors: widget.getErrors('dateRangeInterval')
-    }) }}
-    {# TODO: Translate. #}
+    {% include 'commerce/_components/widgets/_includes/_dateRangeField' with { id: namespaceId, widget: widget } %}
 
 </div>

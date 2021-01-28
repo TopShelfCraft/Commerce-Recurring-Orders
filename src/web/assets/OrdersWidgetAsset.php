@@ -14,16 +14,12 @@ class OrdersWidgetAsset extends AssetBundle
     public function init()
     {
 
-		$this->sourcePath = __DIR__ . '/orderswidget/dist';
-
         $this->depends = [
             CpAsset::class,
             StatWidgetsAsset::class,
             AdminTableAsset::class,
 			CpCustomizationsAsset::class,
         ];
-
-        $this->js[] = 'js/OrdersWidgetSettings.js';
 
         parent::init();
 

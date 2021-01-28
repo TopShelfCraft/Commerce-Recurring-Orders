@@ -1,13 +1,13 @@
 <?php
 namespace beSteadfast\RecurringOrders\web\widgets;
 
+use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
+use beSteadfast\RecurringOrders\RecurringOrders;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\widgets\Orders as OrdersWidget;
 use craft\helpers\StringHelper;
-use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
-use beSteadfast\RecurringOrders\RecurringOrders;
 
 /**
  * @property string|false $bodyHtml the widget's body HTML
@@ -25,33 +25,10 @@ class RecentGeneratedOrdersWidget extends OrdersWidget
 	/**
 	 * @inheritdoc
 	 */
-	public static function isSelectable(): bool
-	{
-		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function displayName(): string
-	{
-		return RecurringOrders::t('Recently Generated Orders');
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function icon(): string
-	{
-		return Craft::getAlias('@recurring-orders/icon-mask.svg');
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function getTitle(): string
 	{
 
+		// TODO: Translate
 		if ($orderStatusId = $this->orderStatusId) {
 			$orderStatus = Commerce::getInstance()->getOrderStatuses()->getOrderStatusById($orderStatusId);
 
@@ -109,6 +86,35 @@ class RecentGeneratedOrdersWidget extends OrdersWidget
 		$query->hasParentOrder();
 		return $query->all();
 
+	}
+
+	/*
+	 * Static
+	 */
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function displayName(): string
+	{
+		// TODO: Translate
+		return RecurringOrders::t('Recently Generated Orders');
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function icon(): string
+	{
+		return Craft::getAlias('@recurring-orders/icon-mask.svg');
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function isSelectable(): bool
+	{
+		return parent::isSelectable() && Craft::$app->getUser()->checkPermission('commerce-manageOrders');
 	}
 
 }
