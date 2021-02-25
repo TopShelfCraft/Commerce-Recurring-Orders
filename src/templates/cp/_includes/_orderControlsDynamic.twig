@@ -100,15 +100,15 @@
                 <span>
                 {% if settings.recurrenceIntervalOptions is not empty %}
                     {% include '_includes/forms/select' with {
-                        id: 'makeRecurring-recurrenceInterval',
-                        name: 'makeRecurring[recurrenceInterval]',
+                        id: 'recurringOrder-recurrenceInterval',
+                        name: 'recurringOrder[recurrenceInterval]',
                         value: order.getRecurrenceInterval(),
                         options: settings.getRecurrenceIntervalOptions(),
                     } %}
                 {% else %}
                     {% include '_includes/forms/text' with {
-                        id: 'makeRecurring-recurrenceInterval',
-                        name: 'makeRecurring[recurrenceInterval]',
+                        id: 'recurringOrder-recurrenceInterval',
+                        name: 'recurringOrder[recurrenceInterval]',
                         value: order.getRecurrenceInterval(),
                     } %}
                 {% endif %}
@@ -140,8 +140,8 @@
             <div class="input">
                 <div id="floatingDateTimeFieldWrapper" style="display: inline-block; float: left;">
                     {{ forms.dateTimeField({
-                        id: 'makeRecurring-nextRecurrence',
-                        name: 'makeRecurring[nextRecurrence]',
+                        id: 'recurringOrder-nextRecurrence',
+                        name: 'recurringOrder[nextRecurrence]',
                         value: order.nextRecurrence,
                         errors: order.getErrors('nextRecurrence'),
                         disabled: false,
@@ -160,8 +160,8 @@
             <div class="input">
                 <span>
                     {% include '_includes/forms/select' with {
-                        id: 'makeRecurring-paymentSourceId',
-                        name: 'makeRecurring[paymentSourceId]',
+                        id: 'recurringOrder-paymentSourceId',
+                        name: 'recurringOrder[paymentSourceId]',
                         value: order.getRecurrencePaymentSourceId(),
                         options: recurringOrders.orders.getPaymentSourceFormOptionsByOrder(order),
                     } %}
