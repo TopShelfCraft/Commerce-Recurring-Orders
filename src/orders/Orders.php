@@ -11,6 +11,7 @@ use beSteadfast\RecurringOrders\misc\TimeHelper;
 use beSteadfast\RecurringOrders\misc\NormalizeTrait;
 use beSteadfast\RecurringOrders\misc\PaymentSourcesHelper;
 use beSteadfast\RecurringOrders\RecurringOrders;
+use craft\web\Request;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\Exception;
@@ -116,7 +117,7 @@ class Orders extends Component
 
 	/**
 	 * Intercepts Order Save events *before* saving begins, and, if it appears we're in the middle of an Action request,
-	 * processes any given `recurringOrder` attributes.
+	 * allows Recurring Order attributes to be set from the Request.
 	 *
 	 * @throws \Exception
 	 */
@@ -128,59 +129,12 @@ class Orders extends Component
 
 		$request = Craft::$app->request;
 
-		if (!$request->getIsActionRequest() || !$request->getParam('recurringOrder'))
+		if (!$request instanceof Request || !$request->getIsActionRequest())
 		{
 			return;
 		}
 
-		// Order fields
-
-		if ($status = $request->getParam('recurringOrder.status'))
-		{
-			$order->setRecurrenceStatus($status);
-		}
-
-		if ($recurrenceInterval = $request->getParam('recurringOrder.recurrenceInterval'))
-		{
-			$order->setRecurrenceInterval($recurrenceInterval);
-		}
-
-		if ($nextRecurrence = $request->getParam('recurringOrder.nextRecurrence'))
-		{
-			$order->setNextRecurrence($nextRecurrence);
-		}
-
-		if (($resetNextRecurrence = $request->getParam('recurringOrder.resetNextRecurrence')) !== null)
-		{
-			$order->setResetNextRecurrenceOnSave(self::normalizeBoolean($resetNextRecurrence));
-		}
-
-		if (($paymentSourceId = $request->getParam('recurringOrder.paymentSourceId')) !== null)
-		{
-			$order->setRecurrencePaymentSourceId($paymentSourceId ?: null);
-		}
-
-		// Spec fields
-
-		if ($specStatus = $request->getParam('recurringOrder.spec.status'))
-		{
-			$order->getSpec()->setStatus($specStatus);
-		}
-
-		if ($specRecurrenceInterval = $request->getParam('recurringOrder.spec.recurrenceInterval'))
-		{
-			$order->getSpec()->setRecurrenceInterval($specRecurrenceInterval);
-		}
-
-		if ($specNextRecurrence = $request->getParam('recurringOrder.spec.nextRecurrence'))
-		{
-			$order->getSpec()->setNextRecurrence($specNextRecurrence);
-		}
-
-		if (($specPaymentSourceId = $request->getParam('recurringOrder.spec.paymentSourceId')) !== null)
-		{
-			$order->getSpec()->setRecurrencePaymentSourceId($specPaymentSourceId ?: null);
-		}
+		$this->setRecurringOrderAttributesFromWebRequest($order, $request);
 
 	}
 
@@ -433,6 +387,65 @@ class Orders extends Component
 		}
 
 		return $success;
+
+	}
+
+	public function setRecurringOrderAttributesFromWebRequest(Order $order, Request $request): void
+	{
+
+		if (!$request->getParam('recurringOrder'))
+		{
+			return;
+		}
+
+		/** @var RecurringOrder $order */
+
+		if ($status = $request->getParam('recurringOrder.status'))
+		{
+			$order->setRecurrenceStatus($status);
+		}
+
+		if ($recurrenceInterval = $request->getParam('recurringOrder.recurrenceInterval'))
+		{
+			$order->setRecurrenceInterval($recurrenceInterval);
+		}
+
+		if ($nextRecurrence = $request->getParam('recurringOrder.nextRecurrence'))
+		{
+			$order->setNextRecurrence($nextRecurrence);
+		}
+
+		if (($resetNextRecurrence = $request->getParam('recurringOrder.resetNextRecurrence')) !== null)
+		{
+			$order->setResetNextRecurrenceOnSave(self::normalizeBoolean($resetNextRecurrence));
+		}
+
+		if (($paymentSourceId = $request->getParam('recurringOrder.paymentSourceId')) !== null)
+		{
+			$order->setRecurrencePaymentSourceId($paymentSourceId ?: null);
+		}
+
+		// Spec fields
+
+		if ($specStatus = $request->getParam('recurringOrder.spec.status'))
+		{
+			$order->getSpec()->setStatus($specStatus);
+		}
+
+		if ($specRecurrenceInterval = $request->getParam('recurringOrder.spec.recurrenceInterval'))
+		{
+			$order->getSpec()->setRecurrenceInterval($specRecurrenceInterval);
+		}
+
+		if ($specNextRecurrence = $request->getParam('recurringOrder.spec.nextRecurrence'))
+		{
+			$order->getSpec()->setNextRecurrence($specNextRecurrence);
+		}
+
+		if (($specPaymentSourceId = $request->getParam('recurringOrder.spec.paymentSourceId')) !== null)
+		{
+			$order->getSpec()->setRecurrencePaymentSourceId($specPaymentSourceId ?: null);
+		}
 
 	}
 
