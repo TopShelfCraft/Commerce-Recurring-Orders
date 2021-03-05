@@ -56,10 +56,8 @@ class Orders extends Component
 
 	/**
 	 * Return a list of all possible Recurrence Status labels, keyed by the status value.
-	 *
-	 * @return array
 	 */
-	public function getAllRecurrenceStatuses()
+	public function getAllRecurrenceStatuses(): array
 	{
 		return [
 			RecurringOrderRecord::STATUS_ACTIVE => RecurringOrders::t('_status:'.RecurringOrderRecord::STATUS_ACTIVE),
@@ -70,36 +68,49 @@ class Orders extends Component
 		];
 	}
 
-	/**
-	 * @param Order $order The Commerce Order
-	 * @param array $attributes Additional attributes to set on the Recurring Order record
-	 * @param bool $resetNextRecurrence Whether the Next Occurrence should be reset from the present time (if possible).
-	 *
-	 * @return bool
-	 *
-	 * @throws \Exception
-	 *
-	 * @deprecated
-	 */
-	public function makeOrderRecurring(Order $order, $attributes = [], $resetNextRecurrence = false)
+	public function getPaymentSourceFormOptionsByOrder(Order $order): array
+	{
+		return PaymentSourcesHelper::getPaymentSourceFormOptionsByOrder($order);
+	}
+
+	public function getLightClone(Order $order): Order
 	{
 
-		/** @var RecurringOrder $order */
+		$attributesToClone = [
+			'billingAddressId',
+			'shippingAddressId',
+			'estimatedBillingAddressId',
+			'estimatedShippingAddressId',
+			'gatewayId',
+			'paymentSourceId',
+			'customerId',
+			'couponCode',
+			'email',
+			'currency',
+			'paymentCurrency',
+			'orderLanguage',
+			'origin',
+			'shippingMethodHandle'
+		];
 
-		// Default status, if none provided
-		if (!isset($attributes['status']))
+		$attributes = $order->getAttributes($attributesToClone);
+
+		$clone = new Order();
+		$clone->number = Commerce::getInstance()->getCarts()->generateCartNumber();
+		$clone->setAttributes($attributes, false);
+
+		Craft::$app->elements->saveElement($clone);
+
+		$lineItems = [];
+		foreach ($order->getLineItems() as $lineItem)
 		{
-			$attributes['status'] = RecurringOrderRecord::STATUS_ACTIVE;
+			$lineItems[] = Commerce::getInstance()->lineItems->createLineItem($clone->id, $lineItem->purchasableId, $lineItem->getOptions(), $lineItem->qty, $lineItem->note, $clone);
 		}
+		$clone->setLineItems($lineItems);
 
-		$order->setRecurringOrdersAttributes($attributes);
+		Craft::$app->elements->saveElement($clone);
 
-		if ($resetNextRecurrence)
-		{
-			$order->resetNextRecurrence();
-		}
-
-		return $order->saveRecurringOrdersRecord();
+		return $clone;
 
 	}
 
@@ -107,13 +118,9 @@ class Orders extends Component
 	 * Intercepts Order Save events *before* saving begins, and, if it appears we're in the middle of an Action request,
 	 * processes any given `recurringOrder` attributes.
 	 *
-	 * @param Order $order
-	 *
-	 * @return void
-	 *
 	 * @throws \Exception
 	 */
-	public function handleOrderBeforeSave(ModelEvent $event)
+	public function handleOrderBeforeSave(ModelEvent $event): void
 	{
 
 		/** @var RecurringOrder $order */
@@ -180,13 +187,9 @@ class Orders extends Component
 	/**
 	 * Intercepts Order Save events *after* the Order is saved, and saves the associated RecurringOrderRecord.
 	 *
-	 * @param Order $order
-	 *
-	 * @return void
-	 *
 	 * @throws \Exception to interrupt the Order Save event if the RecurringOrderRecord cannot be saved.
 	 */
-	public function handleOrderAfterSave(ModelEvent $event)
+	public function handleOrderAfterSave(ModelEvent $event): void
 	{
 
 		/** @var RecurringOrder $order */
@@ -206,10 +209,7 @@ class Orders extends Component
 
 	}
 
-	/**
-	 * @param Event $event
-	 */
-	public function handleAfterCompleteOrder(Event $event)
+	public function handleAfterCompleteOrder(Event $event): void
 	{
 
 		$order = $event->sender;
@@ -229,150 +229,45 @@ class Orders extends Component
 	}
 
 	/**
-	 * @param Order $order
+	 * @param Order $order The Commerce Order
+	 * @param array $attributes Additional attributes to set on the Recurring Order record
+	 * @param bool $resetNextRecurrence Whether the Next Occurrence should be reset from the present time (if possible).
 	 *
-	 * @throws Exception from `saveElement()`
-	 * @throws \Throwable from `markAsComplete()`
-	 * @throws \craft\commerce\errors\OrderStatusException from `markAsComplete()`
-	 * @throws \craft\errors\ElementNotFoundException from `markAsComplete()`
+	 * @return bool
+	 *
+	 * @throws \Exception
+	 *
+	 * @deprecated
 	 */
-	public function replicateAsRecurring(Order $order)
+	public function makeOrderRecurring(Order $order, $attributes = [], $resetNextRecurrence = false)
 	{
 
-		$success = true;
+		/** @var RecurringOrder $order */
 
-		$derivedOrders = $this->_prepareDerivedOrders($order);
-
-		foreach ($derivedOrders as $derivedOrder)
+		// Default status, if none provided
+		if (!isset($attributes['status']))
 		{
-			$success = $success && Craft::$app->getElements()->saveElement($derivedOrder);
-			$success = $success && $derivedOrder->markAsComplete();
+			$attributes['status'] = RecurringOrderRecord::STATUS_ACTIVE;
 		}
 
-		// Raising the 'afterCompleteDerivedOrders' event
-		$event = new DerivedOrdersEvent([
-			'originatingOrder' => $order,
-			'derivedOrders' => $derivedOrders,
-		]);
-		if ($this->hasEventHandlers(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS)) {
-			$this->trigger(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS, $event);
-		}
+		$order->setRecurringOrdersAttributes($attributes);
 
-		return $success;
-
-	}
-
-	/**
-	 * @param Order $originatingOrder
-	 *
-	 * @return Order[]
-	 */
-	private function _prepareDerivedOrders(Order $originatingOrder)
-	{
-
-		/** @var RecurringOrder $originatingOrder **/
-
-		$derivedOrders = [];
-
-		$spec = $originatingOrder->getSpec();
-
-		if (!$spec->isEmpty())
+		if ($resetNextRecurrence)
 		{
-
-			/** @var RecurringOrder $newOrder */
-			$newOrder = $this->getLightClone($originatingOrder);
-
-			$newOrder->setOriginatingOrderId($originatingOrder->id);
-
-			$newOrder->setRecurrenceStatus($spec->getStatus() ?: RecurringOrderRecord::STATUS_ACTIVE);
-			$newOrder->setRecurrenceInterval($spec->getRecurrenceInterval());
-			$newOrder->setRecurrencePaymentSourceId($spec->getRecurrencePaymentSourceId());
-
-			try
-			{
-				$newOrder->setNextRecurrence($spec->getNextRecurrence());
-				if (!$newOrder->getNextRecurrence())
-				{
-					$newOrder->resetNextRecurrence();
-				}
-			}
-			catch (\Exception $e)
-			{
-				RecurringOrders::error($e->getMessage());
-			}
-
-			$derivedOrders = [$newOrder];
-
+			$order->resetNextRecurrence();
 		}
 
-		// Raising the 'afterPrepareDerivedOrders' event
-		$event = new DerivedOrdersEvent([
-			'originatingOrder' => $originatingOrder,
-			'derivedOrders' => $derivedOrders,
-		]);
-		if ($this->hasEventHandlers(self::EVENT_AFTER_PREPARE_DERIVED_ORDERS)) {
-			$this->trigger(self::EVENT_AFTER_PREPARE_DERIVED_ORDERS, $event);
-		}
-
-		return $event->derivedOrders;
-
-	}
-
-	/**
-	 * @param Order $order
-	 *
-	 * @return Order
-	 */
-	public function getLightClone(Order $order)
-	{
-
-		$attributesToClone = [
-			'billingAddressId',
-			'shippingAddressId',
-			'estimatedBillingAddressId',
-			'estimatedShippingAddressId',
-			'gatewayId',
-			'paymentSourceId',
-			'customerId',
-			'couponCode',
-			'email',
-			'currency',
-			'paymentCurrency',
-			'orderLanguage',
-			'origin',
-			'shippingMethodHandle'
-		];
-
-		$attributes = $order->getAttributes($attributesToClone);
-
-		$clone = new Order();
-		$clone->number = Commerce::getInstance()->getCarts()->generateCartNumber();
-		$clone->setAttributes($attributes, false);
-
-		Craft::$app->elements->saveElement($clone);
-
-		$lineItems = [];
-		foreach ($order->getLineItems() as $lineItem)
-		{
-			$lineItems[] = Commerce::getInstance()->lineItems->createLineItem($clone->id, $lineItem->purchasableId, $lineItem->getOptions(), $lineItem->qty, $lineItem->note, $clone);
-		}
-		$clone->setLineItems($lineItems);
-
-		Craft::$app->elements->saveElement($clone);
-
-		return $clone;
+		return $order->saveRecurringOrdersRecord();
 
 	}
 
 	/**
 	 * @param Order $parentOrder
 	 *
-	 * @return true
-	 *
-	 * @throws Exception
-	 * @throws \Exception from `processOrderRecurrenceError()`
-	 *
+	 * @return true Because I was young and foolish.
 	 * @todo Remove return value.
+	 *
+	 * @throws \Exception from `processOrderRecurrenceError()`
 	 */
 	public function processOrderRecurrence(Order $parentOrder)
 	{
@@ -485,9 +380,6 @@ class Orders extends Component
 	}
 
 	/**
-	 * @param Order $parentOrder
-	 * @param string $errorReason
-	 *
 	 * @throws \Exception
 	 */
 	public function processOrderRecurrenceError(Order $parentOrder, string $errorReason)
@@ -510,15 +402,92 @@ class Orders extends Component
 	}
 
 	/**
-	 * @param Order $order
+	 * @return bool Because I was young and foolish.
+	 * @todo Remove boolean return
 	 *
-	 * @return array
-	 *
-	 * @throws \yii\base\InvalidConfigException
+	 * @throws Exception from `saveElement()`
+	 * @throws \Throwable from `markAsComplete()`
+	 * @throws \craft\commerce\errors\OrderStatusException from `markAsComplete()`
+	 * @throws \craft\errors\ElementNotFoundException from `markAsComplete()`
 	 */
-	public function getPaymentSourceFormOptionsByOrder(Order $order)
+	public function replicateAsRecurring(Order $order)
 	{
-		return PaymentSourcesHelper::getPaymentSourceFormOptionsByOrder($order);
+
+		$success = true;
+
+		$derivedOrders = $this->_prepareDerivedOrders($order);
+
+		foreach ($derivedOrders as $derivedOrder)
+		{
+			$success = $success && Craft::$app->getElements()->saveElement($derivedOrder);
+			$success = $success && $derivedOrder->markAsComplete();
+		}
+
+		// Raising the 'afterCompleteDerivedOrders' event
+		$event = new DerivedOrdersEvent([
+			'originatingOrder' => $order,
+			'derivedOrders' => $derivedOrders,
+		]);
+		if ($this->hasEventHandlers(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS)) {
+			$this->trigger(self::EVENT_AFTER_COMPLETE_DERIVED_ORDERS, $event);
+		}
+
+		return $success;
+
+	}
+
+	/**
+	 * @return Order[]
+	 */
+	private function _prepareDerivedOrders(Order $originatingOrder): array
+	{
+
+		/** @var RecurringOrder $originatingOrder **/
+
+		$derivedOrders = [];
+
+		$spec = $originatingOrder->getSpec();
+
+		if (!$spec->isEmpty())
+		{
+
+			/** @var RecurringOrder $newOrder */
+			$newOrder = $this->getLightClone($originatingOrder);
+
+			$newOrder->setOriginatingOrderId($originatingOrder->id);
+
+			$newOrder->setRecurrenceStatus($spec->getStatus() ?: RecurringOrderRecord::STATUS_ACTIVE);
+			$newOrder->setRecurrenceInterval($spec->getRecurrenceInterval());
+			$newOrder->setRecurrencePaymentSourceId($spec->getRecurrencePaymentSourceId());
+
+			try
+			{
+				$newOrder->setNextRecurrence($spec->getNextRecurrence());
+				if (!$newOrder->getNextRecurrence())
+				{
+					$newOrder->resetNextRecurrence();
+				}
+			}
+			catch (\Exception $e)
+			{
+				RecurringOrders::error($e->getMessage());
+			}
+
+			$derivedOrders = [$newOrder];
+
+		}
+
+		// Raising the 'afterPrepareDerivedOrders' event
+		$event = new DerivedOrdersEvent([
+			'originatingOrder' => $originatingOrder,
+			'derivedOrders' => $derivedOrders,
+		]);
+		if ($this->hasEventHandlers(self::EVENT_AFTER_PREPARE_DERIVED_ORDERS)) {
+			$this->trigger(self::EVENT_AFTER_PREPARE_DERIVED_ORDERS, $event);
+		}
+
+		return $event->derivedOrders;
+
 	}
 
 }
