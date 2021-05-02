@@ -16,6 +16,7 @@ use yii\base\Exception;
  * @property \DateTime $nextRecurrence
  * @property \DateTime $dateMarkedImminent
  * @property int $paymentSourceId
+ * @property string|null $note
  * @property mixed $spec
  * @property mixed $originatingOrderId
  * @property mixed $parentOrderId
@@ -116,6 +117,7 @@ class RecurringOrderRecord extends BaseRecord
 			'status',
 			'errorReason',
 			'errorCount',
+			'note',
 			'recurrenceInterval',
 		]));
 		if ($saved = parent::save($runValidation, $attributeNames))
@@ -127,6 +129,7 @@ class RecurringOrderRecord extends BaseRecord
 					'status' => $this->status,
 					'errorReason' => $this->errorReason,
 					'errorCount' => $this->errorCount,
+					'note' => $this->note,
 					'recurrenceInterval' => $this->recurrenceInterval,
 					'updatedByUserId' => Craft::$app->getUser()->id,
 				]);

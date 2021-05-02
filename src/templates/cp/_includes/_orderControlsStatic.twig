@@ -162,6 +162,24 @@
 
         {# TODO: Show payment source? #}
 
+        <div id="recurringOrder-note" class="field">
+            <div class="heading">
+                <label for="recurringOrder-note" class="">
+                    {# TODO: Translate. #}
+                    {{ recurringOrders.t("Note") }}
+                </label>
+            </div>
+            <div class="input">
+                <span>
+                    {% if order.getRecurrenceNote %}
+                        {{ order.getRecurrenceNote | nl2br }}
+                    {% else %}
+                        &mdash;
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
     {% else %}
 
         <div id="recurringOrder-status" class="field">

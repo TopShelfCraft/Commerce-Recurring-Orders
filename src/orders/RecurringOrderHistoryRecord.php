@@ -11,6 +11,7 @@ use beSteadfast\RecurringOrders\base\BaseRecord;
  * @property string $status
  * @property string $errorReason
  * @property int $errorCount
+ * @property string|null $note
  * @property string $recurrenceInterval
  * @property int $updatedByUserId
  */

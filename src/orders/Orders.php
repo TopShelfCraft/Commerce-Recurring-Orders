@@ -425,6 +425,11 @@ class Orders extends Component
 			$order->setRecurrencePaymentSourceId($paymentSourceId ?: null);
 		}
 
+		if ($note = $request->getParam('recurringOrder.note'))
+		{
+			$order->setRecurrenceNote($note);
+		}
+
 		// Spec fields
 
 		if ($specStatus = $request->getParam('recurringOrder.spec.status'))
@@ -440,6 +445,11 @@ class Orders extends Component
 		if ($specNextRecurrence = $request->getParam('recurringOrder.spec.nextRecurrence'))
 		{
 			$order->getSpec()->setNextRecurrence($specNextRecurrence);
+		}
+
+		if ($specNote = $request->getParam('recurringOrder.spec.note'))
+		{
+			$order->getSpec()->setRecurrenceNote($specNote);
 		}
 
 		if (($specPaymentSourceId = $request->getParam('recurringOrder.spec.paymentSourceId')) !== null)
@@ -472,6 +482,7 @@ class Orders extends Component
 			$newOrder->setRecurrenceStatus($spec->getStatus() ?: RecurringOrderRecord::STATUS_ACTIVE);
 			$newOrder->setRecurrenceInterval($spec->getRecurrenceInterval());
 			$newOrder->setRecurrencePaymentSourceId($spec->getRecurrencePaymentSourceId());
+			$newOrder->setRecurrenceNote($spec->getRecurrenceNote());
 
 			try
 			{

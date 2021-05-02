@@ -25,6 +25,11 @@ class Spec extends Model
 	protected $nextRecurrence;
 
 	/**
+	 * @var string
+	 */
+	protected $note;
+
+	/**
 	 * @var int
 	 */
 	protected $paymentSourceId;
@@ -50,6 +55,7 @@ class Spec extends Model
 			'status' => $this->status,
 			'recurrenceInterval' => $this->recurrenceInterval,
 			'nextRecurrence' => $this->nextRecurrence ? Db::prepareDateForDb($this->nextRecurrence) : null,
+			'note' => $this->note,
 			'paymentSourceId' => $this->paymentSourceId,
 		];
 		if (empty(array_filter($attributes)))
@@ -120,6 +126,24 @@ class Spec extends Model
 	{
 		$value = DateTimeHelper::toDateTime($value);
 		$this->nextRecurrence = ($value ?: null);
+	}
+
+	/**
+	 * @return string
+	 *
+	 * @throws \Exception if DateTimeHelper cannot convert the value to a DateTime
+	 */
+	public function getRecurrenceNote()
+	{
+		return $this->note ?: null;
+	}
+
+	/**
+	 * @param $value
+	 */
+	public function setRecurrenceNote($value)
+	{
+		$this->note = (trim($value) ?: null);
 	}
 
 	/**

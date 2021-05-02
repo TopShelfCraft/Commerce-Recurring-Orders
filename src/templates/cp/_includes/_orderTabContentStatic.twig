@@ -130,7 +130,7 @@
 
                         </td>
                         <td>
-                            {% for attribute, value in record.getAttributes(['status', 'errorReason', 'errorCount', 'recurrenceInterval']) if value %}
+                            {% for attribute, value in record.getAttributes(['status', 'errorReason', 'errorCount', 'recurrenceInterval', 'note']) if value %}
                                 <strong>{{ attribute | title }}</strong>: {{ value }}<br>
                             {% endfor %}
                         </td>

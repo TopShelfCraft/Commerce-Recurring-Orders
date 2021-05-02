@@ -171,6 +171,24 @@
 
         {# TODO: Show payment source? #}
 
+        <div id="recurringOrder-note" class="field">
+            <div class="heading">
+                <label for="recurringOrder-note" class="">
+                    {# TODO: Translate. #}
+                    {{ recurringOrders.t("Note") }}
+                </label>
+            </div>
+            <div class="input">
+                <span>
+                    {% include '_includes/forms/textarea' with {
+                        id: 'recurringOrder-note',
+                        name: 'recurringOrder[note]',
+                        value: order.getRecurrenceNote(),
+                    } %}
+                </span>
+            </div>
+        </div>
+
     {% else %}
 
         <div id="recurringOrder-status" class="field">

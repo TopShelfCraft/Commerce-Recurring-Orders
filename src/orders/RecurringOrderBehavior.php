@@ -19,7 +19,8 @@ use yii\base\Event;
  * @property \DateTime|null $lastRecurrence
  * @property \DateTime|null $nextRecurrence
  * @property \DateTime|null $dateMarkedImminent
- * @property int|null $paymentSourceId
+ * @property int|null $recurrencePaymentSourceId
+ * @property string|null $note
  * @property mixed $spec
  * @property string|null $originatingOrderId
  * @property string|null $parentOrderId
@@ -347,6 +348,22 @@ class RecurringOrderBehavior extends Behavior
 	public function setRecurrencePaymentSourceId($value)
 	{
 		$this->_getOrMakeRecord()->paymentSourceId = ((int)$value ?: null);
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getRecurrenceNote()
+	{
+		return $this->_getRecord() ? $this->_getRecord()->note : null;
+	}
+
+	/**
+	 * @param $value
+	 */
+	public function setRecurrenceNote($value)
+	{
+		$this->_getOrMakeRecord()->note = (trim($value) ?: null);
 	}
 
 	/**
