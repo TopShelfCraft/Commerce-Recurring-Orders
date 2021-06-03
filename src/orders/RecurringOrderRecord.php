@@ -112,14 +112,18 @@ class RecurringOrderRecord extends BaseRecord
 		/*
 		 * We're doing this inside of save() rather than afterSave() because save() resets dirty attributes status.
 		 */
-		$isDirty = !empty($this->getDirtyAttributes([
+
+		$dirties = $this->getDirtyAttributes([
 			'orderId',
 			'status',
 			'errorReason',
 			'errorCount',
 			'note',
 			'recurrenceInterval',
-		]));
+		]);
+
+		$isDirty = !empty($dirties);
+
 		if ($saved = parent::save($runValidation, $attributeNames))
 		{
 			if ($isDirty)
@@ -132,6 +136,7 @@ class RecurringOrderRecord extends BaseRecord
 					'note' => $this->note,
 					'recurrenceInterval' => $this->recurrenceInterval,
 					'updatedByUserId' => Craft::$app->getUser()->id,
+					'updatedAttributes' => array_keys($dirties),
 				]);
 				$saved = $saved && $historyRecord->save();
 			}

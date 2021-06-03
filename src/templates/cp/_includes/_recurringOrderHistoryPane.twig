@@ -1,0 +1,35 @@
+{% set recurringOrderHistory = recurringOrderHistory ?? [] %}
+
+<div class="pane">
+
+    {# TODO: Translate. #}
+    <h3>Recurring Order History</h3>
+
+    <table>
+        {% for record in recurringOrderHistory %}
+            <tr>
+                <td>
+                    {{ record.dateCreated | date }}
+                </td>
+                <td>
+                    {% if record.updatedByUserId %}
+                        {% set updatedByUser = craft.app.users.getUserById(record.updatedByUserId) %}
+                        {% if updatedByUser %}
+                            <a href="{{ updatedByUser.cpEditUrl }}">{{ updatedByUser.friendlyName }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                </td>
+                <td>
+                    {% for attribute, value in record.getAttributes(['status', 'errorReason', 'errorCount', 'recurrenceInterval', 'note']) if value and (attribute in record.updatedAttributes) %}
+                        <strong>{{ attribute | title }}</strong>: {{ value }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            <p>
+
+            </p>
+        {% endfor %}
+    </table>
+
+</div>

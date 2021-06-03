@@ -52,7 +52,7 @@ class RecurringOrders extends Plugin
 	/**
 	 * @var string
 	 */
-	public $schemaVersion = '0.0.48.0';
+	public $schemaVersion = '0.0.49.0';
 
 
 	/*

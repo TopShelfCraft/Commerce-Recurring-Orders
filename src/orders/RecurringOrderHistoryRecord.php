@@ -14,6 +14,7 @@ use beSteadfast\RecurringOrders\base\BaseRecord;
  * @property string|null $note
  * @property string $recurrenceInterval
  * @property int $updatedByUserId
+ * @property string $updatedAttributes
  */
 class RecurringOrderHistoryRecord extends BaseRecord
 {
