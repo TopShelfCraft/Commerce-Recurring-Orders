@@ -22,11 +22,11 @@
     ],
 } %}
 
-<div class="meta">
+<h3 class="order-title" style="margin: 0 0 8px;">
+    {{ recurringOrders.t("Recurring Order") }}
+</h3>
 
-    <h3 class="order-title">
-        {{ recurringOrders.t("Recurring Order") }}
-    </h3>
+<div class="meta">
 
     {% if order.originatingOrderId %}
 
@@ -47,6 +47,7 @@
 
     {% if order.hasRecurrenceStatus %}
 
+        {# TODO: In dynamic fields view, show status field as a dropdown, and hide the action buttons. #}
         <div id="recurringOrder-status" class="field">
             <div class="heading">
                 <label for="recurringOrder-status">
