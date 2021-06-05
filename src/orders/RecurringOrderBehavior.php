@@ -158,7 +158,7 @@ class RecurringOrderBehavior extends Behavior
 	 * @todo If the record is completely empty, perhaps we should delete it from the db to keep things tidy?
 	 * @todo Should probably throw exception rather than returning boolean (despite Yii returning a success boolean)
 	 */
-	public function saveRecurringOrdersRecord(?array $attributes): bool
+	public function saveRecurringOrdersRecord(array $attributes = null): bool
 	{
 
 		if (!$this->_record && !$this->_spec && empty($attributes))
