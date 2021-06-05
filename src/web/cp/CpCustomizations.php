@@ -272,51 +272,14 @@ class CpCustomizations extends Component
 	}
 
 	/**
-	 * Adds a Recurring Orders tab on the Users edit screen.
-	 *
-	 * @param array $context
-	 *
-	 * @return string
-	 *
-	 * @throws Exception
 	 * @throws \Twig\Error\LoaderError
 	 * @throws \Twig\Error\RuntimeError
 	 * @throws \Twig\Error\SyntaxError
 	 */
-	public static function cpCommerceOrderEditHook(array &$context)
+	public static function cpCommerceOrderEditHook(array &$context): string
 	{
-
-		$context['tabs']['recurringOrdersTab'] = [
-			'label' => RecurringOrders::t('Recurring Orders'),
-			'url' => '#recurringOrdersTab',
-			'class' => 'custom-tab',
-		];
-
-		$context['tabs']['static-recurringOrdersTab'] = [
-			'label' => RecurringOrders::t('Recurring Orders'),
-			'url' => '#static-recurringOrdersTab',
-			'class' => 'custom-tab static',
-		];
-
 		// Add supplemental info to Order screen titles
 		return Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit', $context);
-
-	}
-
-	/**
-	 * Renders the content for the Recurring Orders tab on the Order edit screen.
-	 * @param array $context
-	 *
-	 * @return string
-	 *
-	 * @throws Exception
-	 * @throws \Twig\Error\LoaderError
-	 * @throws \Twig\Error\RuntimeError
-	 * @throws \Twig\Error\SyntaxError
-	 */
-	public static function cpCommerceOrderEditMainPaneHook(array &$context)
-	{
-		return Craft::$app->view->renderTemplate('recurring-orders/cp/_hooks/cp.commerce.order.edit.main-pane', $context);
 	}
 
 	/**

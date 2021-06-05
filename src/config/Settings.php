@@ -29,6 +29,11 @@ class Settings extends Model
 	/**
 	 * @var bool
 	 */
+	public $hideRecurrenceControlsForNonRecurringOrders = false;
+
+	/**
+	 * @var bool
+	 */
 	public $hideRecurrenceControlsForOriginatingOrders = true;
 
 	/**

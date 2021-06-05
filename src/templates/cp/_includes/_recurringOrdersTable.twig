@@ -1,52 +1,44 @@
 {#
-
 This template expects:
  - `orders`
-
 #}
 
-{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+<div>
+    <table class="data fullwidth">
 
-{% do view.registerTranslations('commerce', [
-    'No orders exist.',
-    'Order Date',
-    'Order',
-    'Status',
-    'Search orders',
-    'Total',
-]) %}
+        <thead>
+        <tr>
+            <th>{{ "Reference" | t('commerce') }}</th>
+            <th>{{ "Recurrence Status" | t('recurring-orders') }}</th>
+            <th>{{ "Total" | t('commerce') }}</th>
+            <th>{{ "Order Date" | t('commerce') }}</th>
+        </tr>
+        </thead>
 
-{% do view.registerTranslations('recurring-orders', [
-    'Recurrence Status',
-    'Next Recurrence',
-    'Last Recurrence',
-]) %}
+        <tbody>
 
-{% set tableData = [] %}
-{% for order in orders %}
-    {% set status %}{% include 'recurring-orders/cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}{% endset %}
-    {% set tableData = tableData|merge([{
-        title: order.reference,
-        url: order.getCpEditUrl(),
-        recurrenceStatus: status,
-        total: order.totalPrice|currency(order.currency),
-        date: order.dateOrdered|datetime('short'),
-    }]) %}
-{% endfor %}
+        {% for order in orders %}
 
-{% js %}
-var columns = [
-    { name: '__slot:title', title: Craft.escapeHtml(Craft.t('commerce', 'Reference')) },
-    { name: 'recurrenceStatus', title: Craft.escapeHtml(Craft.t('recurring-orders', 'Recurrence Status')) },
-    { name: 'total', title: Craft.escapeHtml(Craft.t('commerce', 'Total')) },
-    { name: 'date', title: Craft.escapeHtml(Craft.t('commerce', 'Date Ordered')) }
-];
+            <tr>
+                <td>
+                    <a href="{{ order.getCpEditUrl() }}" class="cell-bold">{{ order.reference }}</a>
+                </td>
+                <td>
+                    {% include 'recurring-orders/cp/_includes/_statusLabel' with {
+                        status: order.recurrenceStatus
+                    } only %}
+                </td>
+                <td>
+                    {{ order.totalPrice | currency(order.currency) }}
+                </td>
+                <td>
+                    {{ order.dateOrdered|datetime('short') }}
+                </td>
+            </tr>
 
-new Craft.VueAdminTable({
-    columns: columns,
-    container: '#recurring-orders-derived-orders-vue-admin-table',
-    tableData: {{ tableData|json_encode|raw }}
-});
-{% endjs %}
+        {% endfor %}
 
-<div id="recurring-orders-derived-orders-vue-admin-table"></div>
+        </tbody>
+
+    </table>
+</div>

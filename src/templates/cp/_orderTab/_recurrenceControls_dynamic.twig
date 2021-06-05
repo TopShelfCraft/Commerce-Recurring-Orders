@@ -1,5 +1,8 @@
 {% import "_includes/forms" as forms %}
 
+{% set recurringOrders = craft.app.getModule('recurring-orders') %}
+{% set settings = recurringOrders.getSettings() %}
+
 {% set statusButtons = {
     'active': [
         { label: 'Cancel', action: 'recurring-orders/orders/cancel-recurring-order', },
@@ -22,10 +25,7 @@
     ],
 } %}
 
-<h3 class="order-title" style="margin: 0 0 8px;">
-    {{ recurringOrders.t("Recurring Order") }}
-</h3>
-
+<div class="pane" style="padding: 0;">
 <div class="meta">
 
     {% if order.originatingOrderId %}
@@ -47,17 +47,18 @@
 
     {% if order.hasRecurrenceStatus %}
 
+        {# TODO: In dynamic fields view, show status field as a dropdown, and hide the action buttons. #}
         <div id="recurringOrder-status" class="field">
             <div class="heading">
                 <label for="recurringOrder-status">
-                    {{ recurringOrders.t("Status") }}
+                    {{ "Status" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input ltr">
                 {% include 'recurring-orders/cp/_includes/_statusLabel' with {status: order.recurrenceStatus} %}
                 {% for button in statusButtons[order.recurrenceStatus] %}
                     <a class="small btn right edit _ formsubmit" data-action="{{ button.action }}" data-param="id" data-value="{{ order.id }}" style="margin:2px">
-                        {{ recurringOrders.t(button.label) }}
+                        {{ button.label | t('recurring-orders') }}
                     </a>
                 {% endfor %}
             </div>
@@ -68,7 +69,7 @@
             <div id="recurringOrder-errorReason" class="field">
                 <div class="heading">
                     <label for="recurringOrder-errorReason" class="">
-                        {{ recurringOrders.t("Error Reason") }}
+                        {{ "Error Reason" | t('recurring-orders') }}
                     </label>
                 </div>
                 <div class="input">
@@ -77,14 +78,10 @@
                 </div>
             </div>
 
-        {% endif %}
-
-        {% if order.recurrenceErrorCount %}
-
             <div id="recurringOrder-errorReason" class="field">
                 <div class="heading">
                     <label for="recurringOrder-errorReason" class="">
-                        {{ recurringOrders.t("Error Count") }}
+                        {{ "Error Count" | t('recurring-orders') }}
                     </label>
                 </div>
                 <div class="input">
@@ -97,18 +94,33 @@
         <div id="recurringOrder-recurrenceInterval" class="field">
             <div class="heading">
                 <label for="recurringOrder-recurrenceInterval" class="">
-                    {{ recurringOrders.t("Recurrence Interval") }}
+                    {{ "Recurrence Interval" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input">
-                {{ order.getRecurrenceInterval() }}
+                <span>
+                {% if settings.recurrenceIntervalOptions is not empty %}
+                    {% include '_includes/forms/select' with {
+                        id: 'recurringOrder-recurrenceInterval',
+                        name: 'recurringOrder[recurrenceInterval]',
+                        value: order.getRecurrenceInterval(),
+                        options: settings.getRecurrenceIntervalOptions(),
+                    } %}
+                {% else %}
+                    {% include '_includes/forms/text' with {
+                        id: 'recurringOrder-recurrenceInterval',
+                        name: 'recurringOrder[recurrenceInterval]',
+                        value: order.getRecurrenceInterval(),
+                    } %}
+                {% endif %}
+                </span>
             </div>
         </div>
 
         <div id="recurringOrder-lastRecurrence" class="field">
             <div class="heading">
                 <label for="recurringOrder-lastRecurrence" class="">
-                    {{ recurringOrders.t("Last Recurrence") }}
+                    {{ "Last Recurrence" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input">
@@ -123,22 +135,19 @@
         <div id="recurringOrder-nextRecurrence" class="field">
             <div class="heading">
                 <label for="recurringOrder-nextRecurrence" class="">
-                    {{ recurringOrders.t("Next Recurrence") }}
+                    {{ "Next Recurrence" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input">
-
-                {% if order.nextRecurrence %}
-                    {{ order.nextRecurrence | datetime('short') }}
-                {% else %}
-                    &mdash;
-                {% endif %}
-
-                {# TODO: canProcessOrderRecurrenceManually config #}
-                <a class="small btn right edit _ formsubmit" data-action="recurring-orders/orders/process-order-recurrence" data-confirm="Are you sure you want to immediately process this Order recurrence?" data-param="id" data-value="{{ order.id }}" style="margin:2px">
-                    {{ recurringOrders.t("Process Now") }}
-                </a>
-
+                <div id="floatingDateTimeFieldWrapper" style="display: inline-block; float: left;">
+                    {{ forms.dateTimeField({
+                        id: 'recurringOrder-nextRecurrence',
+                        name: 'recurringOrder[nextRecurrence]',
+                        value: order.nextRecurrence,
+                        errors: order.getErrors('nextRecurrence'),
+                        disabled: false,
+                    }) }}
+                </div>
             </div>
         </div>
 
@@ -146,16 +155,17 @@
             <div class="heading">
                 <label for="recurringOrder-paymentSourceId" class="">
                     {# TODO: Translate. #}
-                    {{ recurringOrders.t("Payment Source") }}
+                    {{ "Payment Source" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input">
                 <span>
-                    {% if order.getRecurrencePaymentSource %}
-                        {{ order.getRecurrencePaymentSource.description }}
-                    {% else %}
-                        &mdash;
-                    {% endif %}
+                    {% include '_includes/forms/select' with {
+                        id: 'recurringOrder-paymentSourceId',
+                        name: 'recurringOrder[paymentSourceId]',
+                        value: order.getRecurrencePaymentSourceId(),
+                        options: recurringOrders.orders.getPaymentSourceFormOptionsByOrder(order),
+                    } %}
                 </span>
             </div>
         </div>
@@ -166,16 +176,16 @@
             <div class="heading">
                 <label for="recurringOrder-note" class="">
                     {# TODO: Translate. #}
-                    {{ recurringOrders.t("Note") }}
+                    {{ "Note" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input">
                 <span>
-                    {% if order.getRecurrenceNote %}
-                        {{ order.getRecurrenceNote | nl2br }}
-                    {% else %}
-                        &mdash;
-                    {% endif %}
+                    {% include '_includes/forms/textarea' with {
+                        id: 'recurringOrder-note',
+                        name: 'recurringOrder[note]',
+                        value: order.getRecurrenceNote(),
+                    } %}
                 </span>
             </div>
         </div>
@@ -185,26 +195,17 @@
         <div id="recurringOrder-status" class="field">
             <div class="heading">
                 <label for="recurringOrder-status">
-                    {{ recurringOrders.t("Status") }}
+                    {{ "Status" | t('recurring-orders') }}
                 </label>
             </div>
             <div class="input ltr">
                 <span class="commerceStatusLabel">
                     {% include 'recurring-orders/cp/_includes/_statusLabel' %}
                 </span>
-                <span class="right">
-                    <a class="small btn edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/replicate-as-recurring', {id: order.id}) }}">
-                        {{ recurringOrders.t("Replicate as Recurring") }}
-                        {# TODO: Translate #}
-                    </a>
-                    <a class="small btn edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/make-order-recurring', {id: order.id }) }}">
-                        {{ recurringOrders.t("Convert to Recurring") }}
-                        {# TODO: Back to "Make Recurring" #}
-                    </a>
-                </span>
             </div>
         </div>
 
     {% endif %}
 
+</div>
 </div>

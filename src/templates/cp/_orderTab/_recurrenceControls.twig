@@ -1,0 +1,25 @@
+{% set order = order ?? element %}
+
+<h3>
+    {{ "Recurring Order" | t('recurring-orders') }}
+</h3>
+
+{# Render these templates in the `cp` template mode so we can take advantage of Craft's form includes, etc. #}
+
+{% if (static ?? false) %}
+
+    {{ craft.app.view.renderTemplate(
+        'recurring-orders/cp/_orderTab/_recurrenceControls_static',
+        { order: order },
+        'cp'
+    ) | raw }}
+
+{% else %}
+
+    {{ craft.app.view.renderTemplate(
+        'recurring-orders/cp/_orderTab/_recurrenceControls_dynamic',
+        {order: order},
+        'cp'
+    ) | raw }}
+
+{% endif %}

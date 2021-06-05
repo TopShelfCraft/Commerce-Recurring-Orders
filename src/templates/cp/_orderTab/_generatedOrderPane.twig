@@ -1,0 +1,22 @@
+{% set order = order ?? element %}
+
+<h3>
+    {{ "Generated Order" | t('recurring-orders') }}
+</h3>
+
+<div class="meta">
+
+    <div id="recurringOrder-parentOrder" class="field">
+        <div class="heading">
+            <label for="recurringOrder-parentOrder">
+                {# TODO: Translate. #}
+                Generated from
+            </label>
+        </div>
+        <div class="input ltr">
+            {# TODO: Add a "Deleted" message/hint? #}
+            {{ (order.parentOrder.getLink ?? order.parentOrderId) | raw }}
+        </div>
+    </div>
+
+</div>

@@ -1,22 +1,26 @@
 <?php
 namespace beSteadfast\RecurringOrders;
 
-use Craft;
-use craft\base\Plugin;
-use craft\commerce\elements\db\OrderQuery;
-use craft\commerce\elements\Order;
-use craft\console\Application as ConsoleApplication;
-use craft\helpers\FileHelper;
-use craft\services\Dashboard;
-use craft\web\Application as WebApplication;
-use craft\web\twig\variables\Cp;
-use craft\web\twig\variables\CraftVariable;
-use topshelfcraft\paymentsourcetools\base\PaymentSourceToolsBase;
 use beSteadfast\RecurringOrders\config\Settings;
 use beSteadfast\RecurringOrders\orders\Orders;
 use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
 use beSteadfast\RecurringOrders\orders\RecurringOrderQueryBehavior;
 use beSteadfast\RecurringOrders\web\cp\CpCustomizations;
+use beSteadfast\RecurringOrders\web\cp\FieldLayoutBehavior;
+use Craft;
+use craft\base\Plugin;
+use craft\commerce\elements\db\OrderQuery;
+use craft\commerce\elements\Order;
+use craft\console\Application as ConsoleApplication;
+use craft\events\RegisterTemplateRootsEvent;
+use craft\helpers\FileHelper;
+use craft\models\FieldLayout;
+use craft\services\Dashboard;
+use craft\web\Application as WebApplication;
+use craft\web\twig\variables\Cp;
+use craft\web\twig\variables\CraftVariable;
+use craft\web\View;
+use topshelfcraft\paymentsourcetools\base\PaymentSourceToolsBase;
 use yii\base\Event;
 
 /**
@@ -67,7 +71,6 @@ class RecurringOrders extends Plugin
 		 * We register our components here, rather than utilizing the "extra" field of our `composer.json`
 		 * because this way, we don't have to re-run Composer every time we add a service or something.
 		 */
-
 		$config['components'] = [
 			'cpCustomizations' => CpCustomizations::class,
 			'orders' => Orders::class,
@@ -90,6 +93,7 @@ class RecurringOrders extends Plugin
 		$this->_registerEventHandlers();
 		$this->_attachVariableGlobal();
 		$this->_registerTemplateHooks();
+		$this->_registerTemplateRoots();
 		$this->_initPaymentSourceTools();
 
 		// Register controllers via namespace map
@@ -184,9 +188,20 @@ class RecurringOrders extends Plugin
 	}
 
 	/**
-	 * Attaches custom behaviors to Order and OrderQuery components
+	 * Attaches custom behaviors to system components.
 	 */
 	private function _attachComponentBehaviors() {
+
+		Event::on(
+			FieldLayout::class,
+			FieldLayout::EVENT_DEFINE_BEHAVIORS,
+			function (Event $event)
+			{
+				/** @var FieldLayout $fieldLayout */
+				$fieldLayout = $event->sender;
+				$fieldLayout->attachBehavior('recurringOrdersFieldLayout', FieldLayoutBehavior::class);
+			}
+		);
 
 		Event::on(
 			Order::class,
@@ -218,12 +233,27 @@ class RecurringOrders extends Plugin
 
 		Craft::$app->view->hook('cp.layouts.base', [CpCustomizations::class, 'cpLayoutsBaseHook']);
 		Craft::$app->view->hook('cp.commerce.order.edit', [CpCustomizations::class, 'cpCommerceOrderEditHook']);
-		Craft::$app->view->hook('cp.commerce.order.edit.main-pane', [CpCustomizations::class, 'cpCommerceOrderEditMainPaneHook']);
 
 		if ($this->getSettings()->showUserRecurringOrdersTab) {
 			Craft::$app->getView()->hook('cp.users.edit', [CpCustomizations::class, 'cpUsersEditHook']);
 			Craft::$app->getView()->hook('cp.users.edit.content', [CpCustomizations::class, 'cpUsersEditContentHook']);
 		}
+
+	}
+
+	/**
+	 * Registers a Site template root, so we can access the plugin templates from the front-end or Field Layout UI.
+	 */
+	private function _registerTemplateRoots()
+	{
+
+		Event::on(
+			View::class,
+			View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
+			function(RegisterTemplateRootsEvent $e) {
+				$e->roots['__recurringOrders'] = Craft::getAlias('@recurring-orders/templates');
+			}
+		);
 
 	}
 

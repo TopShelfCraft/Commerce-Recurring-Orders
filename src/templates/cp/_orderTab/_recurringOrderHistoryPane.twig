@@ -1,12 +1,15 @@
-{% set recurringOrderHistory = recurringOrderHistory ?? [] %}
+{% set order = order ?? element %}
+
+{# TODO: Translate. #}
+<h3>
+    Recurring Order History
+</h3>
 
 <div class="pane">
 
-    {# TODO: Translate. #}
-    <h3>Recurring Order History</h3>
-
     <table>
-        {% for record in recurringOrderHistory %}
+        {# `reverse` to show in descending chronological order. #}
+        {% for record in order.getRecurringOrderHistory() | reverse %}
             <tr>
                 <td>
                     {{ record.dateCreated | date }}
@@ -26,9 +29,6 @@
                     {% endfor %}
                 </td>
             </tr>
-            <p>
-
-            </p>
         {% endfor %}
     </table>
 

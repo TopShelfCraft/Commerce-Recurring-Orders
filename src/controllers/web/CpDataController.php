@@ -15,25 +15,23 @@ class CpDataController extends BaseWebController
 {
 
 	/**
-	 * @return Response
-	 *
 	 * @throws BadRequestHttpException
 	 * @throws InvalidArgumentException
 	 * @throws ForbiddenHttpException
 	 */
 	public function actionUserOrdersTable(): Response
 	{
+
 		$this->requirePermission('commerce-manageOrders');
 		$this->requireAcceptsJson();
 
 		$request = Craft::$app->getRequest();
-		$page = $request->getParam('page', 1);
-		$sort = $request->getParam('sort', null);
-		$limit = $request->getParam('per_page', 10);
-		$search = $request->getParam('search', null);
+		$page = (int) $request->getParam('page', 1);
+		$limit = (int) $request->getParam('per_page', 10);
+		$search = (string) $request->getParam('search', null);
 		$offset = ($page - 1) * $limit;
 
-		$customerId = $request->getQueryParam('customerId', null);
+		$customerId = (int) $request->getQueryParam('customerId', null);
 
 		if (!$customerId) {
 			return $this->asErrorJson(Commerce::t('Customer ID is required.'));
@@ -52,14 +50,6 @@ class CpDataController extends BaseWebController
 
 		if ($search) {
 			$orderQuery->search($search);
-		}
-
-		if ($sort) {
-			list($field, $direction) = explode('|', $sort);
-
-			if ($field && $direction) {
-				$orderQuery->orderBy($field . ' ' . $direction);
-			}
 		}
 
 		$total = $orderQuery->count();
@@ -91,11 +81,10 @@ class CpDataController extends BaseWebController
 			'pagination' => AdminTable::paginationLinks($page, $total, $limit),
 			'data' => $rows,
 		]);
+
 	}
 
 	/**
-	 * @return Response
-	 *
 	 * @throws BadRequestHttpException
 	 * @throws InvalidArgumentException
 	 * @throws ForbiddenHttpException
@@ -107,39 +96,24 @@ class CpDataController extends BaseWebController
 		$this->requireAcceptsJson();
 
 		$request = Craft::$app->getRequest();
-		$page = $request->getParam('page', 1);
-		$sort = $request->getParam('sort', null);
-		$limit = $request->getParam('per_page', 10);
-		$search = $request->getParam('search', null);
+		$page = (int) $request->getParam('page', 1);
+		$limit = (int) $request->getParam('per_page', 10);
+		$search = (string) $request->getParam('search', null);
 		$offset = ($page - 1) * $limit;
 
-		$parentId = $request->getQueryParam('parentId', null);
+		$parentId = (int) $request->getQueryParam('parentId', null);
 
 		if (!$parentId) {
 			return $this->asErrorJson(Commerce::t('Parent Order ID is required.'));
 		}
 
-		$parentOrder = Commerce::getInstance()->getOrders()->getOrderById($parentId);
-
-		if (!$parentOrder) {
-			return $this->asErrorJson(Commerce::t('Unable to retrieve the Parent Order.'));
-		}
-
 		/** @var RecurringOrderQuery $orderQuery */
 		$orderQuery = Order::find()
 			->isCompleted()
-			->parentOrderId($parentOrder->id);
+			->parentOrderId($parentId);
 
 		if ($search) {
 			$orderQuery->search($search);
-		}
-
-		if ($sort) {
-			list($field, $direction) = explode('|', $sort);
-
-			if ($field && $direction) {
-				$orderQuery->orderBy($field . ' ' . $direction);
-			}
 		}
 
 		$total = $orderQuery->count();
@@ -168,6 +142,7 @@ class CpDataController extends BaseWebController
 			'pagination' => AdminTable::paginationLinks($page, $total, $limit),
 			'data' => $rows,
 		]);
+
 	}
 
 }
