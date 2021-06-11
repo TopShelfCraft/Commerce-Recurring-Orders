@@ -202,6 +202,18 @@
                 <span class="commerceStatusLabel">
                     {% include 'recurring-orders/cp/_includes/_statusLabel' %}
                 </span>
+                <span class="right">
+                    {% if order.isCompleted %}
+                        <a class="small btn edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/replicate-as-recurring', {id: order.id}) }}">
+                        {{ "Replicate as Recurring" | t('recurring-orders') }}
+                            {# TODO: Translate #}
+                    </a>
+                    {% endif %}
+                    <a class="small btn edit" style="margin:2px" href="{{ actionUrl('recurring-orders/orders/make-order-recurring', {id: order.id }) }}">
+                        {{ "Convert to Recurring" | t('recurring-orders') }}
+                        {# TODO: Back to "Make Recurring" #}
+                    </a>
+                </span>
             </div>
         </div>
 
