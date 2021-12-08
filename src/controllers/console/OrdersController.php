@@ -3,7 +3,6 @@ namespace beSteadfast\RecurringOrders\controllers\console;
 
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
-use craft\helpers\Db;
 use beSteadfast\RecurringOrders\meta\RecurringOrder;
 use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
 use beSteadfast\RecurringOrders\misc\TimeHelper;
@@ -15,6 +14,28 @@ use yii\console\ExitCode;
  */
 class OrdersController extends BaseConsoleController
 {
+
+	/**
+	 * @todo Should be a pass-through to a service method.
+	 */
+	public function actionListEligibleRecurrences()
+	{
+
+		$query = Order::find();
+		/** @var RecurringOrderQuery $query */
+		$eligibleOrders = $query->isEligibleForRecurrence()->all();
+
+		$this->_writeLine(count($eligibleOrders) . " orders eligible for recurrence:");
+
+		foreach ($eligibleOrders as $order)
+		{
+			/** @var RecurringOrder $order */
+			$this->_writeLine(" - Order {$order->id} (Next recurrence: {$order->nextRecurrence->format(DATE_COOKIE)}");
+		}
+
+		return ExitCode::OK;
+
+	}
 
 	/**
 	 * @param $orderId

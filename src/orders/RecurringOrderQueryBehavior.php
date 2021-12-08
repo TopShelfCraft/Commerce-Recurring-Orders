@@ -394,10 +394,14 @@ class RecurringOrderQueryBehavior extends Behavior
 				Db::parseDateParam('recurringOrders.retryDate', '<'.TimeHelper::now()->getTimestamp()),
 			]);
 
-			// If we have configured a max error count, only select orders where the Error Count is less than the limit.
+			// If we have configured a max error count, only select orders where the Error Count is null or less than the limit.
 			if ($errorLimit = (int) RecurringOrders::getInstance()->getSettings()->maxRecurrenceErrorCount)
 			{
-				$orderQuery->subQuery->andWhere(Db::parseParam('recurringOrders.errorCount', $errorLimit, '<'));
+				$orderQuery->subQuery->andWhere([
+					'or',
+					['is', '[[recurringOrders.errorCount]]', null],
+					Db::parseParam('recurringOrders.errorCount', $errorLimit, '<')
+				]);
 			}
 
 		}
