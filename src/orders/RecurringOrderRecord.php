@@ -36,7 +36,6 @@ class RecurringOrderRecord extends BaseRecord
 	const ERROR_DISCOUNT_UNAVAILABLE = 'discountUnavailable';
 	const ERROR_NO_PAYMENT_SOURCE = 'noPaymentSource';
 	const ERROR_PAYMENT_ISSUE = 'paymentIssue';
-	const ERROR_PAYMENT_SOURCE_EXPIRED = 'paymentSourceExpired';
 	const ERROR_PRODUCT_UNAVAILABLE = 'productUnavailable';
 	const ERROR_UNKNOWN = 'unknown';
 

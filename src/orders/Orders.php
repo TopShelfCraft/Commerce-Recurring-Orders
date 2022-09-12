@@ -317,9 +317,14 @@ class Orders extends Component
 		 * Process success!
 		 */
 
+		$parentStatus = (
+			$parentOrder->getRecurrenceStatus() == RecurringOrderRecord::STATUS_ERROR
+				? RecurringOrderRecord::STATUS_ACTIVE
+				: $parentOrder->getRecurrenceStatus()
+		);
+
 		$this->makeOrderRecurring($parentOrder, [
-			// TODO: Should we be resetting to Active every time? Or only if it was previously in error status?
-			'status' => RecurringOrderRecord::STATUS_ACTIVE,
+			'status' => $parentStatus,
 			'errorReason' => null,
 			'errorCount' => null,
 			'retryDate' => null,

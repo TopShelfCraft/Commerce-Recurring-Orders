@@ -1,8 +1,12 @@
 <?php
 namespace beSteadfast\RecurringOrders\orders;
 
+use craft\commerce\elements\Order;
 use yii\base\Event;
 
+/**
+ * @property Order $sender
+ */
 class RecurrenceStatusChangeEvent extends Event
 {
 
