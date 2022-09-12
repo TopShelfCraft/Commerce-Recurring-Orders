@@ -20,7 +20,7 @@ use craft\web\Application as WebApplication;
 use craft\web\twig\variables\Cp;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
-use topshelfcraft\paymentsourcetools\base\PaymentSourceToolsBase;
+use TopShelfCraft\PaymentSourceTools\PaymentSourceTools;
 use yii\base\Event;
 
 /**
@@ -361,8 +361,8 @@ class RecurringOrders extends Plugin
 	{
 		if ($this->getSettings()->showUserPaymentSourcesTab)
 		{
-			PaymentSourceToolsBase::registerModule();
-			PaymentSourceToolsBase::getInstance()->getSettings()->addPaymentSourcesUserTab = true;
+			PaymentSourceTools::registerModule();
+			PaymentSourceTools::getInstance()->getSettings()->addPaymentSourcesUserTab = true;
 		}
 	}
 
