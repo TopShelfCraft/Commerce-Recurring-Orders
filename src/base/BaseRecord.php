@@ -1,5 +1,5 @@
 <?php
-namespace beSteadfast\RecurringOrders\base;
+namespace TopShelfCraft\RecurringOrders\base;
 
 use craft\db\ActiveRecord;
 use craft\helpers\DateTimeHelper;

@@ -1,13 +1,13 @@
 <?php
-namespace beSteadfast\RecurringOrders\controllers\web;
+namespace TopShelfCraft\RecurringOrders\controllers\web;
 
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\StringHelper;
-use beSteadfast\RecurringOrders\meta\RecurringOrder;
-use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
-use beSteadfast\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\meta\RecurringOrder;
+use TopShelfCraft\RecurringOrders\orders\RecurringOrderRecord;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 

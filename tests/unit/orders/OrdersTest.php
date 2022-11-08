@@ -1,5 +1,5 @@
 <?php
-namespace beSteadfast\test\orders;
+namespace TopShelfCraft\test\orders;
 
 use Craft;
 use Codeception\Test\Unit;
@@ -8,7 +8,7 @@ use craft\commerce\elements\Product;
 use craft\commerce\models\Customer;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\test\fixtures\elements\ProductFixture;
-use beSteadfast\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
 use UnitTester;
 
 class OrdersTest extends Unit

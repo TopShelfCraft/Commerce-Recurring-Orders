@@ -1,5 +1,5 @@
 <?php
-namespace beSteadfast\RecurringOrders\misc;
+namespace TopShelfCraft\RecurringOrders\misc;
 
 use Craft;
 use craft\helpers\ConfigHelper;

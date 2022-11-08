@@ -1,13 +1,13 @@
 <?php
-namespace beSteadfast\RecurringOrders\web\cp;
+namespace TopShelfCraft\RecurringOrders\web\cp;
 
-use beSteadfast\RecurringOrders\meta\RecurringOrder;
-use beSteadfast\RecurringOrders\RecurringOrders;
-use beSteadfast\RecurringOrders\web\widgets\CountGeneratedOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\CountRecurringOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\RecentGeneratedOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\RecentRecurringOrdersWidget;
-use beSteadfast\RecurringOrders\web\widgets\CountOrdersWithUpcomingRecurrencesWidget;
+use TopShelfCraft\RecurringOrders\meta\RecurringOrder;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\web\widgets\CountGeneratedOrdersWidget;
+use TopShelfCraft\RecurringOrders\web\widgets\CountRecurringOrdersWidget;
+use TopShelfCraft\RecurringOrders\web\widgets\RecentGeneratedOrdersWidget;
+use TopShelfCraft\RecurringOrders\web\widgets\RecentRecurringOrdersWidget;
+use TopShelfCraft\RecurringOrders\web\widgets\CountOrdersWithUpcomingRecurrencesWidget;
 use Craft;
 use craft\base\Component;
 use craft\commerce\Plugin as Commerce;

@@ -1,5 +1,5 @@
 <?php
-namespace beSteadfast\RecurringOrders\config;
+namespace TopShelfCraft\RecurringOrders\config;
 
 use craft\base\Model;
 

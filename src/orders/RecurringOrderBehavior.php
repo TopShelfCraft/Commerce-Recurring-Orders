@@ -1,9 +1,9 @@
 <?php
-namespace beSteadfast\RecurringOrders\orders;
+namespace TopShelfCraft\RecurringOrders\orders;
 
-use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
-use beSteadfast\RecurringOrders\misc\TimeHelper;
-use beSteadfast\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\meta\RecurringOrderQuery;
+use TopShelfCraft\RecurringOrders\misc\TimeHelper;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
@@ -39,8 +39,8 @@ class RecurringOrderBehavior extends Behavior
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
-	 * use beSteadfast\RecurringOrders\orders\RecurrenceStatusChangeEvent;
+	 * use TopShelfCraft\RecurringOrders\orders\RecurringOrderBehavior;
+	 * use TopShelfCraft\RecurringOrders\orders\RecurrenceStatusChangeEvent;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_RECURRENCE_STATUS_CHANGE, function(RecurrenceStatusChangeEvent $event) {
 	 *     $oldStatus = $event->oldStatus;
@@ -56,7 +56,7 @@ class RecurringOrderBehavior extends Behavior
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
+	 * use TopShelfCraft\RecurringOrders\orders\RecurringOrderBehavior;
 	 * use craft\events\CancelableEvent;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_BEFORE_MARK_ORDER_IMMINENT, function(CancelableEvent $event) {
@@ -71,7 +71,7 @@ class RecurringOrderBehavior extends Behavior
 	 *
 	 * ```php
 	 * use craft\commerce\elements\Order;
-	 * use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
+	 * use TopShelfCraft\RecurringOrders\orders\RecurringOrderBehavior;
 	 * use yii\base\Event;
 	 *
 	 * Event::on(Order::class, RecurringOrderBehavior::EVENT_ORDER_MARKED_IMMINENT, function(Event $event) {

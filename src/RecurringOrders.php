@@ -1,12 +1,12 @@
 <?php
-namespace beSteadfast\RecurringOrders;
+namespace TopShelfCraft\RecurringOrders;
 
-use beSteadfast\RecurringOrders\config\Settings;
-use beSteadfast\RecurringOrders\orders\Orders;
-use beSteadfast\RecurringOrders\orders\RecurringOrderBehavior;
-use beSteadfast\RecurringOrders\orders\RecurringOrderQueryBehavior;
-use beSteadfast\RecurringOrders\web\cp\CpCustomizations;
-use beSteadfast\RecurringOrders\web\cp\FieldLayoutBehavior;
+use TopShelfCraft\RecurringOrders\config\Settings;
+use TopShelfCraft\RecurringOrders\orders\Orders;
+use TopShelfCraft\RecurringOrders\orders\RecurringOrderBehavior;
+use TopShelfCraft\RecurringOrders\orders\RecurringOrderQueryBehavior;
+use TopShelfCraft\RecurringOrders\web\cp\CpCustomizations;
+use TopShelfCraft\RecurringOrders\web\cp\FieldLayoutBehavior;
 use Craft;
 use craft\base\Plugin;
 use craft\commerce\elements\db\OrderQuery;
@@ -100,11 +100,11 @@ class RecurringOrders extends Plugin
 
 		if (Craft::$app instanceof ConsoleApplication)
 		{
-			$this->controllerNamespace = 'beSteadfast\\RecurringOrders\\controllers\\console';
+			$this->controllerNamespace = 'TopShelfCraft\\RecurringOrders\\controllers\\console';
 		}
 		if (Craft::$app instanceof WebApplication)
 		{
-			$this->controllerNamespace = 'beSteadfast\\RecurringOrders\\controllers\\web';
+			$this->controllerNamespace = 'TopShelfCraft\\RecurringOrders\\controllers\\web';
 		}
 
 	}

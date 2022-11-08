@@ -1,8 +1,8 @@
 <?php
-namespace beSteadfast\RecurringOrders\migrations;
+namespace TopShelfCraft\RecurringOrders\migrations;
 
-use beSteadfast\RecurringOrders\orders\RecurringOrderHistoryRecord;
-use beSteadfast\RecurringOrders\orders\RecurringOrderRecord;
+use TopShelfCraft\RecurringOrders\orders\RecurringOrderHistoryRecord;
+use TopShelfCraft\RecurringOrders\orders\RecurringOrderRecord;
 use craft\db\Migration;
 
 /**

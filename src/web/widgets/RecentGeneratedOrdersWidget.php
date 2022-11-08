@@ -1,8 +1,8 @@
 <?php
-namespace beSteadfast\RecurringOrders\web\widgets;
+namespace TopShelfCraft\RecurringOrders\web\widgets;
 
-use beSteadfast\RecurringOrders\meta\RecurringOrderQuery;
-use beSteadfast\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\meta\RecurringOrderQuery;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;

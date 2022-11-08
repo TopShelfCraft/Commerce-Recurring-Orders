@@ -1,7 +1,7 @@
 <?php
-namespace beSteadfast\recurringorders\web\widgets;
+namespace TopShelfCraft\Recurringorders\web\widgets;
 
-use beSteadfast\RecurringOrders\misc\TimeHelper;
+use TopShelfCraft\RecurringOrders\misc\TimeHelper;
 
 trait DateRangeWidgetTrait
 {

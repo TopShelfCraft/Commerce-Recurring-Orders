@@ -1,5 +1,5 @@
 <?php
-namespace beSteadfast\RecurringOrders\orders;
+namespace TopShelfCraft\RecurringOrders\orders;
 
 use craft\commerce\elements\Order;
 use yii\base\Event;

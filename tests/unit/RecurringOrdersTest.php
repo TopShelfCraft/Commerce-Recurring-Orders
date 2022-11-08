@@ -1,10 +1,10 @@
 <?php
-namespace beSteadfast\test;
+namespace TopShelfCraft\test;
 
 use Codeception\Test\Unit;
-use beSteadfast\RecurringOrders\orders\Orders;
-use beSteadfast\RecurringOrders\RecurringOrders;
-use beSteadfast\RecurringOrders\web\cp\CpCustomizations;
+use TopShelfCraft\RecurringOrders\orders\Orders;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\web\cp\CpCustomizations;
 use UnitTester;
 
 class RecurringOrdersTest extends Unit

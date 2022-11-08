@@ -1,8 +1,8 @@
 <?php
-namespace beSteadfast\RecurringOrders\web\cp;
+namespace TopShelfCraft\RecurringOrders\web\cp;
 
-use beSteadfast\RecurringOrders\meta\RecurringOrder;
-use beSteadfast\RecurringOrders\RecurringOrders;
+use TopShelfCraft\RecurringOrders\meta\RecurringOrder;
+use TopShelfCraft\RecurringOrders\RecurringOrders;
 use craft\commerce\elements\Order;
 use craft\events\CreateFieldLayoutFormEvent;
 use craft\fieldlayoutelements\BaseUiElement;

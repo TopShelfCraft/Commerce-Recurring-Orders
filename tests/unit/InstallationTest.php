@@ -1,5 +1,5 @@
 <?php
-namespace beSteadfast\test;
+namespace TopShelfCraft\test;
 
 use Craft;
 use Codeception\Test\Unit;
